@@ -32,9 +32,16 @@ Register at `/register` — signup creates your user and your organization —
 then add a passkey under Indstillinger → Sikkerhed.
 
 ```bash
-pnpm test        # RLS tenant-isolation suite (the phase-0 acceptance tests)
+pnpm test        # RLS isolation, invoice math/numbering/immutability, flows
 pnpm lint && pnpm typecheck
 ```
+
+What works today: CRM (customers via CVR lookup, contacts, pipeline,
+activity timeline), time tracking with a weekly view, invoicing (drafts
+from unbilled time, gapless numbering, Danish PDF, credit notes, payment
+status) and economy (monthly revenue targets, per-customer frames and
+consumption). Invoicing needs your seller data first: Indstillinger →
+Virksomhed.
 
 Deployment: [docs/deploy.md](docs/deploy.md). Security policy:
 [SECURITY.md](SECURITY.md). License: [AGPL-3.0](LICENSE).
