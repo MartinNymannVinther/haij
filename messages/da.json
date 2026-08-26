@@ -617,7 +617,22 @@
     "principlesTitle": "Sådan bruger Haij AI",
     "principleSovereign": "Kun EU-hostede eller lokale modeller. Udbyderen kan skiftes uden at røre resten af platformen.",
     "principleApproval": "AI sender aldrig noget ud af huset. Alt den udarbejder, kræver din godkendelse først.",
-    "principleUsage": "Første anvendelse bliver signalmotoren i fase 4, der scorer muligheder mod din serviceprofil."
+    "principleUsage": "Første anvendelse bliver signalmotoren i fase 4, der scorer muligheder mod din serviceprofil.",
+    "apiKeys": {
+      "title": "API-nøgler (MCP)",
+      "hint": "Giver AI-assistenter adgang til Haijs data og sikre handlinger. En nøgle handler på dine vegne og kan altid trækkes tilbage. Udstedelse af fakturaer kræver stadig et menneske her i Haij.",
+      "empty": "Ingen nøgler endnu.",
+      "namePlaceholder": "Navn, fx Claude på min Mac",
+      "create": "Opret nøgle",
+      "createdTitle": "Nøglen er oprettet",
+      "createdHint": "Kopiér den nu. Den vises ikke igen, og der gemmes kun et fingeraftryk af den.",
+      "copy": "Kopiér",
+      "copiedToast": "Nøglen er kopieret.",
+      "revoke": "Tilbagekald",
+      "revoked": "Tilbagekaldt",
+      "revokedToast": "Nøglen er tilbagekaldt og virker ikke længere.",
+      "connectHint": "Forbind en assistent, fx Claude Code:"
+    }
   },
   "signals": {
     "title": "Signaler",

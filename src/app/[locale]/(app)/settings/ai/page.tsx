@@ -4,8 +4,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getOrgContext } from "@/core/auth/session";
+import { env } from "@/core/env";
 import { getLlmProvider } from "@/core/llm";
+import { listApiKeys } from "@/modules/mcp/keys";
 import { redirect } from "@/i18n/navigation";
+import { ApiKeysCard } from "./api-keys-card";
 import { TestConnection } from "./test-connection";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -22,6 +25,8 @@ export default async function AiSettingsPage() {
 
   const t = await getTranslations("ai");
   const provider = getLlmProvider();
+  const keys = await listApiKeys(context!);
+  const mcpUrl = `${env.BETTER_AUTH_URL.replace(/\/$/, "")}/api/mcp`;
 
   return (
     <div className="flex max-w-2xl flex-col gap-6">
@@ -69,6 +74,8 @@ export default async function AiSettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      <ApiKeysCard keys={keys} mcpUrl={mcpUrl} />
 
       <Card>
         <CardHeader>

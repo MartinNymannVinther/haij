@@ -617,7 +617,22 @@
     "principlesTitle": "How Haij uses AI",
     "principleSovereign": "EU-hosted or local models only. The provider can be swapped without touching the rest of the platform.",
     "principleApproval": "AI never sends anything out of the house. Everything it drafts requires your approval first.",
-    "principleUsage": "The first use is the phase 4 signals engine, scoring opportunities against your service profile."
+    "principleUsage": "The first use is the phase 4 signals engine, scoring opportunities against your service profile.",
+    "apiKeys": {
+      "title": "API keys (MCP)",
+      "hint": "Give AI assistants access to Haij's data and safe actions. A key acts on your behalf and can always be revoked. Issuing invoices still requires a human here in Haij.",
+      "empty": "No keys yet.",
+      "namePlaceholder": "Name, e.g. Claude on my Mac",
+      "create": "Create key",
+      "createdTitle": "Key created",
+      "createdHint": "Copy it now. It is never shown again; only a fingerprint is stored.",
+      "copy": "Copy",
+      "copiedToast": "Key copied.",
+      "revoke": "Revoke",
+      "revoked": "Revoked",
+      "revokedToast": "The key is revoked and no longer works.",
+      "connectHint": "Connect an assistant, e.g. Claude Code:"
+    }
   },
   "signals": {
     "title": "Signals",

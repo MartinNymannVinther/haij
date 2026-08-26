@@ -739,6 +739,37 @@ export const knowledgeDigests = pgTable(
 );
 
 /**
+ * API keys for the MCP server (phase 5). Only a SHA-256 hash is stored;
+ * the plaintext key is shown exactly once at creation. Each key acts on
+ * behalf of the user who created it, so FKs and the audit trail keep
+ * their meaning when an AI assistant calls in.
+ */
+export const apiKeys = pgTable(
+  "api_keys",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    /** First characters of the key, for recognizing it in the UI. */
+    keyPrefix: text("key_prefix").notNull(),
+    /** sha256 hex of the full key; redacted from the audit trail. */
+    keyHash: text("key_hash").notNull(),
+    createdBy: text("created_by")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("api_keys_hash_uq").on(t.keyHash),
+    index("api_keys_org_idx").on(t.orgId),
+  ],
+);
+
+/**
  * Append-only audit log; one row per mutation (who, what, when, org,
  * before/after). Written by database triggers plus semantic auth events.
  *
