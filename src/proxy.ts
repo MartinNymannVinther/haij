@@ -6,7 +6,6 @@ import { routing } from "./i18n/routing";
 const intlMiddleware = createIntlMiddleware(routing);
 
 const PROTECTED_PREFIXES = ["/dashboard", "/settings", "/onboarding"];
-const AUTH_PAGES = ["/login", "/register"];
 
 /** Pathname with any locale prefix removed, e.g. /en/login → /login. */
 function stripLocale(pathname: string): string {
@@ -28,9 +27,15 @@ function localizedPath(pathname: string, target: string): string {
 }
 
 /**
- * Optimistic auth redirects based on the presence of the session cookie.
+ * Optimistic auth redirect based on the presence of the session cookie.
  * This is UX only — the (app) layout verifies the session for real, and RLS
  * is the actual isolation boundary.
+ *
+ * Deliberately one-directional: users WITHOUT a cookie are kept away from
+ * app pages, but users WITH a cookie are never bounced away from the auth
+ * pages. A stale cookie (expired or revoked session, reset database) would
+ * otherwise loop: proxy pushes /login -> /dashboard on the cookie alone,
+ * while the app layout pushes it back on the real session check.
  */
 export default function proxy(request: NextRequest) {
   const pathname = stripLocale(request.nextUrl.pathname);
@@ -39,13 +44,6 @@ export default function proxy(request: NextRequest) {
   if (!hasSessionCookie && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
     const url = request.nextUrl.clone();
     url.pathname = localizedPath(request.nextUrl.pathname, "/login");
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
-  if (hasSessionCookie && AUTH_PAGES.some((p) => pathname.startsWith(p))) {
-    const url = request.nextUrl.clone();
-    url.pathname = localizedPath(request.nextUrl.pathname, "/dashboard");
     url.search = "";
     return NextResponse.redirect(url);
   }
