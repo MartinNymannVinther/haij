@@ -12,6 +12,7 @@ export type CvrCompany = {
   city: string | null;
   phone: string | null;
   email: string | null;
+  website: string | null;
   industryCode: string | null;
   industryText: string | null;
   companyType: string | null;

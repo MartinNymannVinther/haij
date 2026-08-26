@@ -74,6 +74,7 @@ export class CvrapiDkProvider implements CvrProvider {
       city: asText(payload.city),
       phone: asText(payload.phone),
       email: asText(payload.email),
+      website: null,
       industryCode: asText(payload.industrycode),
       industryText: asText(payload.industrydesc),
       companyType: asText(payload.companydesc),

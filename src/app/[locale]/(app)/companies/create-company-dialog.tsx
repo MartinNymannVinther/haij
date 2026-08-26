@@ -69,7 +69,7 @@ export function CreateCompanyDialog() {
       city: company.city ?? "",
       phone: company.phone ?? "",
       email: company.email ?? "",
-      website: "",
+      website: company.website ?? "",
     });
     setIndustry({ code: company.industryCode, text: company.industryText });
     setCompanyType(company.companyType);

@@ -1,0 +1,45 @@
+{
+  "took": 6,
+  "timed_out": false,
+  "hits": {
+    "total": 1,
+    "max_score": 12.3,
+    "hits": [
+      {
+        "_index": "cvr-permanent-prod",
+        "_type": "virksomhed",
+        "_id": "4000000",
+        "_score": 12.3,
+        "_source": {
+          "Vrvirksomhed": {
+            "cvrNummer": 10150817,
+            "virksomhedMetadata": {
+              "nyesteNavn": { "navn": "ERHVERVSSTYRELSEN" },
+              "nyesteBeliggenhedsadresse": {
+                "conavn": null,
+                "vejnavn": "Langelinie Allé",
+                "husnummerFra": 17,
+                "husnummerTil": null,
+                "bogstavFra": null,
+                "bogstavTil": null,
+                "etage": null,
+                "sidedoer": null,
+                "postnummer": 2100,
+                "postdistrikt": "København Ø"
+              },
+              "nyesteHovedbranche": {
+                "branchekode": 841100,
+                "branchetekst": "Generelle offentlige tjenester"
+              },
+              "nyesteVirksomhedsform": {
+                "kortBeskrivelse": "STAT",
+                "langBeskrivelse": "Statslig administrativ enhed"
+              },
+              "nyesteKontaktoplysninger": ["72200030", "erst@erst.dk", "www.erst.dk"]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
