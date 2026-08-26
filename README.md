@@ -17,7 +17,7 @@ The project constitution — values, architecture and rules — lives in
 
 ## Quickstart
 
-Requirements: Node 22+, pnpm (via `corepack enable`), Docker.
+Requirements: Node 22+, pnpm 10+ (`brew install pnpm`; newer Node builds no longer bundle corepack), Docker.
 
 ```bash
 git clone <repo-url> haij && cd haij
