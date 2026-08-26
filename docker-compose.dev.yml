@@ -1,0 +1,31 @@
+# Development infrastructure for Haij.
+# Runs Postgres 16 only; the app runs on the host via `pnpm dev`.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#   pnpm db:migrate
+#   pnpm dev
+
+services:
+  db:
+    image: postgres:16
+    container_name: haij-dev-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: haij
+      # Runtime role passwords, consumed by docker/postgres-init/01-roles.sh.
+      HAIJ_APP_PASSWORD: ${HAIJ_APP_PASSWORD:-haij_app}
+      HAIJ_AUTH_PASSWORD: ${HAIJ_AUTH_PASSWORD:-haij_auth}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - haij-dev-pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d haij"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  haij-dev-pgdata:
