@@ -48,7 +48,7 @@ describe("VirkCvrProvider", () => {
     await provider.lookup("10150817");
     expect(calls).toHaveLength(1);
     const call = calls[0]!;
-    expect(call.url).toBe("https://distribution.virk.dk/cvr-permanent/virksomhed/_search");
+    expect(call.url).toBe("https://distribution.virk.dk/cvr-permanent/_search");
     const headers = call.init?.headers as Record<string, string>;
     expect(headers.Authorization).toBe(`Basic ${Buffer.from("user:secret").toString("base64")}`);
     const body = JSON.parse(String(call.init?.body));

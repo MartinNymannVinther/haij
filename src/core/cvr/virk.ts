@@ -108,29 +108,36 @@ export class VirkCvrProvider implements CvrProvider {
   async lookup(cvr: string): Promise<CvrLookupResult> {
     let response: Response;
     try {
-      response = await this.fetchFn(
-        "https://distribution.virk.dk/cvr-permanent/virksomhed/_search",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${Buffer.from(`${this.user}:${this.password}`).toString("base64")}`,
-          },
-          body: JSON.stringify({
-            query: { term: { "Vrvirksomhed.cvrNummer": Number(cvr) } },
-            size: 1,
-            _source: ["Vrvirksomhed.cvrNummer", "Vrvirksomhed.virksomhedMetadata"],
-          }),
-          signal: AbortSignal.timeout(10_000),
+      // Typeless endpoint: works on current clusters where the old
+      // /cvr-permanent/virksomhed/_search type path is rejected. The term
+      // query only matches company documents anyway.
+      response = await this.fetchFn("https://distribution.virk.dk/cvr-permanent/_search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${Buffer.from(`${this.user}:${this.password}`).toString("base64")}`,
         },
+        body: JSON.stringify({
+          query: { term: { "Vrvirksomhed.cvrNummer": Number(cvr) } },
+          size: 1,
+          _source: ["Vrvirksomhed.cvrNummer", "Vrvirksomhed.virksomhedMetadata"],
+        }),
+        signal: AbortSignal.timeout(10_000),
+      });
+    } catch (error) {
+      console.error(
+        "cvr: virk lookup network error:",
+        error instanceof Error ? error.message : error,
       );
-    } catch {
       return { status: "unavailable" };
     }
 
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        console.error("cvr: virk rejected the credentials");
+        console.error(`cvr: virk rejected the credentials (HTTP ${response.status})`);
+      } else {
+        const snippet = (await response.text().catch(() => "")).slice(0, 200);
+        console.error(`cvr: virk lookup failed (HTTP ${response.status}): ${snippet}`);
       }
       return { status: "unavailable" };
     }
