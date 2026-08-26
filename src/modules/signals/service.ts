@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { env } from "@/core/env";
 import { sanitizeText } from "@/core/ingest/sanitize";
 import { getLlmProvider } from "@/core/llm";
