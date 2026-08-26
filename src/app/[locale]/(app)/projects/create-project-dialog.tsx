@@ -51,11 +51,14 @@ export function CreateProjectDialog({
 
     const hoursRaw = String(form.get("budgetHours") ?? "").trim();
     const amountRaw = String(form.get("budgetAmount") ?? "").trim();
+    const rateRaw = String(form.get("hourlyRate") ?? "").trim();
     const hoursHundredths = hoursRaw ? parseQuantityToHundredths(hoursRaw) : null;
     const amountOere = amountRaw ? parseKronerToOere(amountRaw) : null;
+    const rateOere = rateRaw ? parseKronerToOere(rateRaw) : null;
     if (
       (hoursRaw && (hoursHundredths === null || hoursHundredths <= 0)) ||
-      (amountRaw && (amountOere === null || amountOere <= 0))
+      (amountRaw && (amountOere === null || amountOere <= 0)) ||
+      (rateRaw && (rateOere === null || rateOere < 0))
     ) {
       toast.error(t("invalidFrames"));
       return;
@@ -69,6 +72,7 @@ export function CreateProjectDialog({
       deadline: String(form.get("deadline") ?? "") || null,
       budgetMinutes: hoursHundredths != null ? Math.round((hoursHundredths * 60) / 100) : null,
       budgetAmountOere: amountOere,
+      hourlyRateOere: rateOere,
     });
     setPending(false);
     if (!result.ok) {
@@ -119,10 +123,19 @@ export function CreateProjectDialog({
             <FieldLabel htmlFor="project-description">{t("description")}</FieldLabel>
             <Textarea id="project-description" name="description" rows={2} maxLength={2000} />
           </Field>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Field>
               <FieldLabel htmlFor="project-deadline">{t("deadline")}</FieldLabel>
               <Input id="project-deadline" name="deadline" type="date" />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="project-hourlyRate">{t("hourlyRate")}</FieldLabel>
+              <Input
+                id="project-hourlyRate"
+                name="hourlyRate"
+                inputMode="decimal"
+                placeholder={t("rateFallback")}
+              />
             </Field>
             <Field>
               <FieldLabel htmlFor="project-budgetHours">{t("hourFrame")}</FieldLabel>

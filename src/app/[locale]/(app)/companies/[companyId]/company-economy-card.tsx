@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   createDraftFromTimeAction,
   setCustomerFrameAction,
+  unbilledSummaryAction,
 } from "@/modules/invoicing/actions";
 import {
   formatOere,
@@ -52,8 +53,11 @@ export function CompanyEconomyCard({
   const tCommon = useTranslations("common");
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [range, setRange] = useState<{ from: string; to: string }>({ from: "", to: "" });
+  const [summary, setSummary] = useState<{ minutes: number; entries: number } | null>(null);
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -93,14 +97,42 @@ export function CompanyEconomyCard({
     router.refresh();
   }
 
+  async function refreshSummary(next: { from: string; to: string }) {
+    const result = await unbilledSummaryAction(companyId, {
+      from: next.from || null,
+      to: next.to || null,
+    });
+    setSummary(result.ok ? result.data : null);
+  }
+
+  function openInvoiceDialog() {
+    const initial = { from: "", to: "" };
+    setRange(initial);
+    setSummary({ minutes: economy.unbilledMinutes, entries: -1 });
+    setInvoiceOpen(true);
+    void refreshSummary(initial);
+  }
+
+  function updateRange(field: "from" | "to") {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      const next = { ...range, [field]: event.target.value };
+      setRange(next);
+      void refreshSummary(next);
+    };
+  }
+
   async function handleCreateInvoice() {
     setCreating(true);
-    const result = await createDraftFromTimeAction(companyId);
+    const result = await createDraftFromTimeAction(companyId, {
+      from: range.from || null,
+      to: range.to || null,
+    });
     setCreating(false);
     if (!result.ok) {
       toast.error(result.error === "noUnbilledTime" ? t("noUnbilledTime") : tCommon("error"));
       return;
     }
+    setInvoiceOpen(false);
     toast.success(t("draftToast"));
     router.push(`/invoices/${result.data.invoiceId}`);
   }
@@ -154,17 +186,56 @@ export function CompanyEconomyCard({
 
         <Button
           className="mt-1"
-          onClick={handleCreateInvoice}
-          disabled={creating || economy.unbilledMinutes === 0}
+          onClick={openInvoiceDialog}
+          disabled={economy.unbilledMinutes === 0}
         >
-          {creating ? (
-            <Loader2 data-slot="icon" className="animate-spin" />
-          ) : (
-            <FilePlus2 data-slot="icon" />
-          )}
+          <FilePlus2 data-slot="icon" />
           {t("createInvoice")}
         </Button>
       </CardContent>
+
+      <Dialog open={invoiceOpen} onOpenChange={setInvoiceOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("invoiceDialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <p className="text-muted-foreground text-sm">{t("invoiceDialogHint")}</p>
+            <div className="grid grid-cols-2 gap-4">
+              <Field>
+                <FieldLabel htmlFor="invoice-from">{t("fromDate")}</FieldLabel>
+                <Input
+                  id="invoice-from"
+                  type="date"
+                  value={range.from}
+                  onChange={updateRange("from")}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="invoice-to">{t("toDate")}</FieldLabel>
+                <Input id="invoice-to" type="date" value={range.to} onChange={updateRange("to")} />
+              </Field>
+            </div>
+            <p className="text-sm font-medium tabular-nums" aria-live="polite">
+              {summary
+                ? t("rangeSummary", { hours: formatMinutes(summary.minutes) })
+                : t("rangeLoading")}
+            </p>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setInvoiceOpen(false)}>
+                {tCommon("cancel")}
+              </Button>
+              <Button
+                onClick={handleCreateInvoice}
+                disabled={creating || !summary || summary.minutes === 0}
+              >
+                {creating ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
+                {t("createDraft")}
+              </Button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">

@@ -127,7 +127,7 @@
       "latestTitle": "Seneste aktivitet",
       "latestEmpty": "Ingen aktivitet endnu.",
       "viewAll": "Se alle kunder",
-      "statOutstanding": "Udestående",
+      "statOutstanding": "Udestående (inkl. moms)",
       "statOverdue": "Heraf forfaldent: {amount}"
     },
     "security": {
@@ -291,7 +291,11 @@
       "addedToast": "Tid registreret",
       "invalidDuration": "Varigheden kunne ikke forstås. Prøv fx 1:30, 1,5 eller 45m.",
       "noProject": "Intet projekt",
-      "project": "Projekt"
+      "project": "Projekt",
+      "task": "Opgave",
+      "noTask": "Ingen opgave",
+      "role": "Rolle",
+      "noRole": "Ingen rolle"
     }
   },
   "orgProfile": {
@@ -310,11 +314,35 @@
     "bankReg": "Reg.nr.",
     "bankKonto": "Kontonr.",
     "paymentTerms": "Betalingsfrist (dage)",
-    "defaultHourlyRate": "Standard timepris (kr.)",
+    "defaultHourlyRate": "Standard timepris i kr. (ekskl. moms)",
     "save": "Gem",
     "savedToast": "Virksomhedsprofilen er gemt.",
     "invalidRate": "Timeprisen kunne ikke læses. Skriv fx 950 eller 950,00.",
-    "invalidForm": "Tjek felterne. CVR skal være 8 cifre."
+    "invalidForm": "Tjek felterne. CVR skal være 8 cifre.",
+    "roles": {
+      "title": "Roller og timepriser",
+      "hint": "Priser i kr. ekskl. moms. En rolle valgt på en tidspost vinder over priser på opgave, projekt og kunde.",
+      "empty": "Ingen roller endnu. Tilføj fx Seniorrådgivning eller Projektledelse.",
+      "namePlaceholder": "Rollenavn…",
+      "ratePlaceholder": "Timepris ekskl. moms",
+      "rateLine": "{rate}/t ekskl. moms",
+      "add": "Tilføj",
+      "invalid": "Tjek navn og pris. Skriv prisen som fx 1.400.",
+      "nameTaken": "Der findes allerede en rolle med det navn.",
+      "deletedToast": "Rollen er slettet. Tidsposter beholder deres timer."
+    },
+    "logo": {
+      "title": "Logo",
+      "hint": "PNG eller JPG, højst 1 MB. Vises øverst på dine faktura-PDF'er.",
+      "upload": "Upload logo",
+      "replace": "Skift logo",
+      "remove": "Fjern logo",
+      "previewAlt": "Virksomhedens logo",
+      "wrongType": "Kun PNG og JPG kan bruges.",
+      "tooBig": "Filen er for stor. Højst 1 MB.",
+      "savedToast": "Logoet er gemt og kommer på fremtidige PDF'er.",
+      "deletedToast": "Logoet er fjernet."
+    }
   },
   "invoicing": {
     "list": {
@@ -328,7 +356,7 @@
       "customer": "Kunde",
       "date": "Dato",
       "due": "Forfald",
-      "amount": "Beløb",
+      "amount": "Beløb (inkl. moms)",
       "statusHead": "Status",
       "draftLabel": "Udkast",
       "creditNote": "Kreditnota"
@@ -385,14 +413,14 @@
       "lineDescription": "Beskrivelse",
       "lineQuantity": "Antal",
       "lineUnit": "Enhed",
-      "linePrice": "Enhedspris",
-      "linePriceKr": "Enhedspris (kr.)",
-      "lineAmount": "Beløb",
+      "linePrice": "Enhedspris ekskl. moms",
+      "linePriceKr": "Enhedspris i kr. (ekskl. moms)",
+      "lineAmount": "Beløb ekskl. moms",
       "lineVat": "Moms",
       "lineInvalid": "Tjek antal og pris. Skriv fx 1,5 og 950,00.",
       "subtotal": "Subtotal ekskl. moms",
       "vatTotal": "Moms",
-      "grandTotal": "Total"
+      "grandTotal": "Total inkl. moms"
     },
     "detail": {
       "title": "Faktura",
@@ -410,11 +438,11 @@
       "lineDescription": "Beskrivelse",
       "lineQuantity": "Antal",
       "lineUnit": "Enhed",
-      "linePrice": "Enhedspris",
-      "lineAmount": "Beløb",
+      "linePrice": "Enhedspris ekskl. moms",
+      "lineAmount": "Beløb ekskl. moms",
       "subtotal": "Subtotal ekskl. moms",
       "vatTotal": "Moms",
-      "grandTotal": "Total",
+      "grandTotal": "Total inkl. moms",
       "partiesTitle": "Parter",
       "buyer": "Køber",
       "seller": "Sælger",
@@ -434,21 +462,21 @@
     "monthsTitle": "Omsætning pr. måned",
     "yearSummary": "Realiseret {realized} af mål {target}",
     "month": "Måned",
-    "target": "Mål",
-    "realized": "Realiseret",
+    "target": "Mål (ekskl. moms)",
+    "realized": "Realiseret (ekskl. moms)",
     "gap": "Afvigelse",
-    "outstanding": "Udestående",
+    "outstanding": "Udestående (inkl. moms)",
     "setTarget": "Sæt mål",
     "editTarget": "Redigér mål",
-    "invalidTarget": "Beløbet kunne ikke læses. Skriv fx 40.000.",
+    "invalidTarget": "Beløbet kunne ikke læses. Skriv fx 40.000 (ekskl. moms).",
     "customersTitle": "Kundeøkonomi",
     "noCustomers": "Ingen kunder endnu.",
     "customer": "Kunde",
     "tracked": "Registreret tid",
     "unbilled": "Uafregnet",
-    "invoiced": "Faktureret",
-    "paid": "Betalt",
-    "frame": "Aftalt ramme",
+    "invoiced": "Faktureret (ekskl. moms)",
+    "paid": "Betalt (inkl. moms)",
+    "frame": "Aftalt ramme (ekskl. moms)",
     "noFrame": "Ingen ramme",
     "hourFrame": "{used} af {frame}",
     "amountFrame": "{used} af {frame}",
@@ -472,19 +500,26 @@
       "framesTitle": "Timepris og aftalt ramme",
       "rate": "Timepris",
       "rateDefault": "Standard",
-      "rateLabel": "Timepris i kr. (tom bruger standarden)",
+      "rateLabel": "Timepris i kr. ekskl. moms (tom bruger standarden)",
       "hourFrameLabel": "Aftalt ramme i timer (tom for ingen)",
-      "amountFrameLabel": "Aftalt ramme i kr. (tom for ingen)",
+      "amountFrameLabel": "Aftalt ramme i kr. ekskl. moms (tom for ingen)",
       "noFramePlaceholder": "Ingen",
       "unbilled": "Uafregnet tid",
-      "invoiced": "Faktureret",
-      "outstanding": "Udestående",
-      "paid": "Betalt",
+      "invoiced": "Faktureret (ekskl. moms)",
+      "outstanding": "Udestående (inkl. moms)",
+      "paid": "Betalt (inkl. moms)",
       "createInvoice": "Faktura fra uafregnet tid",
       "noUnbilledTime": "Der er ingen uafregnede timer at fakturere.",
       "draftToast": "Fakturaudkast oprettet fra uafregnede timer.",
       "savedToast": "Timepris og ramme er gemt.",
-      "invalid": "Tjek felterne. Skriv beløb som fx 950,00."
+      "invalid": "Tjek felterne. Skriv beløb som fx 950,00.",
+      "invoiceDialogTitle": "Faktura fra uafregnet tid",
+      "invoiceDialogHint": "Vælg en periode, eller lad felterne stå tomme for at tage alle uafregnede timer med.",
+      "fromDate": "Fra dato",
+      "toDate": "Til dato",
+      "rangeSummary": "Valget dækker {hours} uafregnede timer.",
+      "rangeLoading": "Tæller timer…",
+      "createDraft": "Opret udkast"
     }
   },
   "projects": {
@@ -500,7 +535,7 @@
       "taskCount": "{done}/{total}",
       "tracked": "Registreret tid",
       "deadline": "Deadline",
-      "frame": "Aftalt ramme",
+      "frame": "Aftalt ramme (ekskl. moms)",
       "statusHead": "Status"
     },
     "status": {
@@ -516,11 +551,13 @@
       "description": "Beskrivelse",
       "deadline": "Deadline",
       "hourFrame": "Ramme, timer",
-      "amountFrame": "Ramme, kr.",
+      "amountFrame": "Ramme i kr. (ekskl. moms)",
       "none": "Ingen",
       "submit": "Opret projekt",
       "createdToast": "Projektet er oprettet.",
-      "invalidFrames": "Tjek rammerne. Skriv fx 40 timer eller 60.000 kr."
+      "invalidFrames": "Tjek rammerne. Skriv fx 40 timer eller 60.000 kr.",
+      "hourlyRate": "Timepris i kr. (ekskl. moms)",
+      "rateFallback": "Kundens pris"
     },
     "detail": {
       "title": "Projekt",
@@ -538,7 +575,7 @@
       "consumptionTitle": "Forbrug",
       "tracked": "Registreret tid",
       "unbilled": "Uafregnet",
-      "value": "Værdi af tid",
+      "value": "Værdi af tid (ekskl. moms)",
       "descriptionTitle": "Beskrivelse"
     },
     "tasks": {
@@ -547,7 +584,13 @@
       "placeholder": "Ny opgave…",
       "due": "Frist",
       "add": "Tilføj",
-      "empty": "Ingen opgaver endnu."
+      "empty": "Ingen opgaver endnu.",
+      "ratePlaceholder": "Timepris ekskl. moms",
+      "rateBadge": "{rate}/t",
+      "setRate": "Pris",
+      "ratePrompt": "Timepris for opgaven",
+      "rateEmpty": "Tom bruger projektets/kundens pris",
+      "invalidRate": "Prisen kunne ikke læses. Skriv fx 1.400."
     }
   }
 }

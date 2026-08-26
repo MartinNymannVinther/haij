@@ -73,6 +73,7 @@ export default async function ProjectDetailPage({
               deadline: project.deadline,
               budgetMinutes: project.budgetMinutes,
               budgetAmountOere: project.budgetAmountOere,
+              hourlyRateOere: project.hourlyRateOere,
             }}
             companies={companies.map((c) => ({ id: c.id, name: c.name }))}
           />

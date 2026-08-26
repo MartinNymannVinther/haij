@@ -127,7 +127,7 @@
       "latestTitle": "Latest activity",
       "latestEmpty": "No activity yet.",
       "viewAll": "View all customers",
-      "statOutstanding": "Outstanding",
+      "statOutstanding": "Outstanding (incl. VAT)",
       "statOverdue": "Of which overdue: {amount}"
     },
     "security": {
@@ -291,7 +291,11 @@
       "addedToast": "Time tracked",
       "invalidDuration": "Could not understand the duration. Try 1:30, 1.5 or 45m.",
       "noProject": "No project",
-      "project": "Project"
+      "project": "Project",
+      "task": "Task",
+      "noTask": "No task",
+      "role": "Role",
+      "noRole": "No role"
     }
   },
   "orgProfile": {
@@ -310,11 +314,35 @@
     "bankReg": "Reg. no.",
     "bankKonto": "Account no.",
     "paymentTerms": "Payment terms (days)",
-    "defaultHourlyRate": "Default hourly rate (DKK)",
+    "defaultHourlyRate": "Default hourly rate in DKK (excl. VAT)",
     "save": "Save",
     "savedToast": "Company profile saved.",
     "invalidRate": "Could not read the hourly rate. Try e.g. 950 or 950.00.",
-    "invalidForm": "Check the fields. CVR must be 8 digits."
+    "invalidForm": "Check the fields. CVR must be 8 digits.",
+    "roles": {
+      "title": "Roles and hourly rates",
+      "hint": "Rates in DKK excl. VAT. A role picked on a time entry wins over task, project and customer rates.",
+      "empty": "No roles yet. Add e.g. Senior advisory or Project management.",
+      "namePlaceholder": "Role name…",
+      "ratePlaceholder": "Hourly rate excl. VAT",
+      "rateLine": "{rate}/h excl. VAT",
+      "add": "Add",
+      "invalid": "Check name and rate. Write the rate like 1,400.",
+      "nameTaken": "A role with that name already exists.",
+      "deletedToast": "Role deleted. Time entries keep their hours."
+    },
+    "logo": {
+      "title": "Logo",
+      "hint": "PNG or JPG, at most 1 MB. Shown at the top of your invoice PDFs.",
+      "upload": "Upload logo",
+      "replace": "Replace logo",
+      "remove": "Remove logo",
+      "previewAlt": "Company logo",
+      "wrongType": "Only PNG and JPG are supported.",
+      "tooBig": "The file is too large. At most 1 MB.",
+      "savedToast": "Logo saved; future PDFs will carry it.",
+      "deletedToast": "Logo removed."
+    }
   },
   "invoicing": {
     "list": {
@@ -328,7 +356,7 @@
       "customer": "Customer",
       "date": "Date",
       "due": "Due",
-      "amount": "Amount",
+      "amount": "Amount (incl. VAT)",
       "statusHead": "Status",
       "draftLabel": "Draft",
       "creditNote": "Credit note"
@@ -385,14 +413,14 @@
       "lineDescription": "Description",
       "lineQuantity": "Qty",
       "lineUnit": "Unit",
-      "linePrice": "Unit price",
-      "linePriceKr": "Unit price (DKK)",
-      "lineAmount": "Amount",
+      "linePrice": "Unit price excl. VAT",
+      "linePriceKr": "Unit price in DKK (excl. VAT)",
+      "lineAmount": "Amount excl. VAT",
       "lineVat": "VAT",
       "lineInvalid": "Check quantity and price. Use e.g. 1.5 and 950.00.",
       "subtotal": "Subtotal ex VAT",
       "vatTotal": "VAT",
-      "grandTotal": "Total"
+      "grandTotal": "Total incl. VAT"
     },
     "detail": {
       "title": "Invoice",
@@ -410,11 +438,11 @@
       "lineDescription": "Description",
       "lineQuantity": "Qty",
       "lineUnit": "Unit",
-      "linePrice": "Unit price",
-      "lineAmount": "Amount",
+      "linePrice": "Unit price excl. VAT",
+      "lineAmount": "Amount excl. VAT",
       "subtotal": "Subtotal ex VAT",
       "vatTotal": "VAT",
-      "grandTotal": "Total",
+      "grandTotal": "Total incl. VAT",
       "partiesTitle": "Parties",
       "buyer": "Buyer",
       "seller": "Seller",
@@ -434,21 +462,21 @@
     "monthsTitle": "Revenue per month",
     "yearSummary": "Realized {realized} of target {target}",
     "month": "Month",
-    "target": "Target",
-    "realized": "Realized",
+    "target": "Target (excl. VAT)",
+    "realized": "Realized (excl. VAT)",
     "gap": "Gap",
-    "outstanding": "Outstanding",
+    "outstanding": "Outstanding (incl. VAT)",
     "setTarget": "Set target",
     "editTarget": "Edit target",
-    "invalidTarget": "Could not read the amount. Try e.g. 40,000.",
+    "invalidTarget": "Could not read the amount. Try e.g. 40,000 (excl. VAT).",
     "customersTitle": "Customer economy",
     "noCustomers": "No customers yet.",
     "customer": "Customer",
     "tracked": "Tracked time",
     "unbilled": "Unbilled",
-    "invoiced": "Invoiced",
-    "paid": "Paid",
-    "frame": "Agreed frame",
+    "invoiced": "Invoiced (excl. VAT)",
+    "paid": "Paid (incl. VAT)",
+    "frame": "Agreed frame (excl. VAT)",
     "noFrame": "No frame",
     "hourFrame": "{used} of {frame}",
     "amountFrame": "{used} of {frame}",
@@ -472,19 +500,26 @@
       "framesTitle": "Hourly rate and agreed frame",
       "rate": "Hourly rate",
       "rateDefault": "Default",
-      "rateLabel": "Hourly rate in DKK (empty uses the default)",
+      "rateLabel": "Hourly rate in DKK excl. VAT (empty uses the default)",
       "hourFrameLabel": "Agreed frame in hours (empty for none)",
-      "amountFrameLabel": "Agreed frame in DKK (empty for none)",
+      "amountFrameLabel": "Agreed frame in DKK excl. VAT (empty for none)",
       "noFramePlaceholder": "None",
       "unbilled": "Unbilled time",
-      "invoiced": "Invoiced",
-      "outstanding": "Outstanding",
-      "paid": "Paid",
+      "invoiced": "Invoiced (excl. VAT)",
+      "outstanding": "Outstanding (incl. VAT)",
+      "paid": "Paid (incl. VAT)",
       "createInvoice": "Invoice from unbilled time",
       "noUnbilledTime": "There are no unbilled hours to invoice.",
       "draftToast": "Invoice draft created from unbilled hours.",
       "savedToast": "Hourly rate and frame saved.",
-      "invalid": "Check the fields. Write amounts like 950.00."
+      "invalid": "Check the fields. Write amounts like 950.00.",
+      "invoiceDialogTitle": "Invoice from unbilled time",
+      "invoiceDialogHint": "Pick a period, or leave the fields empty to include all unbilled hours.",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "rangeSummary": "The selection covers {hours} unbilled hours.",
+      "rangeLoading": "Counting hours…",
+      "createDraft": "Create draft"
     }
   },
   "projects": {
@@ -500,7 +535,7 @@
       "taskCount": "{done}/{total}",
       "tracked": "Tracked time",
       "deadline": "Deadline",
-      "frame": "Agreed frame",
+      "frame": "Agreed frame (excl. VAT)",
       "statusHead": "Status"
     },
     "status": {
@@ -516,11 +551,13 @@
       "description": "Description",
       "deadline": "Deadline",
       "hourFrame": "Frame, hours",
-      "amountFrame": "Frame, DKK",
+      "amountFrame": "Frame in DKK (excl. VAT)",
       "none": "None",
       "submit": "Create project",
       "createdToast": "Project created.",
-      "invalidFrames": "Check the frames. Write e.g. 40 hours or 60,000 DKK."
+      "invalidFrames": "Check the frames. Write e.g. 40 hours or 60,000 DKK.",
+      "hourlyRate": "Hourly rate in DKK (excl. VAT)",
+      "rateFallback": "Customer rate"
     },
     "detail": {
       "title": "Project",
@@ -538,7 +575,7 @@
       "consumptionTitle": "Consumption",
       "tracked": "Tracked time",
       "unbilled": "Unbilled",
-      "value": "Value of time",
+      "value": "Value of time (excl. VAT)",
       "descriptionTitle": "Description"
     },
     "tasks": {
@@ -547,7 +584,13 @@
       "placeholder": "New task…",
       "due": "Due",
       "add": "Add",
-      "empty": "No tasks yet."
+      "empty": "No tasks yet.",
+      "ratePlaceholder": "Hourly rate excl. VAT",
+      "rateBadge": "{rate}/h",
+      "setRate": "Rate",
+      "ratePrompt": "Hourly rate for the task",
+      "rateEmpty": "Empty uses the project/customer rate",
+      "invalidRate": "Could not read the rate. Try e.g. 1,400."
     }
   }
 }

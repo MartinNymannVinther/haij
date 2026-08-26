@@ -45,6 +45,7 @@ type ProjectData = {
   deadline: string | null;
   budgetMinutes: number | null;
   budgetAmountOere: number | null;
+  hourlyRateOere: number | null;
 };
 
 const STATUSES: ProjectStatus[] = ["active", "done", "archived"];
@@ -91,11 +92,14 @@ export function ProjectActions({
     const form = new FormData(event.currentTarget);
     const hoursRaw = String(form.get("budgetHours") ?? "").trim();
     const amountRaw = String(form.get("budgetAmount") ?? "").trim();
+    const rateRaw = String(form.get("hourlyRate") ?? "").trim();
     const hoursHundredths = hoursRaw ? parseQuantityToHundredths(hoursRaw) : null;
     const amountOere = amountRaw ? parseKronerToOere(amountRaw) : null;
+    const rateOere = rateRaw ? parseKronerToOere(rateRaw) : null;
     if (
       (hoursRaw && (hoursHundredths === null || hoursHundredths <= 0)) ||
-      (amountRaw && (amountOere === null || amountOere <= 0))
+      (amountRaw && (amountOere === null || amountOere <= 0)) ||
+      (rateRaw && (rateOere === null || rateOere < 0))
     ) {
       toast.error(tCreate("invalidFrames"));
       return;
@@ -108,6 +112,7 @@ export function ProjectActions({
       deadline: String(form.get("deadline") ?? "") || null,
       budgetMinutes: hoursHundredths != null ? Math.round((hoursHundredths * 60) / 100) : null,
       budgetAmountOere: amountOere,
+      hourlyRateOere: rateOere,
     });
     setPending(false);
     if (!result.ok) {
@@ -199,7 +204,7 @@ export function ProjectActions({
                 defaultValue={project.description ?? ""}
               />
             </Field>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Field>
                 <FieldLabel htmlFor="edit-deadline">{tCreate("deadline")}</FieldLabel>
                 <Input
@@ -207,6 +212,18 @@ export function ProjectActions({
                   name="deadline"
                   type="date"
                   defaultValue={project.deadline ?? ""}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="edit-hourlyRate">{tCreate("hourlyRate")}</FieldLabel>
+                <Input
+                  id="edit-hourlyRate"
+                  name="hourlyRate"
+                  inputMode="decimal"
+                  placeholder={tCreate("rateFallback")}
+                  defaultValue={
+                    project.hourlyRateOere != null ? oereToInputValue(project.hourlyRateOere) : ""
+                  }
                 />
               </Field>
               <Field>

@@ -1,4 +1,13 @@
-import { Document, Font, Page, StyleSheet, Text, View, renderToBuffer } from "@react-pdf/renderer";
+import {
+  Document,
+  Font,
+  Image,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+  renderToBuffer,
+} from "@react-pdf/renderer";
 import { formatDateDa } from "@/core/dates";
 import type { invoiceLines, invoices } from "@/core/db/schema";
 import { formatOereBare, formatQuantityHundredths } from "./money";
@@ -38,9 +47,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 48,
     paddingBottom: 64,
   },
-  headerRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 28 },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 28,
+  },
   docTitle: { fontSize: 22, fontFamily: "Helvetica-Bold", letterSpacing: 0.5 },
   wordmark: { fontSize: 12, fontFamily: "Helvetica-Bold" },
+  logo: { maxHeight: 44, maxWidth: 160, objectFit: "contain" },
   partyRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 24 },
   partyLabel: { fontSize: 7, color: muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 },
   partyName: { fontFamily: "Helvetica-Bold", marginBottom: 2 },
@@ -95,7 +110,15 @@ function money(oere: number): string {
   return `${formatOereBare(oere).replace(/[  ]/g, " ")} kr.`;
 }
 
-export function InvoicePdf({ invoice, lines }: { invoice: Invoice; lines: Line[] }) {
+export function InvoicePdf({
+  invoice,
+  lines,
+  logoDataUrl,
+}: {
+  invoice: Invoice;
+  lines: Line[];
+  logoDataUrl?: string | null;
+}) {
   const isCredit = invoice.type === "credit_note";
   const title = isCredit ? "KREDITNOTA" : "FAKTURA";
 
@@ -117,7 +140,12 @@ export function InvoicePdf({ invoice, lines }: { invoice: Invoice; lines: Line[]
       <Page size="A4" style={styles.page}>
         <View style={styles.headerRow}>
           <Text style={styles.docTitle}>{title}</Text>
-          <Text style={styles.wordmark}>{invoice.sellerName}</Text>
+          {logoDataUrl ? (
+            // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf Image has no alt prop
+            <Image src={logoDataUrl} style={styles.logo} />
+          ) : (
+            <Text style={styles.wordmark}>{invoice.sellerName}</Text>
+          )}
         </View>
 
         <View style={styles.partyRow}>
@@ -246,6 +274,10 @@ export function InvoicePdf({ invoice, lines }: { invoice: Invoice; lines: Line[]
   );
 }
 
-export async function renderInvoicePdf(invoice: Invoice, lines: Line[]): Promise<Buffer> {
-  return renderToBuffer(<InvoicePdf invoice={invoice} lines={lines} />);
+export async function renderInvoicePdf(
+  invoice: Invoice,
+  lines: Line[],
+  logoDataUrl?: string | null,
+): Promise<Buffer> {
+  return renderToBuffer(<InvoicePdf invoice={invoice} lines={lines} logoDataUrl={logoDataUrl} />);
 }

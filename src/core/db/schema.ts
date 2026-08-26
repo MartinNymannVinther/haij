@@ -474,7 +474,7 @@ export const orgLogos = pgTable(
     contentType: text("content_type").notNull(),
     ...timestamps,
   },
-  (t) => [check("org_logos_type_valid", sql`content_type in ('image/png', 'image/jpeg')`)],
+  () => [check("org_logos_type_valid", sql`content_type in ('image/png', 'image/jpeg')`)],
 );
 
 /** Gapless sequential invoice numbers, one series per organization. */

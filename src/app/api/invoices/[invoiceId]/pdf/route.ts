@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { requireOrgContext } from "@/core/auth/guard";
+import { getOrgLogo } from "@/modules/invoicing/logo";
 import { getInvoiceDetail } from "@/modules/invoicing/service";
 import { renderInvoicePdf } from "@/modules/invoicing/pdf";
 
@@ -26,7 +27,8 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  const pdf = await renderInvoicePdf(detail.invoice, detail.lines);
+  const logo = await getOrgLogo(ctx);
+  const pdf = await renderInvoicePdf(detail.invoice, detail.lines, logo?.dataUrl ?? null);
   const kind = detail.invoice.type === "credit_note" ? "kreditnota" : "faktura";
   const filename = `${kind}-${detail.invoice.invoiceNumber}.pdf`;
 

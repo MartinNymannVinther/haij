@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { lookupCvrAction } from "@/modules/crm/actions";
 import { saveOrgProfileAction } from "@/modules/invoicing/actions";
 import { oereToInputValue, parseKronerToOere } from "@/modules/invoicing/money";
 import { useRouter } from "@/i18n/navigation";
@@ -26,12 +27,67 @@ type Profile = {
   defaultHourlyRateOere: number | null;
 } | null;
 
+type Fields = {
+  legalName: string;
+  cvr: string;
+  address: string;
+  zipcode: string;
+  city: string;
+  email: string;
+  phone: string;
+};
+
 export function CompanyProfileForm({ profile }: { profile: Profile }) {
   const t = useTranslations("orgProfile");
+  const tLookup = useTranslations("crm.create");
   const tCommon = useTranslations("common");
   const router = useRouter();
   const [pending, setPending] = useState(false);
+  const [looking, setLooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fields, setFields] = useState<Fields>({
+    legalName: profile?.legalName ?? "",
+    cvr: profile?.cvr ?? "",
+    address: profile?.address ?? "",
+    zipcode: profile?.zipcode ?? "",
+    city: profile?.city ?? "",
+    email: profile?.email ?? "",
+    phone: profile?.phone ?? "",
+  });
+
+  function setField(name: keyof Fields) {
+    return (event: React.ChangeEvent<HTMLInputElement>) =>
+      setFields((current) => ({ ...current, [name]: event.target.value }));
+  }
+
+  async function handleLookup() {
+    setLooking(true);
+    const result = await lookupCvrAction(fields.cvr);
+    setLooking(false);
+    if (!result.ok) {
+      toast.error(result.error === "cvrInvalid" ? tLookup("invalidCvr") : tCommon("error"));
+      return;
+    }
+    if (result.data.status === "not_found") {
+      toast.error(tLookup("notFound"));
+      return;
+    }
+    if (result.data.status === "unavailable") {
+      toast.error(tLookup("unavailable"));
+      return;
+    }
+    const company = result.data.company;
+    setFields((current) => ({
+      ...current,
+      legalName: company.name,
+      address: company.address ?? current.address,
+      zipcode: company.zipcode ?? current.zipcode,
+      city: company.city ?? current.city,
+      email: company.email ?? current.email,
+      phone: company.phone ?? current.phone,
+    }));
+    toast.success(tLookup("found", { name: company.name }));
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,13 +104,7 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
 
     setPending(true);
     const result = await saveOrgProfileAction({
-      legalName: String(form.get("legalName") ?? ""),
-      cvr: String(form.get("cvr") ?? ""),
-      address: String(form.get("address") ?? ""),
-      zipcode: String(form.get("zipcode") ?? ""),
-      city: String(form.get("city") ?? ""),
-      email: String(form.get("email") ?? ""),
-      phone: String(form.get("phone") ?? ""),
+      ...fields,
       bankReg: String(form.get("bankReg") ?? ""),
       bankKonto: String(form.get("bankKonto") ?? ""),
       defaultPaymentTermsDays: Number.isFinite(terms) ? terms : 14,
@@ -70,7 +120,7 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-2xl flex-col gap-6">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle>{t("sellerTitle")}</CardTitle>
@@ -78,19 +128,9 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
         </CardHeader>
         <CardContent>
           <FieldGroup className="gap-4">
-            <div className="grid gap-4 sm:grid-cols-[1fr_10rem]">
-              <Field>
-                <FieldLabel htmlFor="legalName">{t("legalName")}</FieldLabel>
-                <Input
-                  id="legalName"
-                  name="legalName"
-                  required
-                  maxLength={200}
-                  defaultValue={profile?.legalName ?? ""}
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="cvr">CVR</FieldLabel>
+            <Field>
+              <FieldLabel htmlFor="cvr">CVR</FieldLabel>
+              <div className="flex gap-2">
                 <Input
                   id="cvr"
                   name="cvr"
@@ -98,10 +138,36 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   inputMode="numeric"
                   maxLength={8}
                   pattern="[0-9]{8}"
-                  defaultValue={profile?.cvr ?? ""}
+                  value={fields.cvr}
+                  onChange={setField("cvr")}
+                  className="max-w-40"
                 />
-              </Field>
-            </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleLookup}
+                  disabled={looking || fields.cvr.trim().length !== 8}
+                >
+                  {looking ? (
+                    <Loader2 data-slot="icon" className="animate-spin" />
+                  ) : (
+                    <Download data-slot="icon" />
+                  )}
+                  {tLookup("fetch")}
+                </Button>
+              </div>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="legalName">{t("legalName")}</FieldLabel>
+              <Input
+                id="legalName"
+                name="legalName"
+                required
+                maxLength={200}
+                value={fields.legalName}
+                onChange={setField("legalName")}
+              />
+            </Field>
             <Field>
               <FieldLabel htmlFor="address">{t("address")}</FieldLabel>
               <Input
@@ -109,7 +175,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                 name="address"
                 required
                 maxLength={300}
-                defaultValue={profile?.address ?? ""}
+                value={fields.address}
+                onChange={setField("address")}
               />
             </Field>
             <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
@@ -120,7 +187,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="zipcode"
                   required
                   maxLength={10}
-                  defaultValue={profile?.zipcode ?? ""}
+                  value={fields.zipcode}
+                  onChange={setField("zipcode")}
                 />
               </Field>
               <Field>
@@ -130,7 +198,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="city"
                   required
                   maxLength={100}
-                  defaultValue={profile?.city ?? ""}
+                  value={fields.city}
+                  onChange={setField("city")}
                 />
               </Field>
             </div>
@@ -142,12 +211,19 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="email"
                   type="email"
                   maxLength={320}
-                  defaultValue={profile?.email ?? ""}
+                  value={fields.email}
+                  onChange={setField("email")}
                 />
               </Field>
               <Field>
                 <FieldLabel htmlFor="phone">{t("phone")}</FieldLabel>
-                <Input id="phone" name="phone" maxLength={30} defaultValue={profile?.phone ?? ""} />
+                <Input
+                  id="phone"
+                  name="phone"
+                  maxLength={30}
+                  value={fields.phone}
+                  onChange={setField("phone")}
+                />
               </Field>
             </div>
           </FieldGroup>
