@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Languages, LogOut, Monitor, Moon, ShieldCheck, Sun } from "lucide-react";
+import { Building2, Check, Languages, LogOut, Monitor, Moon, ShieldCheck, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -63,6 +63,10 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
           <span className="text-muted-foreground block truncate text-xs font-normal">{email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => router.push("/settings/company")}>
+          <Building2 data-slot="icon" />
+          {t("companySettings")}
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => router.push("/settings/security")}>
           <ShieldCheck data-slot="icon" />
           {t("security")}

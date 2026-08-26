@@ -96,7 +96,8 @@
       "english": "English",
       "companies": "Customers",
       "pipeline": "Pipeline",
-      "time": "Time"
+      "time": "Time",
+      "companySettings": "Company"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -281,5 +282,27 @@
       "addedToast": "Time tracked",
       "invalidDuration": "Could not understand the duration. Try 1:30, 1.5 or 45m."
     }
+  },
+  "orgProfile": {
+    "title": "Company",
+    "subtitle": "Master data used as the sender on your invoices.",
+    "sellerTitle": "Legal entity",
+    "sellerHint": "Name, CVR and address are legally required on every invoice.",
+    "legalName": "Company name",
+    "address": "Address",
+    "zipcode": "Zip",
+    "city": "City",
+    "email": "Email",
+    "phone": "Phone",
+    "invoicingTitle": "Invoicing",
+    "invoicingHint": "Payment details and defaults for new invoices.",
+    "bankReg": "Reg. no.",
+    "bankKonto": "Account no.",
+    "paymentTerms": "Payment terms (days)",
+    "defaultHourlyRate": "Default hourly rate (DKK)",
+    "save": "Save",
+    "savedToast": "Company profile saved.",
+    "invalidRate": "Could not read the hourly rate. Try e.g. 950 or 950.00.",
+    "invalidForm": "Check the fields — CVR must be 8 digits."
   }
 }

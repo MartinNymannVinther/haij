@@ -96,7 +96,8 @@
       "english": "English",
       "companies": "Kunder",
       "pipeline": "Pipeline",
-      "time": "Tid"
+      "time": "Tid",
+      "companySettings": "Virksomhed"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -281,5 +282,27 @@
       "addedToast": "Tid registreret",
       "invalidDuration": "Varigheden kunne ikke forstås. Prøv fx 1:30, 1,5 eller 45m."
     }
+  },
+  "orgProfile": {
+    "title": "Virksomhed",
+    "subtitle": "Stamdata der bruges som afsender på dine fakturaer.",
+    "sellerTitle": "Juridisk enhed",
+    "sellerHint": "Navn, CVR og adresse er lovkrav på enhver faktura.",
+    "legalName": "Firmanavn",
+    "address": "Adresse",
+    "zipcode": "Postnr.",
+    "city": "By",
+    "email": "E-mail",
+    "phone": "Telefon",
+    "invoicingTitle": "Fakturering",
+    "invoicingHint": "Betalingsoplysninger og standarder for nye fakturaer.",
+    "bankReg": "Reg.nr.",
+    "bankKonto": "Kontonr.",
+    "paymentTerms": "Betalingsfrist (dage)",
+    "defaultHourlyRate": "Standard timepris (kr.)",
+    "save": "Gem",
+    "savedToast": "Virksomhedsprofilen er gemt.",
+    "invalidRate": "Timeprisen kunne ikke læses. Skriv fx 950 eller 950,00.",
+    "invalidForm": "Tjek felterne — CVR skal være 8 cifre."
   }
 }
