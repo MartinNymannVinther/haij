@@ -1,6 +1,9 @@
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
+  date,
   index,
   integer,
   jsonb,
@@ -186,6 +189,140 @@ export const rateLimits = pgTable("rate_limits", {
   count: integer("count").notNull(),
   lastRequest: bigint("last_request", { mode: "number" }).notNull(),
 });
+
+/* ------------------------------------------------------------------ */
+/* Phase 1 domain tables (CRM + time tracking). Every table carries    */
+/* org_id and gets forced RLS + audit trigger in the 0004 migration.   */
+/* ------------------------------------------------------------------ */
+
+const domainId = (name: string) =>
+  text(name)
+    .primaryKey()
+    .default(sql`(gen_random_uuid())::text`);
+
+export const PIPELINE_STAGES = ["lead", "dialogue", "proposal", "won", "lost"] as const;
+export type PipelineStage = (typeof PIPELINE_STAGES)[number];
+
+export const ACTIVITY_TYPES = [
+  "note",
+  "call",
+  "meeting",
+  "email",
+  "stage_change",
+  "system",
+] as const;
+export type ActivityType = (typeof ACTIVITY_TYPES)[number];
+
+export const companies = pgTable(
+  "companies",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    cvr: text("cvr"),
+    address: text("address"),
+    zipcode: text("zipcode"),
+    city: text("city"),
+    country: text("country").notNull().default("DK"),
+    phone: text("phone"),
+    email: text("email"),
+    website: text("website"),
+    industryCode: text("industry_code"),
+    industryText: text("industry_text"),
+    companyType: text("company_type"),
+    pipelineStage: text("pipeline_stage").notNull().default("lead"),
+    cvrData: jsonb("cvr_data"),
+    cvrSyncedAt: timestamp("cvr_synced_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    index("companies_org_idx").on(t.orgId),
+    index("companies_org_stage_idx").on(t.orgId, t.pipelineStage),
+    uniqueIndex("companies_org_cvr_uq")
+      .on(t.orgId, t.cvr)
+      .where(sql`cvr is not null`),
+    check("companies_cvr_format", sql`cvr is null or cvr ~ '^[0-9]{8}$'`),
+    check(
+      "companies_stage_valid",
+      sql`pipeline_stage in ('lead', 'dialogue', 'proposal', 'won', 'lost')`,
+    ),
+  ],
+);
+
+export const contacts = pgTable(
+  "contacts",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    companyId: text("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    title: text("title"),
+    email: text("email"),
+    phone: text("phone"),
+    isPrimary: boolean("is_primary").notNull().default(false),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [index("contacts_org_company_idx").on(t.orgId, t.companyId)],
+);
+
+export const activities = pgTable(
+  "activities",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    companyId: text("company_id")
+      .notNull()
+      .references(() => companies.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    body: text("body"),
+    metadata: jsonb("metadata"),
+    happenedAt: timestamp("happened_at", { withTimezone: true }).notNull().defaultNow(),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("activities_org_company_time_idx").on(t.orgId, t.companyId, t.happenedAt),
+    index("activities_org_time_idx").on(t.orgId, t.happenedAt),
+    check(
+      "activities_type_valid",
+      sql`type in ('note', 'call', 'meeting', 'email', 'stage_change', 'system')`,
+    ),
+  ],
+);
+
+export const timeEntries = pgTable(
+  "time_entries",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    companyId: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    entryDate: date("entry_date").notNull(),
+    durationMinutes: integer("duration_minutes").notNull(),
+    note: text("note"),
+    ...timestamps,
+  },
+  (t) => [
+    index("time_entries_org_date_idx").on(t.orgId, t.entryDate),
+    index("time_entries_org_user_date_idx").on(t.orgId, t.userId, t.entryDate),
+    index("time_entries_org_company_idx").on(t.orgId, t.companyId),
+    check("time_entries_duration_valid", sql`duration_minutes between 1 and 1440`),
+  ],
+);
 
 /**
  * Append-only audit log; one row per mutation (who, what, when, org,
