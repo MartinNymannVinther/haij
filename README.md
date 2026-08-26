@@ -38,11 +38,23 @@ pnpm lint && pnpm typecheck
 
 What works today: CRM (customers via CVR lookup, contacts, pipeline,
 activity timeline), time tracking with a weekly view, invoicing (drafts
-from unbilled time, gapless numbering, Danish PDF, credit notes, payment
-status), economy (monthly revenue targets, per-customer frames and
-consumption) and light project management (projects with frames, tasks,
-linked time). Invoicing needs your seller data first: Indstillinger →
-Virksomhed.
+from unbilled time, gapless numbering, Danish PDF with your logo, credit
+notes, payment status), economy (monthly revenue targets, per-customer
+frames and consumption), light project management (projects with frames,
+tasks, linked time), the signals engine (CVR events, TED tenders, RSS
+feeds and manual capture, AI-scored against your service profile), a
+knowledge center with AI digests, and an MCP server so AI assistants can
+read your data and draft — never issue — invoices. Invoicing needs your
+seller data first (Indstillinger → Virksomhed); AI features need a model
+(Indstillinger → AI).
+
+Connect an AI assistant to the MCP server with an API key from
+Indstillinger → AI:
+
+```bash
+claude mcp add --transport http haij https://<host>/api/mcp \
+  --header "Authorization: Bearer haij_..."
+```
 
 Deployment: [docs/deploy.md](docs/deploy.md). Security policy:
 [SECURITY.md](SECURITY.md). License: [AGPL-3.0](LICENSE).
