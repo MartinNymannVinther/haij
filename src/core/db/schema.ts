@@ -598,6 +598,77 @@ export const budgets = pgTable(
   ],
 );
 
+/* ------------------------------------------------------------------ */
+/* Phase 4: signals engine — external opportunities, scored by AI.     */
+/* Everything fetched from the outside is UNTRUSTED data (CLAUDE.md):  */
+/* sanitized before storage, never treated as instructions.            */
+/* ------------------------------------------------------------------ */
+
+export const SIGNAL_SOURCES = ["cvr", "ted", "rss", "manual"] as const;
+export type SignalSource = (typeof SIGNAL_SOURCES)[number];
+
+export const SIGNAL_STATUSES = ["new", "saved", "dismissed"] as const;
+export type SignalStatus = (typeof SIGNAL_STATUSES)[number];
+
+/** Per-org signal configuration: what to watch and how to score it. */
+export const signalSettings = pgTable("signal_settings", {
+  orgId: text("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  /** What the firm sells and to whom — the yardstick for AI scoring. */
+  serviceProfile: text("service_profile"),
+  /** RSS/Atom feeds to follow: [{ url, label }]. */
+  rssFeeds: jsonb("rss_feeds").notNull().default([]),
+  /** Keywords for the TED tender search (comma separated). */
+  tedKeywords: text("ted_keywords"),
+  /** Branch code prefixes for CVR events (comma separated, e.g. 6201,7022). */
+  cvrBranchePrefixes: text("cvr_branche_prefixes"),
+  lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+  ...timestamps,
+});
+
+export const signals = pgTable(
+  "signals",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    source: text("source").notNull(),
+    /** Stable id within the source, for dedupe across fetches. */
+    sourceRef: text("source_ref").notNull(),
+    title: text("title").notNull(),
+    /** Sanitized plain text — tags stripped, length capped. */
+    summary: text("summary"),
+    url: text("url"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    /** CVR of the company behind the signal, when the source knows it. */
+    companyCvr: text("company_cvr"),
+    /** Set when the signal is linked/converted to a CRM company. */
+    companyId: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+    status: text("status").notNull().default("new"),
+    /** AI score 0..100 against the service profile; null = unscored. */
+    score: integer("score"),
+    scoreReason: text("score_reason"),
+    suggestion: text("suggestion"),
+    scoredAt: timestamp("scored_at", { withTimezone: true }),
+    followUpAt: date("follow_up_at"),
+    /** Raw source payload — the GDPR source log for this signal. */
+    payload: jsonb("payload"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("signals_org_source_ref_uq").on(t.orgId, t.source, t.sourceRef),
+    index("signals_org_status_idx").on(t.orgId, t.status),
+    index("signals_org_followup_idx").on(t.orgId, t.followUpAt),
+    check("signals_source_valid", sql`source in ('cvr', 'ted', 'rss', 'manual')`),
+    check("signals_status_valid", sql`status in ('new', 'saved', 'dismissed')`),
+    check("signals_score_valid", sql`score is null or score between 0 and 100`),
+  ],
+);
+
 /**
  * Append-only audit log; one row per mutation (who, what, when, org,
  * before/after). Written by database triggers plus semantic auth events.

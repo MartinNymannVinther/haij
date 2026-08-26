@@ -92,6 +92,20 @@
       "when": 1787772913247,
       "tag": "0012_roles_logo_rls_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1787776496200,
+      "tag": "0013_signals",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1787776496201,
+      "tag": "0014_signals_rls_audit",
+      "breakpoints": true
     }
   ]
 }
