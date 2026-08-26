@@ -10,6 +10,7 @@ import {
   deleteTask,
   setProjectStatus,
   setTaskDone,
+  setTaskRate,
   updateProject,
 } from "./service";
 
@@ -53,6 +54,13 @@ const ProjectSchema = z.object({
     .int()
     .min(1)
     .max(100_000_000_000)
+    .nullish()
+    .transform((v) => v ?? null),
+  hourlyRateOere: z
+    .number()
+    .int()
+    .min(0)
+    .max(100_000_000)
     .nullish()
     .transform((v) => v ?? null),
 });
@@ -131,6 +139,13 @@ const TaskSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .nullish()
     .transform((v) => v ?? null),
+  hourlyRateOere: z
+    .number()
+    .int()
+    .min(0)
+    .max(100_000_000)
+    .nullish()
+    .transform((v) => v ?? null),
 });
 
 export async function addTaskAction(input: unknown): Promise<ProjectActionResult> {
@@ -140,7 +155,7 @@ export async function addTaskAction(input: unknown): Promise<ProjectActionResult
   if (!parsed.success) return { ok: false, error: "invalid" };
 
   try {
-    await addTask(ctx, parsed.data.projectId, parsed.data.title, parsed.data.dueDate);
+    await addTask(ctx, parsed.data.projectId, parsed.data);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, error: toError(error) };
@@ -159,6 +174,24 @@ export async function setTaskDoneAction(
 
   try {
     await setTaskDone(ctx, id.data, done.data);
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return { ok: false, error: toError(error) };
+  }
+}
+
+export async function setTaskRateAction(
+  taskId: unknown,
+  hourlyRateOere: unknown,
+): Promise<ProjectActionResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(taskId);
+  const rate = z.number().int().min(0).max(100_000_000).nullable().safeParse(hourlyRateOere);
+  if (!id.success || !rate.success) return { ok: false, error: "invalid" };
+
+  try {
+    await setTaskRate(ctx, id.data, rate.data);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, error: toError(error) };

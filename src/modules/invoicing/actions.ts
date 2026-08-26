@@ -5,7 +5,9 @@ import { requireOrgContext } from "@/core/auth/guard";
 import { INVOICE_UNITS, VAT_CATEGORIES } from "@/core/db/schema";
 import { normalizeCvr } from "@/core/cvr";
 import { setCustomerFrame, setRevenueTarget } from "./economy";
+import { deleteOrgLogo, saveOrgLogo, LOGO_CONTENT_TYPES, LOGO_MAX_BYTES } from "./logo";
 import { upsertOrgProfile } from "./profile";
+import { createRole, deleteRole, updateRole } from "./roles";
 import {
   addLine,
   createCreditNote,
@@ -16,6 +18,7 @@ import {
   markPaid,
   markSent,
   removeLine,
+  unbilledSummary,
   updateDraft,
   updateLine,
   type InvoiceError,
@@ -117,17 +120,50 @@ export async function createDraftAction(
   }
 }
 
+const DateRangeSchema = z.object({
+  from: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullish()
+    .transform((v) => v ?? null),
+  to: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullish()
+    .transform((v) => v ?? null),
+});
+
 export async function createDraftFromTimeAction(
   companyId: unknown,
+  range?: unknown,
 ): Promise<InvoicingResult<{ invoiceId: string }>> {
   const ctx = await requireOrgContext();
   if (!ctx) return { ok: false, error: "unauthorized" };
   const id = Id.safeParse(companyId);
-  if (!id.success) return { ok: false, error: "invalid" };
+  const parsedRange = DateRangeSchema.safeParse(range ?? {});
+  if (!id.success || !parsedRange.success) return { ok: false, error: "invalid" };
 
   try {
-    const invoiceId = await createDraftFromTime(ctx, id.data);
+    const invoiceId = await createDraftFromTime(ctx, id.data, parsedRange.data);
     return { ok: true, data: { invoiceId } };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function unbilledSummaryAction(
+  companyId: unknown,
+  range?: unknown,
+): Promise<InvoicingResult<{ minutes: number; entries: number }>> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(companyId);
+  const parsedRange = DateRangeSchema.safeParse(range ?? {});
+  if (!id.success || !parsedRange.success) return { ok: false, error: "invalid" };
+
+  try {
+    const summary = await unbilledSummary(ctx, id.data, parsedRange.data);
+    return { ok: true, data: summary };
   } catch (error) {
     return { ok: false, error: toActionError(error) };
   }
@@ -341,6 +377,99 @@ export async function setCustomerFrameAction(
   try {
     const updated = await setCustomerFrame(ctx, id.data, parsed.data);
     return updated ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+/* ------------------------------ Roller ------------------------------ */
+
+const RoleSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  hourlyRateOere: z.number().int().min(0).max(100_000_000),
+});
+
+export async function createRoleAction(input: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = RoleSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    await createRole(ctx, parsed.data.name, parsed.data.hourlyRateOere);
+    return { ok: true, data: undefined };
+  } catch (error) {
+    const code =
+      (error as { code?: string }).code ?? (error as { cause?: { code?: string } }).cause?.code;
+    if (code === "23505") return { ok: false, error: "invalid" }; // name taken
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function updateRoleAction(roleId: unknown, input: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(roleId);
+  const parsed = RoleSchema.safeParse(input);
+  if (!id.success || !parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    const updated = await updateRole(ctx, id.data, parsed.data.name, parsed.data.hourlyRateOere);
+    return updated ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function deleteRoleAction(roleId: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(roleId);
+  if (!id.success) return { ok: false, error: "invalid" };
+
+  try {
+    const deleted = await deleteRole(ctx, id.data);
+    return deleted ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+/* ------------------------------- Logo ------------------------------- */
+
+const LogoSchema = z.object({
+  contentType: z.enum(LOGO_CONTENT_TYPES),
+  /** Raw base64 without the data: prefix. */
+  base64: z
+    .string()
+    .min(1)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/),
+});
+
+export async function saveLogoAction(input: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = LogoSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  // Base64 inflates by 4/3; enforce the decoded ceiling.
+  const decodedBytes = Math.floor((parsed.data.base64.length * 3) / 4);
+  if (decodedBytes > LOGO_MAX_BYTES) return { ok: false, error: "invalid" };
+
+  try {
+    await saveOrgLogo(ctx, parsed.data.base64, parsed.data.contentType);
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function deleteLogoAction(): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+
+  try {
+    const deleted = await deleteOrgLogo(ctx);
+    return deleted ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
   } catch (error) {
     return { ok: false, error: toActionError(error) };
   }

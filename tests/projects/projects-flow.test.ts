@@ -94,8 +94,8 @@ describe("projects", () => {
   });
 
   it("tracks tasks with done state and ordering", async () => {
-    await addTask(CTX_A, projectId, "Kickoff-møde");
-    await addTask(CTX_A, projectId, "Skitse af datamodel", "2026-09-04");
+    await addTask(CTX_A, projectId, { title: "Kickoff-møde" });
+    await addTask(CTX_A, projectId, { title: "Skitse af datamodel", dueDate: "2026-09-04" });
     const detail = await getProjectDetail(CTX_A, projectId);
     expect(detail?.tasks.map((t) => t.title)).toEqual(["Kickoff-møde", "Skitse af datamodel"]);
 
@@ -109,7 +109,7 @@ describe("projects", () => {
 
     await deleteTask(CTX_A, first.id);
     expect((await getProjectDetail(CTX_A, projectId))?.tasks).toHaveLength(1);
-    await addTask(CTX_A, projectId, "Byg prototype");
+    await addTask(CTX_A, projectId, { title: "Byg prototype" });
   });
 
   it("links time via the project and inherits the company", async () => {
@@ -167,7 +167,7 @@ describe("projects", () => {
   it("deleting a project keeps the hours but drops the link", async () => {
     const doomedId = await createProject(CTX_A, { name: "Slettes", companyId: companyA });
     await addEntry(CTX_A, { projectId: doomedId, entryDate: "2026-08-26", durationMinutes: 45 });
-    await addTask(CTX_A, doomedId, "Ryger med");
+    await addTask(CTX_A, doomedId, { title: "Ryger med" });
     expect(await deleteProject(CTX_A, doomedId)).toBe(true);
 
     const orphan = await admin.query(

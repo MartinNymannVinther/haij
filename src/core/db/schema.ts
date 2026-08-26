@@ -325,6 +325,10 @@ export const timeEntries = pgTable(
     }),
     /** Optional link to a project (phase 3); survives project deletion as null. */
     projectId: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+    /** Optional task within the project; carries its own rate override. */
+    taskId: text("task_id").references(() => tasks.id, { onDelete: "set null" }),
+    /** Optional role that performed the work; wins the rate resolution. */
+    roleId: text("role_id").references(() => roles.id, { onDelete: "set null" }),
     ...timestamps,
   },
   (t) => [
@@ -334,6 +338,26 @@ export const timeEntries = pgTable(
     index("time_entries_org_project_idx").on(t.orgId, t.projectId),
     check("time_entries_duration_valid", sql`duration_minutes between 1 and 1440`),
   ],
+);
+
+/**
+ * Org-wide role catalog for differentiated hourly rates (e.g. senior
+ * advisory vs. project management). Rates are øre EXcl. VAT. A role on a
+ * time entry wins the rate resolution: role -> task -> project ->
+ * company -> org default.
+ */
+export const roles = pgTable(
+  "roles",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }).notNull(),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("roles_org_name_uq").on(t.orgId, t.name)],
 );
 
 /* ------------------------------------------------------------------ */
@@ -357,6 +381,8 @@ export const projects = pgTable(
     /** Agreed frame for this project, if any: hours and/or amount. */
     budgetMinutes: integer("budget_minutes"),
     budgetAmountOere: bigint("budget_amount_oere", { mode: "number" }),
+    /** Project-specific hourly rate (øre excl. VAT); beats the customer rate. */
+    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }),
     deadline: date("deadline"),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
@@ -383,6 +409,8 @@ export const tasks = pgTable(
     doneAt: timestamp("done_at", { withTimezone: true }),
     dueDate: date("due_date"),
     position: integer("position").notNull().default(0),
+    /** Task-specific hourly rate (øre excl. VAT); beats the project rate. */
+    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
   },
@@ -427,6 +455,27 @@ export const orgProfiles = pgTable("org_profiles", {
   defaultHourlyRateOere: bigint("default_hourly_rate_oere", { mode: "number" }),
   ...timestamps,
 });
+
+/**
+ * Company logo, stored in Postgres so backup and exit stay one database.
+ * Kept out of org_profiles on purpose: the audit trigger snapshots whole
+ * rows, and a base64 image would bloat every profile audit entry. This
+ * table has no row trigger; the service writes a semantic audit event
+ * instead (same pattern as auth events, see ADR 0003 exclusions).
+ */
+export const orgLogos = pgTable(
+  "org_logos",
+  {
+    orgId: text("org_id")
+      .primaryKey()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    /** Raw base64 (no data: prefix); rendered as a data URL when needed. */
+    data: text("data").notNull(),
+    contentType: text("content_type").notNull(),
+    ...timestamps,
+  },
+  (t) => [check("org_logos_type_valid", sql`content_type in ('image/png', 'image/jpeg')`)],
+);
 
 /** Gapless sequential invoice numbers, one series per organization. */
 export const invoiceCounters = pgTable("invoice_counters", {

@@ -24,6 +24,20 @@ const EntrySchema = z.object({
     .transform((value) => (value.length > 0 ? value : null))
     .nullish()
     .transform((value) => value ?? null),
+  taskId: z
+    .string()
+    .trim()
+    .max(64)
+    .transform((value) => (value.length > 0 ? value : null))
+    .nullish()
+    .transform((value) => value ?? null),
+  roleId: z
+    .string()
+    .trim()
+    .max(64)
+    .transform((value) => (value.length > 0 ? value : null))
+    .nullish()
+    .transform((value) => value ?? null),
   entryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   duration: z.string().trim().min(1).max(20),
   note: z
@@ -48,6 +62,8 @@ export async function addTimeEntryAction(input: unknown): Promise<TimeActionResu
     await addEntry(ctx, {
       companyId: parsed.data.companyId,
       projectId: parsed.data.projectId,
+      taskId: parsed.data.taskId,
+      roleId: parsed.data.roleId,
       entryDate: parsed.data.entryDate,
       durationMinutes,
       note: parsed.data.note,
@@ -56,7 +72,9 @@ export async function addTimeEntryAction(input: unknown): Promise<TimeActionResu
   } catch (error) {
     if (
       error instanceof Error &&
-      (error.message === "COMPANY_NOT_FOUND" || error.message === "PROJECT_NOT_FOUND")
+      ["COMPANY_NOT_FOUND", "PROJECT_NOT_FOUND", "TASK_NOT_FOUND", "ROLE_NOT_FOUND"].includes(
+        error.message,
+      )
     ) {
       return { ok: false, error: "notFound" };
     }

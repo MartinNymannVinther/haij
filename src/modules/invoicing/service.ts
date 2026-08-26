@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { todayInCopenhagen, addDaysIso, formatDateDa } from "@/core/dates";
 import {
   activities,
@@ -6,6 +6,9 @@ import {
   invoiceLines,
   invoices,
   orgProfiles,
+  projects,
+  roles,
+  tasks,
   timeEntries,
   type InvoiceStatus,
   type InvoiceUnit,
@@ -14,6 +17,7 @@ import {
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
 import { invoiceTotals, lineNetOere, lineVatOere, minutesToQuantityHundredths } from "./money";
 import { allocateInvoiceNumber } from "./numbering";
+import { resolveHourlyRateOere } from "./rates";
 
 /**
  * Invoicing services. RLS scopes every query to the caller's organization;
@@ -167,13 +171,52 @@ export async function createDraft(ctx: OrgContext, companyId?: string | null) {
   });
 }
 
+export type DraftFromTimeOptions = {
+  /** Inclusive yyyy-mm-dd bounds; omitted side means unbounded. */
+  from?: string | null;
+  to?: string | null;
+};
+
+function unbilledFilter(companyId: string, options?: DraftFromTimeOptions) {
+  return and(
+    eq(timeEntries.companyId, companyId),
+    isNull(timeEntries.invoiceLineId),
+    options?.from ? gte(timeEntries.entryDate, options.from) : undefined,
+    options?.to ? lte(timeEntries.entryDate, options.to) : undefined,
+  );
+}
+
+/** Unbilled minutes and entry count for a company, optionally date-bounded. */
+export async function unbilledSummary(
+  ctx: OrgContext,
+  companyId: string,
+  options?: DraftFromTimeOptions,
+) {
+  return withOrgContext(ctx, async (tx) => {
+    await getCompanyOrThrow(tx, companyId);
+    const [row] = await tx
+      .select({
+        minutes: sql<number>`coalesce(sum(duration_minutes), 0)::int`,
+        entries: sql<number>`count(*)::int`,
+      })
+      .from(timeEntries)
+      .where(unbilledFilter(companyId, options));
+    return { minutes: Number(row?.minutes ?? 0), entries: Number(row?.entries ?? 0) };
+  });
+}
+
 /**
- * Builds a draft from the company's unbilled time: one line per entry,
- * priced by the company rate with the org default as fallback. Entries are
- * linked to their line, so they never get billed twice — and unlink again
- * automatically if the line or draft is deleted.
+ * Builds a draft from the company's unbilled time — all of it, or the
+ * inclusive date range in `options`. One line per entry, each priced
+ * individually: role -> task -> project -> customer -> org default (all
+ * rates excl. VAT). Entries are linked to their line so they never get
+ * billed twice, and unlink again if the line or draft is deleted.
  */
-export async function createDraftFromTime(ctx: OrgContext, companyId: string) {
+export async function createDraftFromTime(
+  ctx: OrgContext,
+  companyId: string,
+  options?: DraftFromTimeOptions,
+) {
   return withOrgContext(ctx, async (tx) => {
     const company = await getCompanyOrThrow(tx, companyId);
     const [profile] = await tx
@@ -188,13 +231,18 @@ export async function createDraftFromTime(ctx: OrgContext, companyId: string) {
         entryDate: timeEntries.entryDate,
         durationMinutes: timeEntries.durationMinutes,
         note: timeEntries.note,
+        roleName: roles.name,
+        roleRateOere: roles.hourlyRateOere,
+        taskRateOere: tasks.hourlyRateOere,
+        projectRateOere: projects.hourlyRateOere,
       })
       .from(timeEntries)
-      .where(and(eq(timeEntries.companyId, companyId), isNull(timeEntries.invoiceLineId)))
+      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
+      .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .where(unbilledFilter(companyId, options))
       .orderBy(asc(timeEntries.entryDate), asc(timeEntries.createdAt));
     if (entries.length === 0) throw domainError("NO_UNBILLED_TIME");
-
-    const unitPriceOere = company.hourlyRateOere ?? profile?.defaultHourlyRateOere ?? 0;
 
     const [created] = await tx
       .insert(invoices)
@@ -208,15 +256,25 @@ export async function createDraftFromTime(ctx: OrgContext, companyId: string) {
     if (!created) throw new Error("invoice insert returned no row");
 
     for (const [index, entry] of entries.entries()) {
+      const unitPriceOere = resolveHourlyRateOere({
+        roleRateOere: entry.roleRateOere,
+        taskRateOere: entry.taskRateOere,
+        projectRateOere: entry.projectRateOere,
+        companyRateOere: company.hourlyRateOere,
+        orgDefaultRateOere: profile?.defaultHourlyRateOere,
+      });
       const quantityHundredths = minutesToQuantityHundredths(entry.durationMinutes);
       const net = lineNetOere(quantityHundredths, unitPriceOere);
+      const label = entry.note ?? "Konsulentarbejde";
       const [line] = await tx
         .insert(invoiceLines)
         .values({
           orgId: ctx.orgId,
           invoiceId: created.id,
           position: index,
-          description: `${formatDateDa(entry.entryDate)} · ${entry.note ?? "Konsulentarbejde"}`,
+          description: `${formatDateDa(entry.entryDate)} · ${label}${
+            entry.roleName ? ` (${entry.roleName})` : ""
+          }`,
           quantityHundredths,
           unit: "hour",
           unitPriceOere,

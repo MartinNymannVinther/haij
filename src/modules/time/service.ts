@@ -1,5 +1,5 @@
 import { and, asc, between, desc, eq, sql } from "drizzle-orm";
-import { companies, projects, timeEntries } from "@/core/db/schema";
+import { companies, projects, roles, tasks, timeEntries } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { weekDates } from "./duration";
 
@@ -12,6 +12,8 @@ import { weekDates } from "./duration";
 export type TimeEntryInput = {
   companyId?: string | null;
   projectId?: string | null;
+  taskId?: string | null;
+  roleId?: string | null;
   entryDate: string; // yyyy-mm-dd
   durationMinutes: number;
   note?: string | null;
@@ -33,10 +35,12 @@ export async function listWeek(ctx: OrgContext, mondayIso: string) {
         note: timeEntries.note,
         projectId: timeEntries.projectId,
         projectName: projects.name,
+        roleName: roles.name,
       })
       .from(timeEntries)
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
       .where(between(timeEntries.entryDate, monday, sunday))
       .orderBy(asc(timeEntries.entryDate), desc(timeEntries.createdAt)),
   );
@@ -45,21 +49,40 @@ export async function listWeek(ctx: OrgContext, mondayIso: string) {
 export async function addEntry(ctx: OrgContext, input: TimeEntryInput) {
   return withOrgContext(ctx, async (tx) => {
     let companyId = input.companyId ?? null;
-    if (input.projectId) {
-      // A project entry inherits the project's company unless one was
-      // chosen explicitly; the RLS-scoped lookup also blocks
+    let projectId = input.projectId ?? null;
+
+    if (input.taskId) {
+      // A task pins the project; the RLS-scoped lookup blocks
       // cross-tenant links (FK constraints don't know about tenants).
+      const [task] = await tx
+        .select({ id: tasks.id, projectId: tasks.projectId })
+        .from(tasks)
+        .where(eq(tasks.id, input.taskId))
+        .limit(1);
+      if (!task) throw new Error("TASK_NOT_FOUND");
+      if (projectId && projectId !== task.projectId) throw new Error("TASK_NOT_FOUND");
+      projectId = task.projectId;
+    }
+    if (projectId) {
+      // A project entry inherits the project's company unless one was
+      // chosen explicitly.
       const [project] = await tx
         .select({ id: projects.id, companyId: projects.companyId })
         .from(projects)
-        .where(and(eq(projects.id, input.projectId), eq(projects.status, "active")))
+        .where(and(eq(projects.id, projectId), eq(projects.status, "active")))
         .limit(1);
       if (!project) throw new Error("PROJECT_NOT_FOUND");
       companyId = companyId ?? project.companyId;
     }
+    if (input.roleId) {
+      const [role] = await tx
+        .select({ id: roles.id })
+        .from(roles)
+        .where(eq(roles.id, input.roleId))
+        .limit(1);
+      if (!role) throw new Error("ROLE_NOT_FOUND");
+    }
     if (companyId) {
-      // FK constraints don't know about tenants; RLS-scoped existence
-      // check prevents attaching time to another org's company.
       const [company] = await tx
         .select({ id: companies.id })
         .from(companies)
@@ -72,7 +95,9 @@ export async function addEntry(ctx: OrgContext, input: TimeEntryInput) {
       .values({
         orgId: ctx.orgId,
         companyId,
-        projectId: input.projectId ?? null,
+        projectId,
+        taskId: input.taskId ?? null,
+        roleId: input.roleId ?? null,
         userId: ctx.userId,
         entryDate: input.entryDate,
         durationMinutes: input.durationMinutes,

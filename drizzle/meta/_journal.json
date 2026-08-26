@@ -78,6 +78,20 @@
       "when": 1787764219910,
       "tag": "0010_projects_rls_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1787772913246,
+      "tag": "0011_roles_logo_rates",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787772913247,
+      "tag": "0012_roles_logo_rls_audit",
+      "breakpoints": true
     }
   ]
 }
