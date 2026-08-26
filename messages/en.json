@@ -93,7 +93,10 @@
       "system": "Follow system",
       "language": "Language",
       "danish": "Dansk",
-      "english": "English"
+      "english": "English",
+      "companies": "Customers",
+      "pipeline": "Pipeline",
+      "time": "Time"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -111,7 +114,13 @@
       "emptyBody": "Your customers, hours and invoices will live here. CRM and time tracking are the first modules on their way.",
       "passkeyPromptTitle": "Make your account more secure",
       "passkeyPromptBody": "Add a passkey so you can sign in without a password.",
-      "passkeyPromptCta": "Add passkey"
+      "passkeyPromptCta": "Add passkey",
+      "statCompanies": "Customers",
+      "statPipeline": "Active in pipeline",
+      "statWeek": "Hours this week",
+      "latestTitle": "Latest activity",
+      "latestEmpty": "No activity yet.",
+      "viewAll": "View all customers"
     },
     "security": {
       "title": "Security",
@@ -147,6 +156,130 @@
         "disabledToast": "Two-factor authentication disabled",
         "error": "The action failed. Check the password and try again."
       }
+    }
+  },
+  "crm": {
+    "stages": {
+      "lead": "Lead",
+      "dialogue": "Dialogue",
+      "proposal": "Proposal",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "list": {
+      "title": "Customers",
+      "searchPlaceholder": "Search name or CVR…",
+      "search": "Search",
+      "empty": "No customers yet.",
+      "emptyHint": "Create your first customer and let the CVR lookup fill in the details.",
+      "noResults": "No customers match the search.",
+      "create": "Create customer",
+      "name": "Name",
+      "cvr": "CVR",
+      "city": "City",
+      "stage": "Stage"
+    },
+    "create": {
+      "title": "Create customer",
+      "cvrLabel": "CVR number",
+      "fetch": "Fetch from CVR",
+      "found": "Fetched from CVR: {name}",
+      "notFound": "The CVR number was not found. Fill in the fields yourself.",
+      "unavailable": "The CVR lookup is unavailable right now. Fill in the fields yourself.",
+      "invalidCvr": "Enter a valid 8-digit CVR number.",
+      "throttled": "Too many lookups in a short time. Wait a moment.",
+      "cvrExists": "A customer with this CVR number already exists.",
+      "submit": "Create customer",
+      "createdToast": "{name} has been created"
+    },
+    "form": {
+      "name": "Name",
+      "cvr": "CVR number",
+      "address": "Address",
+      "zipcode": "Postal code",
+      "city": "City",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website"
+    },
+    "detail": {
+      "back": "All customers",
+      "info": "Company details",
+      "edit": "Edit",
+      "editTitle": "Edit customer",
+      "save": "Save",
+      "savedToast": "Changes saved",
+      "industry": "Industry",
+      "companyType": "Company form",
+      "trackedTime": "Tracked time",
+      "stageLabel": "Stage",
+      "notFoundError": "The customer no longer exists.",
+      "delete": "Delete customer",
+      "deleteTitle": "Delete {name}?",
+      "deleteBody": "Contacts and the timeline are deleted too. Time entries are kept but lose the customer link.",
+      "deleteConfirm": "Delete customer",
+      "deletedToast": "The customer has been deleted"
+    },
+    "contacts": {
+      "title": "Contacts",
+      "empty": "No contacts yet.",
+      "add": "Add contact",
+      "addTitle": "Add contact",
+      "name": "Name",
+      "role": "Title",
+      "email": "Email",
+      "phone": "Phone",
+      "primary": "Primary contact",
+      "primaryBadge": "Primary",
+      "remove": "Remove",
+      "submit": "Add",
+      "addedToast": "Contact added",
+      "removedToast": "Contact removed"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "placeholder": "Write a note…",
+      "submit": "Add",
+      "typeNote": "Note",
+      "typeCall": "Call",
+      "typeMeeting": "Meeting",
+      "typeEmail": "Email",
+      "createdCvr": "Customer created via CVR lookup",
+      "createdManual": "Customer created",
+      "stageChanged": "Stage changed from {from} to {to}",
+      "addedToast": "Added to the timeline",
+      "empty": "No activity yet."
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "empty": "No customers in the pipeline yet.",
+      "moveTo": "Move to…",
+      "movedToast": "{name} moved to {stage}",
+      "count": "{count} customers"
+    }
+  },
+  "time": {
+    "title": "Time",
+    "weekLabel": "Week {week}",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "This week",
+    "weekTotal": "Week total",
+    "emptyWeek": "No entries this week.",
+    "delete": "Delete",
+    "deletedToast": "The entry has been deleted",
+    "add": {
+      "title": "Track time",
+      "date": "Date",
+      "company": "Customer",
+      "noCompany": "No customer (internal)",
+      "duration": "Duration",
+      "durationPlaceholder": "1:30 or 1.5",
+      "note": "Note",
+      "notePlaceholder": "What did you work on?",
+      "submit": "Track",
+      "addedToast": "Time tracked",
+      "invalidDuration": "Could not understand the duration. Try 1:30, 1.5 or 45m."
     }
   }
 }

@@ -93,7 +93,10 @@
       "system": "Følg systemet",
       "language": "Sprog",
       "danish": "Dansk",
-      "english": "English"
+      "english": "English",
+      "companies": "Kunder",
+      "pipeline": "Pipeline",
+      "time": "Tid"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -111,7 +114,13 @@
       "emptyBody": "Dine kunder, timer og fakturaer kommer til at bo her. CRM og tidsregistrering er de første moduler på vej.",
       "passkeyPromptTitle": "Gør din konto mere sikker",
       "passkeyPromptBody": "Tilføj en passkey, så du kan logge ind uden adgangskode.",
-      "passkeyPromptCta": "Tilføj passkey"
+      "passkeyPromptCta": "Tilføj passkey",
+      "statCompanies": "Kunder",
+      "statPipeline": "Aktive i pipeline",
+      "statWeek": "Timer denne uge",
+      "latestTitle": "Seneste aktivitet",
+      "latestEmpty": "Ingen aktivitet endnu.",
+      "viewAll": "Se alle kunder"
     },
     "security": {
       "title": "Sikkerhed",
@@ -147,6 +156,130 @@
         "disabledToast": "Totrinsbekræftelse er slået fra",
         "error": "Handlingen mislykkedes. Tjek adgangskoden, og prøv igen."
       }
+    }
+  },
+  "crm": {
+    "stages": {
+      "lead": "Emne",
+      "dialogue": "Dialog",
+      "proposal": "Tilbud",
+      "won": "Vundet",
+      "lost": "Tabt"
+    },
+    "list": {
+      "title": "Kunder",
+      "searchPlaceholder": "Søg på navn eller CVR…",
+      "search": "Søg",
+      "empty": "Ingen kunder endnu.",
+      "emptyHint": "Opret din første kunde, og lad CVR-opslaget udfylde stamdata.",
+      "noResults": "Ingen kunder matcher søgningen.",
+      "create": "Opret kunde",
+      "name": "Navn",
+      "cvr": "CVR",
+      "city": "By",
+      "stage": "Status"
+    },
+    "create": {
+      "title": "Opret kunde",
+      "cvrLabel": "CVR-nummer",
+      "fetch": "Hent fra CVR",
+      "found": "Hentet fra CVR: {name}",
+      "notFound": "CVR-nummeret blev ikke fundet. Udfyld felterne selv.",
+      "unavailable": "CVR-opslaget er ikke tilgængeligt lige nu. Udfyld felterne selv.",
+      "invalidCvr": "Skriv et gyldigt 8-cifret CVR-nummer.",
+      "throttled": "For mange opslag på kort tid. Vent et øjeblik.",
+      "cvrExists": "Der findes allerede en kunde med dette CVR-nummer.",
+      "submit": "Opret kunde",
+      "createdToast": "{name} er oprettet"
+    },
+    "form": {
+      "name": "Navn",
+      "cvr": "CVR-nummer",
+      "address": "Adresse",
+      "zipcode": "Postnr.",
+      "city": "By",
+      "phone": "Telefon",
+      "email": "E-mail",
+      "website": "Websted"
+    },
+    "detail": {
+      "back": "Alle kunder",
+      "info": "Stamdata",
+      "edit": "Redigér",
+      "editTitle": "Redigér kunde",
+      "save": "Gem",
+      "savedToast": "Ændringerne er gemt",
+      "industry": "Branche",
+      "companyType": "Virksomhedsform",
+      "trackedTime": "Registreret tid",
+      "stageLabel": "Status",
+      "notFoundError": "Kunden findes ikke længere.",
+      "delete": "Slet kunde",
+      "deleteTitle": "Slet {name}?",
+      "deleteBody": "Kontakter og tidslinje slettes også. Tidsregistreringer bevares, men mister kundekoblingen.",
+      "deleteConfirm": "Slet kunden",
+      "deletedToast": "Kunden er slettet"
+    },
+    "contacts": {
+      "title": "Kontakter",
+      "empty": "Ingen kontakter endnu.",
+      "add": "Tilføj kontakt",
+      "addTitle": "Tilføj kontakt",
+      "name": "Navn",
+      "role": "Titel",
+      "email": "E-mail",
+      "phone": "Telefon",
+      "primary": "Primær kontakt",
+      "primaryBadge": "Primær",
+      "remove": "Fjern",
+      "submit": "Tilføj",
+      "addedToast": "Kontakten er tilføjet",
+      "removedToast": "Kontakten er fjernet"
+    },
+    "timeline": {
+      "title": "Tidslinje",
+      "placeholder": "Skriv en note…",
+      "submit": "Tilføj",
+      "typeNote": "Note",
+      "typeCall": "Opkald",
+      "typeMeeting": "Møde",
+      "typeEmail": "E-mail",
+      "createdCvr": "Kunde oprettet via CVR-opslag",
+      "createdManual": "Kunde oprettet",
+      "stageChanged": "Status ændret fra {from} til {to}",
+      "addedToast": "Tilføjet til tidslinjen",
+      "empty": "Ingen aktivitet endnu."
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "empty": "Ingen kunder i pipelinen endnu.",
+      "moveTo": "Flyt til…",
+      "movedToast": "{name} flyttet til {stage}",
+      "count": "{count} kunder"
+    }
+  },
+  "time": {
+    "title": "Tid",
+    "weekLabel": "Uge {week}",
+    "prevWeek": "Forrige uge",
+    "nextWeek": "Næste uge",
+    "thisWeek": "Denne uge",
+    "weekTotal": "Uge i alt",
+    "emptyWeek": "Ingen registreringer i denne uge.",
+    "delete": "Slet",
+    "deletedToast": "Registreringen er slettet",
+    "add": {
+      "title": "Registrér tid",
+      "date": "Dato",
+      "company": "Kunde",
+      "noCompany": "Ingen kunde (intern tid)",
+      "duration": "Varighed",
+      "durationPlaceholder": "1:30 eller 1,5",
+      "note": "Note",
+      "notePlaceholder": "Hvad arbejdede du på?",
+      "submit": "Registrér",
+      "addedToast": "Tid registreret",
+      "invalidDuration": "Varigheden kunne ikke forstås. Prøv fx 1:30, 1,5 eller 45m."
     }
   }
 }

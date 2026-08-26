@@ -1,0 +1,169 @@
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Metadata } from "next";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOrgContext, getSession } from "@/core/auth/session";
+import {
+  formatMinutes,
+  isoWeekMonday,
+  isoWeekNumber,
+  shiftWeek,
+  weekDates,
+} from "@/modules/time/duration";
+import { listWeek } from "@/modules/time/service";
+import { listCompanies } from "@/modules/crm/service";
+import { Link, redirect } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
+import { AddEntryForm } from "./add-entry-form";
+import { EntryDeleteButton } from "./entry-delete-button";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("time");
+  return { title: t("title") };
+}
+
+function todayInCopenhagen(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Copenhagen",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+export default async function TimePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ week?: string }>;
+}) {
+  const context = await getOrgContext();
+  const session = await getSession();
+  if (!context || !session) {
+    redirect({ href: "/onboarding", locale: await getLocale() });
+    return null;
+  }
+
+  const today = todayInCopenhagen();
+  const currentMonday = isoWeekMonday(new Date(`${today}T12:00:00Z`));
+  const { week } = await searchParams;
+  const monday = /^\d{4}-\d{2}-\d{2}$/.test(week ?? "")
+    ? isoWeekMonday(new Date(`${week}T12:00:00Z`))
+    : currentMonday;
+
+  const [t, entries, companies, format] = await Promise.all([
+    getTranslations("time"),
+    listWeek(context, monday),
+    listCompanies(context),
+    getFormatter(),
+  ]);
+
+  const days = weekDates(monday);
+  const weekTotal = entries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
+  const byDay = new Map<string, typeof entries>();
+  for (const entry of entries) {
+    const list = byDay.get(entry.entryDate) ?? [];
+    list.push(entry);
+    byDay.set(entry.entryDate, list);
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+          <span className="text-muted-foreground text-sm">
+            {t("weekLabel", { week: isoWeekNumber(monday) })}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Link
+            href={`/time?week=${shiftWeek(monday, -1)}`}
+            aria-label={t("prevWeek")}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
+          >
+            <ChevronLeft />
+          </Link>
+          <Link href="/time" className={cn(buttonVariants({ variant: "outline", size: "sm" }))}>
+            {t("thisWeek")}
+          </Link>
+          <Link
+            href={`/time?week=${shiftWeek(monday, 1)}`}
+            aria-label={t("nextWeek")}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
+          >
+            <ChevronRight />
+          </Link>
+        </div>
+      </div>
+
+      <AddEntryForm
+        defaultDate={today >= monday && today <= days[6]! ? today : monday}
+        companies={companies.map((company) => ({ id: company.id, name: company.name }))}
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between text-base">
+            <span>
+              {format.dateTimeRange(
+                new Date(`${monday}T12:00:00Z`),
+                new Date(`${days[6]}T12:00:00Z`),
+                { day: "numeric", month: "short" },
+              )}
+            </span>
+            <span className="tabular-nums">
+              {t("weekTotal")}: {formatMinutes(weekTotal)}
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {weekTotal === 0 && entries.length === 0 ? (
+            <p className="text-muted-foreground text-sm">{t("emptyWeek")}</p>
+          ) : null}
+          {days.map((day) => {
+            const dayEntries = byDay.get(day) ?? [];
+            if (dayEntries.length === 0) return null;
+            const dayTotal = dayEntries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
+            return (
+              <div key={day}>
+                <div className="text-muted-foreground mb-1.5 flex items-center justify-between text-xs font-medium tracking-wide uppercase">
+                  <span className={day === today ? "text-primary" : undefined}>
+                    {format.dateTime(new Date(`${day}T12:00:00Z`), {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                  <span className="tabular-nums">{formatMinutes(dayTotal)}</span>
+                </div>
+                <ul className="flex flex-col divide-y rounded-lg border">
+                  {dayEntries.map((entry) => (
+                    <li key={entry.id} className="group flex items-center gap-3 px-3 py-2">
+                      <div className="min-w-0 flex-1 text-sm">
+                        <span className="font-medium">
+                          {entry.companyName ?? t("add.noCompany")}
+                        </span>
+                        {entry.note ? (
+                          <span className="text-muted-foreground"> · {entry.note}</span>
+                        ) : null}
+                      </div>
+                      <span className="text-sm tabular-nums">
+                        {formatMinutes(entry.durationMinutes)}
+                      </span>
+                      {entry.userId === session.user.id ? (
+                        <EntryDeleteButton entryId={entry.id} />
+                      ) : (
+                        <span className="w-7" />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
