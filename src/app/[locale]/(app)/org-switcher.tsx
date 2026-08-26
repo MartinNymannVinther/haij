@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -73,13 +74,16 @@ export function OrgSwitcher() {
           }
         />
         <DropdownMenuContent align="start" className="min-w-56">
-          <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
-          {(organizations ?? []).map((organization) => (
-            <DropdownMenuItem key={organization.id} onClick={() => switchTo(organization.id)}>
-              <span className="flex-1 truncate">{organization.name}</span>
-              {organization.id === activeOrganization?.id ? <Check data-slot="icon" /> : null}
-            </DropdownMenuItem>
-          ))}
+          {/* Base UI: a GroupLabel must live inside a Group. */}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>
+            {(organizations ?? []).map((organization) => (
+              <DropdownMenuItem key={organization.id} onClick={() => switchTo(organization.id)}>
+                <span className="flex-1 truncate">{organization.name}</span>
+                {organization.id === activeOrganization?.id ? <Check data-slot="icon" /> : null}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setDialogOpen(true)}>
             <Plus data-slot="icon" />

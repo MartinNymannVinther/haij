@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -58,10 +59,15 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
         }
       />
       <DropdownMenuContent align="end" className="min-w-56">
-        <DropdownMenuLabel>
-          <span className="block truncate">{name}</span>
-          <span className="text-muted-foreground block truncate text-xs font-normal">{email}</span>
-        </DropdownMenuLabel>
+        {/* Base UI: a GroupLabel must live inside a Group. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <span className="block truncate">{name}</span>
+            <span className="text-muted-foreground block truncate text-xs font-normal">
+              {email}
+            </span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/settings/company")}>
           <Building2 data-slot="icon" />
