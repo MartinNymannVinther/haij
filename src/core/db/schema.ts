@@ -233,6 +233,11 @@ export const companies = pgTable(
     industryText: text("industry_text"),
     companyType: text("company_type"),
     pipelineStage: text("pipeline_stage").notNull().default("lead"),
+    /** Agreed frame with the customer, if any: hours and/or amount. */
+    budgetMinutes: integer("budget_minutes"),
+    budgetAmountOere: bigint("budget_amount_oere", { mode: "number" }),
+    /** Customer-specific hourly rate; falls back to the org default. */
+    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }),
     cvrData: jsonb("cvr_data"),
     cvrSyncedAt: timestamp("cvr_synced_at", { withTimezone: true }),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
@@ -314,6 +319,10 @@ export const timeEntries = pgTable(
     entryDate: date("entry_date").notNull(),
     durationMinutes: integer("duration_minutes").notNull(),
     note: text("note"),
+    /** Set when the entry is pulled onto an invoice line (draft or issued). */
+    invoiceLineId: text("invoice_line_id").references(() => invoiceLines.id, {
+      onDelete: "set null",
+    }),
     ...timestamps,
   },
   (t) => [
@@ -321,6 +330,163 @@ export const timeEntries = pgTable(
     index("time_entries_org_user_date_idx").on(t.orgId, t.userId, t.entryDate),
     index("time_entries_org_company_idx").on(t.orgId, t.companyId),
     check("time_entries_duration_valid", sql`duration_minutes between 1 and 1440`),
+  ],
+);
+
+/* ------------------------------------------------------------------ */
+/* Phase 2: invoicing, org profile and budgets. Amounts are integer    */
+/* øre for exact VAT arithmetic; fields map cleanly to Peppol BIS 3.0. */
+/* ------------------------------------------------------------------ */
+
+export const INVOICE_STATUSES = ["draft", "issued", "sent", "paid"] as const;
+export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
+
+export const INVOICE_TYPES = ["invoice", "credit_note"] as const;
+export type InvoiceType = (typeof INVOICE_TYPES)[number];
+
+export const VAT_CATEGORIES = ["standard", "zero", "exempt"] as const;
+export type VatCategory = (typeof VAT_CATEGORIES)[number];
+
+export const INVOICE_UNITS = ["hour", "day", "piece", "fixed"] as const;
+export type InvoiceUnit = (typeof INVOICE_UNITS)[number];
+
+/** Seller master data required on every invoice (fakturakrav). */
+export const orgProfiles = pgTable("org_profiles", {
+  orgId: text("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  legalName: text("legal_name").notNull(),
+  cvr: text("cvr").notNull(),
+  address: text("address").notNull(),
+  zipcode: text("zipcode").notNull(),
+  city: text("city").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  bankReg: text("bank_reg"),
+  bankKonto: text("bank_konto"),
+  defaultPaymentTermsDays: integer("default_payment_terms_days").notNull().default(14),
+  defaultHourlyRateOere: bigint("default_hourly_rate_oere", { mode: "number" }),
+  ...timestamps,
+});
+
+/** Gapless sequential invoice numbers, one series per organization. */
+export const invoiceCounters = pgTable("invoice_counters", {
+  orgId: text("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  nextNumber: integer("next_number").notNull().default(1),
+});
+
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    type: text("type").notNull().default("invoice"),
+    creditedInvoiceId: text("credited_invoice_id"),
+    companyId: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+    status: text("status").notNull().default("draft"),
+    invoiceNumber: integer("invoice_number"),
+    invoiceDate: date("invoice_date"),
+    deliveryDate: date("delivery_date"),
+    dueDate: date("due_date"),
+    paymentTermsDays: integer("payment_terms_days").notNull().default(14),
+    currency: text("currency").notNull().default("DKK"),
+    // Buyer snapshot (frozen at issue; editable while draft)
+    buyerName: text("buyer_name"),
+    buyerCvr: text("buyer_cvr"),
+    buyerAddress: text("buyer_address"),
+    buyerZipcode: text("buyer_zipcode"),
+    buyerCity: text("buyer_city"),
+    buyerEanGln: text("buyer_ean_gln"),
+    buyerReference: text("buyer_reference"),
+    // Seller snapshot (copied from org_profiles at issue)
+    sellerName: text("seller_name"),
+    sellerCvr: text("seller_cvr"),
+    sellerAddress: text("seller_address"),
+    sellerZipcode: text("seller_zipcode"),
+    sellerCity: text("seller_city"),
+    sellerEmail: text("seller_email"),
+    sellerPhone: text("seller_phone"),
+    sellerBankReg: text("seller_bank_reg"),
+    sellerBankKonto: text("seller_bank_konto"),
+    note: text("note"),
+    netOere: bigint("net_oere", { mode: "number" }).notNull().default(0),
+    vatOere: bigint("vat_oere", { mode: "number" }).notNull().default(0),
+    grossOere: bigint("gross_oere", { mode: "number" }).notNull().default(0),
+    issuedAt: timestamp("issued_at", { withTimezone: true }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    index("invoices_org_status_idx").on(t.orgId, t.status),
+    index("invoices_org_company_idx").on(t.orgId, t.companyId),
+    uniqueIndex("invoices_org_number_uq")
+      .on(t.orgId, t.invoiceNumber)
+      .where(sql`invoice_number is not null`),
+    check("invoices_status_valid", sql`status in ('draft', 'issued', 'sent', 'paid')`),
+    check("invoices_type_valid", sql`type in ('invoice', 'credit_note')`),
+    check(
+      "invoices_issued_have_number",
+      sql`status = 'draft' or (invoice_number is not null and invoice_date is not null)`,
+    ),
+  ],
+);
+
+export const invoiceLines = pgTable(
+  "invoice_lines",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    invoiceId: text("invoice_id")
+      .notNull()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+    description: text("description").notNull(),
+    /** Quantity in hundredths (2 decimals), e.g. 1.50 stored as 150. */
+    quantityHundredths: integer("quantity_hundredths").notNull(),
+    unit: text("unit").notNull().default("hour"),
+    unitPriceOere: bigint("unit_price_oere", { mode: "number" }).notNull(),
+    vatCategory: text("vat_category").notNull().default("standard"),
+    /** Basis points: 2500 = 25 %. */
+    vatRateBp: integer("vat_rate_bp").notNull().default(2500),
+    lineNetOere: bigint("line_net_oere", { mode: "number" }).notNull(),
+    lineVatOere: bigint("line_vat_oere", { mode: "number" }).notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    index("invoice_lines_org_invoice_idx").on(t.orgId, t.invoiceId),
+    check("invoice_lines_unit_valid", sql`unit in ('hour', 'day', 'piece', 'fixed')`),
+    check(
+      "invoice_lines_vat_valid",
+      sql`vat_category in ('standard', 'zero', 'exempt') and vat_rate_bp between 0 and 10000`,
+    ),
+    check("invoice_lines_quantity_valid", sql`quantity_hundredths <> 0`),
+  ],
+);
+
+/** Monthly revenue targets; actuals are computed from issued invoices. */
+export const budgets = pgTable(
+  "budgets",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    year: integer("year").notNull(),
+    month: integer("month").notNull(),
+    revenueTargetOere: bigint("revenue_target_oere", { mode: "number" }).notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("budgets_org_year_month_uq").on(t.orgId, t.year, t.month),
+    check("budgets_month_valid", sql`month between 1 and 12`),
   ],
 );
 

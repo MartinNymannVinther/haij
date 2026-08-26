@@ -43,6 +43,27 @@
       "when": 1787748820644,
       "tag": "0005_audit_org_id_fallback",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787761481581,
+      "tag": "0006_invoicing_budget",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1787761482585,
+      "tag": "0007_invoicing_rls_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787761748536,
+      "tag": "0008_hourly_rates",
+      "breakpoints": true
     }
   ]
 }
