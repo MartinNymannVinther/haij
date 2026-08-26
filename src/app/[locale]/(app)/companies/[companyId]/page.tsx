@@ -7,8 +7,10 @@ import { getOrgContext } from "@/core/auth/session";
 import type { PipelineStage } from "@/core/db/schema";
 import { formatMinutes } from "@/modules/time/duration";
 import { getCompanyDetail } from "@/modules/crm/service";
+import { getCustomerEconomy } from "@/modules/invoicing/economy";
 import { Link, redirect } from "@/i18n/navigation";
 import { ActivityComposer } from "./activity-composer";
+import { CompanyEconomyCard } from "./company-economy-card";
 import { AddContactDialog } from "./add-contact-dialog";
 import { CompanyActions } from "./company-actions";
 import { ContactDeleteButton } from "./contact-delete-button";
@@ -41,6 +43,7 @@ export default async function CompanyDetailPage({
   ]);
   const format = await getFormatter();
   const { company, contacts, timeline, trackedMinutes } = detail;
+  const economy = (await getCustomerEconomy(context)).find((row) => row.companyId === companyId);
 
   return (
     <div className="flex flex-col gap-6">
@@ -134,6 +137,8 @@ export default async function CompanyDetailPage({
               </p>
             </CardContent>
           </Card>
+
+          {economy ? <CompanyEconomyCard companyId={company.id} economy={economy} /> : null}
 
           <Card>
             <CardHeader>

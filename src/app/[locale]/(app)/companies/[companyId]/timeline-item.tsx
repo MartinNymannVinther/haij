@@ -41,7 +41,13 @@ export function TimelineItem({
       to: tStages(to as never),
     });
   } else if (entry.type === "system") {
-    headline = metadata.source === "cvr" ? t("createdCvr") : t("createdManual");
+    if (metadata.event === "invoice_issued" || metadata.event === "credit_note_issued") {
+      headline = t(metadata.event === "invoice_issued" ? "invoiceIssued" : "creditNoteIssued", {
+        number: Number(metadata.invoiceNumber ?? 0),
+      });
+    } else {
+      headline = metadata.source === "cvr" ? t("createdCvr") : t("createdManual");
+    }
   } else {
     headline = t(
       entry.type === "note"

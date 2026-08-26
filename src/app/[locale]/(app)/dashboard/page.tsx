@@ -7,6 +7,8 @@ import { getOrgContext } from "@/core/auth/session";
 import { organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { getCrmOverview } from "@/modules/crm/service";
+import { formatOere } from "@/modules/invoicing/money";
+import { getInvoicingOverview } from "@/modules/invoicing/service";
 import { formatMinutes, isoWeekMonday } from "@/modules/time/duration";
 import { weekTotalMinutes } from "@/modules/time/service";
 import { Link, redirect } from "@/i18n/navigation";
@@ -41,9 +43,10 @@ export default async function DashboardPage() {
   }
 
   const monday = isoWeekMonday(new Date());
-  const [overview, weekMinutes, format] = await Promise.all([
+  const [overview, weekMinutes, invoicing, format] = await Promise.all([
     getCrmOverview(context),
     weekTotalMinutes(context, monday),
+    getInvoicingOverview(context),
     getFormatter(),
   ]);
   const totalCompanies = overview.stages.reduce((sum, row) => sum + row.count, 0);
@@ -60,6 +63,12 @@ export default async function DashboardPage() {
       });
     }
     if (entry.type === "system") {
+      if (metadata.event === "invoice_issued" || metadata.event === "credit_note_issued") {
+        return tTimeline(
+          metadata.event === "invoice_issued" ? "invoiceIssued" : "creditNoteIssued",
+          { number: Number(metadata.invoiceNumber ?? 0) },
+        );
+      }
       return metadata.source === "cvr" ? tTimeline("createdCvr") : tTimeline("createdManual");
     }
     return entry.body ?? "";
@@ -96,7 +105,7 @@ export default async function DashboardPage() {
         </Card>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardContent className="pt-0">
                 <p className="text-muted-foreground text-sm">{t("statCompanies")}</p>
@@ -119,6 +128,19 @@ export default async function DashboardPage() {
                 <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
                   {formatMinutes(weekMinutes)}
                 </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-0">
+                <p className="text-muted-foreground text-sm">{t("statOutstanding")}</p>
+                <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
+                  {formatOere(invoicing.outstandingOere)}
+                </p>
+                {invoicing.overdueOere > 0 ? (
+                  <p className="text-destructive mt-1 text-xs font-medium">
+                    {t("statOverdue", { amount: formatOere(invoicing.overdueOere) })}
+                  </p>
+                ) : null}
               </CardContent>
             </Card>
           </div>

@@ -9,6 +9,8 @@ const LINKS = [
   { href: "/companies", key: "companies" },
   { href: "/pipeline", key: "pipeline" },
   { href: "/time", key: "time" },
+  { href: "/invoices", key: "invoices" },
+  { href: "/economy", key: "economy" },
 ] as const;
 
 export function NavLinks() {
