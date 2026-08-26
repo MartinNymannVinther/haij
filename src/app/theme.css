@@ -1,0 +1,74 @@
+/*
+ * Haij design tokens — GRANIT (chosen direction, phase 0.5)
+ * Tight and near-monochrome with one electric blue accent. Fast, precise,
+ * tool-like. Smaller radius, higher contrast.
+ */
+
+:root {
+  --background: oklch(0.996 0 0);
+  --foreground: oklch(0.15 0.005 260);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.005 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.005 260);
+  --primary: oklch(0.51 0.21 265);
+  --primary-foreground: oklch(0.985 0.005 265);
+  --secondary: oklch(0.965 0.002 260);
+  --secondary-foreground: oklch(0.22 0.01 260);
+  --muted: oklch(0.965 0.002 260);
+  --muted-foreground: oklch(0.52 0.01 260);
+  --accent: oklch(0.955 0.012 265);
+  --accent-foreground: oklch(0.35 0.08 265);
+  --destructive: oklch(0.577 0.245 27);
+  --border: oklch(0.915 0.004 260);
+  --input: oklch(0.915 0.004 260);
+  --ring: oklch(0.6 0.18 265);
+  --chart-1: oklch(0.51 0.21 265);
+  --chart-2: oklch(0.42 0.01 260);
+  --chart-3: oklch(0.62 0.01 260);
+  --chart-4: oklch(0.66 0.15 300);
+  --chart-5: oklch(0.78 0.005 260);
+  --radius: 0.45rem;
+  --sidebar: oklch(0.98 0.001 260);
+  --sidebar-foreground: oklch(0.15 0.005 260);
+  --sidebar-primary: oklch(0.51 0.21 265);
+  --sidebar-primary-foreground: oklch(0.985 0.005 265);
+  --sidebar-accent: oklch(0.955 0.012 265);
+  --sidebar-accent-foreground: oklch(0.35 0.08 265);
+  --sidebar-border: oklch(0.915 0.004 260);
+  --sidebar-ring: oklch(0.6 0.18 265);
+}
+
+.dark {
+  --background: oklch(0.148 0.004 260);
+  --foreground: oklch(0.97 0.002 260);
+  --card: oklch(0.19 0.005 260);
+  --card-foreground: oklch(0.97 0.002 260);
+  --popover: oklch(0.19 0.005 260);
+  --popover-foreground: oklch(0.97 0.002 260);
+  --primary: oklch(0.62 0.19 265);
+  --primary-foreground: oklch(0.985 0.005 265);
+  --secondary: oklch(0.24 0.006 260);
+  --secondary-foreground: oklch(0.97 0.002 260);
+  --muted: oklch(0.24 0.006 260);
+  --muted-foreground: oklch(0.68 0.008 260);
+  --accent: oklch(0.27 0.03 265);
+  --accent-foreground: oklch(0.88 0.06 265);
+  --destructive: oklch(0.704 0.191 22);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 13%);
+  --ring: oklch(0.62 0.19 265);
+  --chart-1: oklch(0.62 0.19 265);
+  --chart-2: oklch(0.75 0.008 260);
+  --chart-3: oklch(0.55 0.01 260);
+  --chart-4: oklch(0.7 0.14 300);
+  --chart-5: oklch(0.4 0.008 260);
+  --sidebar: oklch(0.19 0.005 260);
+  --sidebar-foreground: oklch(0.97 0.002 260);
+  --sidebar-primary: oklch(0.62 0.19 265);
+  --sidebar-primary-foreground: oklch(0.985 0.005 265);
+  --sidebar-accent: oklch(0.27 0.03 265);
+  --sidebar-accent-foreground: oklch(0.88 0.06 265);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: oklch(0.62 0.19 265);
+}

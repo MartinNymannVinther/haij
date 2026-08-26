@@ -1,7 +1,8 @@
 "use client";
 
-import { Languages, LogOut, ShieldCheck } from "lucide-react";
+import { Check, Languages, LogOut, Monitor, Moon, ShieldCheck, Sun } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authClient } from "@/core/auth/client";
@@ -25,11 +29,18 @@ function initials(name: string): string {
   );
 }
 
+const THEME_OPTIONS = [
+  { value: "light", labelKey: "light", icon: Sun },
+  { value: "dark", labelKey: "dark", icon: Moon },
+  { value: "system", labelKey: "system", icon: Monitor },
+] as const;
+
 export function UserMenu({ name, email }: { name: string; email: string }) {
   const t = useTranslations("app.nav");
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
+  const { theme, setTheme } = useTheme();
 
   async function handleLogout() {
     await authClient.signOut();
@@ -56,6 +67,22 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
           <ShieldCheck data-slot="icon" />
           {t("security")}
         </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Sun data-slot="icon" className="dark:hidden" />
+            <Moon data-slot="icon" className="hidden dark:block" />
+            {t("appearance")}
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            {THEME_OPTIONS.map((option) => (
+              <DropdownMenuItem key={option.value} onClick={() => setTheme(option.value)}>
+                <option.icon data-slot="icon" />
+                <span className="flex-1">{t(option.labelKey)}</span>
+                {(theme ?? "system") === option.value ? <Check data-slot="icon" /> : null}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuItem
           onClick={() => router.replace(pathname, { locale: locale === "da" ? "en" : "da" })}
         >
