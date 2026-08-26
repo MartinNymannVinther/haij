@@ -184,7 +184,10 @@ export function DraftEditor({
           <LinesCard invoiceId={invoice.id} lines={lines} />
         </div>
 
-        <form onSubmit={saveMeta}>
+        {/* Keyed by updatedAt: a save refreshes the invoice props, and
+            remounting keeps the uncontrolled defaults in sync (Base UI
+            warns if a default changes on a mounted control). */}
+        <form key={String(invoice.updatedAt)} onSubmit={saveMeta}>
           <Card>
             <CardHeader>
               <CardTitle>{t("metaTitle")}</CardTitle>

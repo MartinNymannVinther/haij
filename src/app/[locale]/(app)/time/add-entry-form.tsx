@@ -173,6 +173,7 @@ export function AddEntryForm({
           <Field>
             <FieldLabel htmlFor="entry-date">{t("date")}</FieldLabel>
             <Input
+              key={defaultDate}
               id="entry-date"
               name="entryDate"
               type="date"

@@ -35,6 +35,10 @@ type Fields = {
   city: string;
   email: string;
   phone: string;
+  bankReg: string;
+  bankKonto: string;
+  paymentTerms: string;
+  defaultHourlyRate: string;
 };
 
 export function CompanyProfileForm({ profile }: { profile: Profile }) {
@@ -45,6 +49,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
   const [pending, setPending] = useState(false);
   const [looking, setLooking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Fully controlled: router.refresh() after save hands the form new
+  // profile props, and Base UI warns if an uncontrolled default changes.
   const [fields, setFields] = useState<Fields>({
     legalName: profile?.legalName ?? "",
     cvr: profile?.cvr ?? "",
@@ -53,6 +59,11 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
     city: profile?.city ?? "",
     email: profile?.email ?? "",
     phone: profile?.phone ?? "",
+    bankReg: profile?.bankReg ?? "",
+    bankKonto: profile?.bankKonto ?? "",
+    paymentTerms: String(profile?.defaultPaymentTermsDays ?? 14),
+    defaultHourlyRate:
+      profile?.defaultHourlyRateOere != null ? oereToInputValue(profile.defaultHourlyRateOere) : "",
   });
 
   function setField(name: keyof Fields) {
@@ -92,21 +103,26 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-    const form = new FormData(event.currentTarget);
 
-    const rateInput = String(form.get("defaultHourlyRate") ?? "").trim();
+    const rateInput = fields.defaultHourlyRate.trim();
     const rateOere = rateInput ? parseKronerToOere(rateInput) : null;
     if (rateInput && (rateOere === null || rateOere < 0)) {
       setError(t("invalidRate"));
       return;
     }
-    const terms = Number(form.get("defaultPaymentTermsDays") ?? 14);
+    const terms = Number(fields.paymentTerms);
 
     setPending(true);
     const result = await saveOrgProfileAction({
-      ...fields,
-      bankReg: String(form.get("bankReg") ?? ""),
-      bankKonto: String(form.get("bankKonto") ?? ""),
+      legalName: fields.legalName,
+      cvr: fields.cvr,
+      address: fields.address,
+      zipcode: fields.zipcode,
+      city: fields.city,
+      email: fields.email,
+      phone: fields.phone,
+      bankReg: fields.bankReg,
+      bankKonto: fields.bankKonto,
       defaultPaymentTermsDays: Number.isFinite(terms) ? terms : 14,
       defaultHourlyRateOere: rateOere,
     });
@@ -245,7 +261,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="bankReg"
                   inputMode="numeric"
                   maxLength={10}
-                  defaultValue={profile?.bankReg ?? ""}
+                  value={fields.bankReg}
+                  onChange={setField("bankReg")}
                 />
               </Field>
               <Field>
@@ -255,7 +272,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="bankKonto"
                   inputMode="numeric"
                   maxLength={20}
-                  defaultValue={profile?.bankKonto ?? ""}
+                  value={fields.bankKonto}
+                  onChange={setField("bankKonto")}
                 />
               </Field>
             </div>
@@ -269,7 +287,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   min={0}
                   max={120}
                   required
-                  defaultValue={profile?.defaultPaymentTermsDays ?? 14}
+                  value={fields.paymentTerms}
+                  onChange={setField("paymentTerms")}
                 />
               </Field>
               <Field>
@@ -279,11 +298,8 @@ export function CompanyProfileForm({ profile }: { profile: Profile }) {
                   name="defaultHourlyRate"
                   inputMode="decimal"
                   placeholder="950,00"
-                  defaultValue={
-                    profile?.defaultHourlyRateOere != null
-                      ? oereToInputValue(profile.defaultHourlyRateOere)
-                      : ""
-                  }
+                  value={fields.defaultHourlyRate}
+                  onChange={setField("defaultHourlyRate")}
                 />
               </Field>
             </div>
