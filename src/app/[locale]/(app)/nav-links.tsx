@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/dashboard", key: "dashboard" },
   { href: "/companies", key: "companies" },
   { href: "/pipeline", key: "pipeline" },
+  { href: "/projects", key: "projects" },
   { href: "/time", key: "time" },
   { href: "/invoices", key: "invoices" },
   { href: "/economy", key: "economy" },

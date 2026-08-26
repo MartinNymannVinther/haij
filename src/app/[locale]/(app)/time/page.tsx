@@ -14,6 +14,7 @@ import {
 } from "@/modules/time/duration";
 import { listWeek } from "@/modules/time/service";
 import { listCompanies } from "@/modules/crm/service";
+import { listActiveProjectsForPicker } from "@/modules/projects/service";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { AddEntryForm } from "./add-entry-form";
@@ -43,10 +44,11 @@ export default async function TimePage({
     ? isoWeekMonday(new Date(`${week}T12:00:00Z`))
     : currentMonday;
 
-  const [t, entries, companies, format] = await Promise.all([
+  const [t, entries, companies, projects, format] = await Promise.all([
     getTranslations("time"),
     listWeek(context, monday),
     listCompanies(context),
+    listActiveProjectsForPicker(context),
     getFormatter(),
   ]);
 
@@ -92,6 +94,7 @@ export default async function TimePage({
       <AddEntryForm
         defaultDate={today >= monday && today <= days[6]! ? today : monday}
         companies={companies.map((company) => ({ id: company.id, name: company.name }))}
+        projects={projects}
       />
 
       <Card>
@@ -136,6 +139,9 @@ export default async function TimePage({
                         <span className="font-medium">
                           {entry.companyName ?? t("add.noCompany")}
                         </span>
+                        {entry.projectName ? (
+                          <span className="text-primary"> · {entry.projectName}</span>
+                        ) : null}
                         {entry.note ? (
                           <span className="text-muted-foreground"> · {entry.note}</span>
                         ) : null}

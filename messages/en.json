@@ -101,7 +101,8 @@
       "time": "Time",
       "companySettings": "Company",
       "invoices": "Invoices",
-      "economy": "Economy"
+      "economy": "Economy",
+      "projects": "Projects"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -288,7 +289,9 @@
       "notePlaceholder": "What did you work on?",
       "submit": "Track",
       "addedToast": "Time tracked",
-      "invalidDuration": "Could not understand the duration. Try 1:30, 1.5 or 45m."
+      "invalidDuration": "Could not understand the duration. Try 1:30, 1.5 or 45m.",
+      "noProject": "No project",
+      "project": "Project"
     }
   },
   "orgProfile": {
@@ -482,6 +485,69 @@
       "draftToast": "Invoice draft created from unbilled hours.",
       "savedToast": "Hourly rate and frame saved.",
       "invalid": "Check the fields. Write amounts like 950.00."
+    }
+  },
+  "projects": {
+    "list": {
+      "title": "Projects",
+      "filterAll": "All",
+      "empty": "No projects yet.",
+      "emptyHint": "Create your first project, set a frame and link your hours.",
+      "noResults": "No projects with that status.",
+      "name": "Project",
+      "customer": "Customer",
+      "tasks": "Tasks",
+      "taskCount": "{done}/{total}",
+      "tracked": "Tracked time",
+      "deadline": "Deadline",
+      "frame": "Agreed frame",
+      "statusHead": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "done": "Done",
+      "archived": "Archived"
+    },
+    "create": {
+      "title": "New project",
+      "name": "Project name",
+      "customer": "Customer",
+      "noCompany": "No customer (internal)",
+      "description": "Description",
+      "deadline": "Deadline",
+      "hourFrame": "Frame, hours",
+      "amountFrame": "Frame, DKK",
+      "none": "None",
+      "submit": "Create project",
+      "createdToast": "Project created.",
+      "invalidFrames": "Check the frames. Write e.g. 40 hours or 60,000 DKK."
+    },
+    "detail": {
+      "title": "Project",
+      "back": "All projects",
+      "deadlineLine": "Deadline {date}",
+      "editTitle": "Edit project",
+      "savedToast": "Project saved.",
+      "deleteTitle": "Delete the project?",
+      "deleteBody": "Tasks are deleted. Tracked hours are kept but lose the project link.",
+      "deletedToast": "Project deleted.",
+      "timeTitle": "Tracked time",
+      "noTime": "No time on the project yet. Pick the project when tracking time.",
+      "noNote": "No note",
+      "billed": "invoiced",
+      "consumptionTitle": "Consumption",
+      "tracked": "Tracked time",
+      "unbilled": "Unbilled",
+      "value": "Value of time",
+      "descriptionTitle": "Description"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "openCount": "{count} open",
+      "placeholder": "New task…",
+      "due": "Due",
+      "add": "Add",
+      "empty": "No tasks yet."
     }
   }
 }

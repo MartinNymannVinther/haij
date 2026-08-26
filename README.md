@@ -39,8 +39,9 @@ pnpm lint && pnpm typecheck
 What works today: CRM (customers via CVR lookup, contacts, pipeline,
 activity timeline), time tracking with a weekly view, invoicing (drafts
 from unbilled time, gapless numbering, Danish PDF, credit notes, payment
-status) and economy (monthly revenue targets, per-customer frames and
-consumption). Invoicing needs your seller data first: Indstillinger →
+status), economy (monthly revenue targets, per-customer frames and
+consumption) and light project management (projects with frames, tasks,
+linked time). Invoicing needs your seller data first: Indstillinger →
 Virksomhed.
 
 Deployment: [docs/deploy.md](docs/deploy.md). Security policy:

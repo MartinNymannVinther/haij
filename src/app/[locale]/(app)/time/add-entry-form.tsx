@@ -18,26 +18,53 @@ import {
 import { addTimeEntryAction } from "@/modules/time/actions";
 import { useRouter } from "@/i18n/navigation";
 
-const NO_COMPANY = "none";
+const NONE = "none";
+
+export type ProjectOption = {
+  id: string;
+  name: string;
+  companyId: string | null;
+  companyName: string | null;
+};
 
 export function AddEntryForm({
   defaultDate,
   companies,
+  projects,
 }: {
   defaultDate: string;
   companies: Array<{ id: string; name: string }>;
+  projects: ProjectOption[];
 }) {
   const t = useTranslations("time.add");
   const tCommon = useTranslations("common");
   const router = useRouter();
-  const [companyId, setCompanyId] = useState<string>(NO_COMPANY);
+  const [companyId, setCompanyId] = useState<string>(NONE);
+  const [projectId, setProjectId] = useState<string>(NONE);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const items = [
-    { value: NO_COMPANY, label: t("noCompany") },
+  const companyItems = [
+    { value: NONE, label: t("noCompany") },
     ...companies.map((company) => ({ value: company.id, label: company.name })),
   ];
+  const projectItems = [
+    { value: NONE, label: t("noProject") },
+    ...projects.map((project) => ({
+      value: project.id,
+      label: project.companyName ? `${project.name} · ${project.companyName}` : project.name,
+    })),
+  ];
+
+  function handleProjectChange(next: string | null) {
+    const value = next ?? NONE;
+    setProjectId(value);
+    // Picking a project preselects its customer; a manual choice wins.
+    if (value !== NONE) {
+      const project = projects.find((p) => p.id === value);
+      if (project?.companyId) setCompanyId(project.companyId);
+    }
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +73,8 @@ export function AddEntryForm({
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const result = await addTimeEntryAction({
-      companyId: companyId === NO_COMPANY ? null : companyId,
+      companyId: companyId === NONE ? null : companyId,
+      projectId: projectId === NONE ? null : projectId,
       entryDate: String(form.get("entryDate") ?? ""),
       duration: String(form.get("duration") ?? ""),
       note: String(form.get("note") ?? ""),
@@ -57,7 +85,8 @@ export function AddEntryForm({
       return;
     }
     formElement.reset();
-    setCompanyId(NO_COMPANY);
+    setCompanyId(NONE);
+    setProjectId(NONE);
     toast.success(t("addedToast"));
     router.refresh();
   }
@@ -67,7 +96,7 @@ export function AddEntryForm({
       <CardContent>
         <form
           onSubmit={handleSubmit}
-          className="grid items-end gap-3 sm:grid-cols-[9.5rem_minmax(10rem,1fr)_7rem_minmax(10rem,1.5fr)_auto]"
+          className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[9.5rem_minmax(9rem,1fr)_minmax(9rem,1fr)_6.5rem_minmax(9rem,1.4fr)_auto]"
         >
           <Field>
             <FieldLabel htmlFor="entry-date">{t("date")}</FieldLabel>
@@ -82,15 +111,30 @@ export function AddEntryForm({
           <Field>
             <FieldLabel>{t("company")}</FieldLabel>
             <Select
-              items={items}
+              items={companyItems}
               value={companyId}
-              onValueChange={(v) => setCompanyId(v ?? NO_COMPANY)}
+              onValueChange={(v) => setCompanyId(v ?? NONE)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {items.map((item) => (
+                {companyItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field>
+            <FieldLabel>{t("project")}</FieldLabel>
+            <Select items={projectItems} value={projectId} onValueChange={handleProjectChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {projectItems.map((item) => (
                   <SelectItem key={item.value} value={item.value}>
                     {item.label}
                   </SelectItem>

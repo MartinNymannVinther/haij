@@ -101,7 +101,8 @@
       "time": "Tid",
       "companySettings": "Virksomhed",
       "invoices": "Fakturaer",
-      "economy": "Økonomi"
+      "economy": "Økonomi",
+      "projects": "Projekter"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -288,7 +289,9 @@
       "notePlaceholder": "Hvad arbejdede du på?",
       "submit": "Registrér",
       "addedToast": "Tid registreret",
-      "invalidDuration": "Varigheden kunne ikke forstås. Prøv fx 1:30, 1,5 eller 45m."
+      "invalidDuration": "Varigheden kunne ikke forstås. Prøv fx 1:30, 1,5 eller 45m.",
+      "noProject": "Intet projekt",
+      "project": "Projekt"
     }
   },
   "orgProfile": {
@@ -482,6 +485,69 @@
       "draftToast": "Fakturaudkast oprettet fra uafregnede timer.",
       "savedToast": "Timepris og ramme er gemt.",
       "invalid": "Tjek felterne. Skriv beløb som fx 950,00."
+    }
+  },
+  "projects": {
+    "list": {
+      "title": "Projekter",
+      "filterAll": "Alle",
+      "empty": "Ingen projekter endnu.",
+      "emptyHint": "Opret dit første projekt, sæt en ramme, og kobl dine timer på.",
+      "noResults": "Ingen projekter med den status.",
+      "name": "Projekt",
+      "customer": "Kunde",
+      "tasks": "Opgaver",
+      "taskCount": "{done}/{total}",
+      "tracked": "Registreret tid",
+      "deadline": "Deadline",
+      "frame": "Aftalt ramme",
+      "statusHead": "Status"
+    },
+    "status": {
+      "active": "Aktivt",
+      "done": "Afsluttet",
+      "archived": "Arkiveret"
+    },
+    "create": {
+      "title": "Nyt projekt",
+      "name": "Projektnavn",
+      "customer": "Kunde",
+      "noCompany": "Ingen kunde (internt)",
+      "description": "Beskrivelse",
+      "deadline": "Deadline",
+      "hourFrame": "Ramme, timer",
+      "amountFrame": "Ramme, kr.",
+      "none": "Ingen",
+      "submit": "Opret projekt",
+      "createdToast": "Projektet er oprettet.",
+      "invalidFrames": "Tjek rammerne. Skriv fx 40 timer eller 60.000 kr."
+    },
+    "detail": {
+      "title": "Projekt",
+      "back": "Alle projekter",
+      "deadlineLine": "Deadline {date}",
+      "editTitle": "Redigér projekt",
+      "savedToast": "Projektet er gemt.",
+      "deleteTitle": "Slet projektet?",
+      "deleteBody": "Opgaverne slettes. Registrerede timer bevares, men mister koblingen til projektet.",
+      "deletedToast": "Projektet er slettet.",
+      "timeTitle": "Registreret tid",
+      "noTime": "Ingen tid på projektet endnu. Vælg projektet, når du registrerer tid.",
+      "noNote": "Uden note",
+      "billed": "faktureret",
+      "consumptionTitle": "Forbrug",
+      "tracked": "Registreret tid",
+      "unbilled": "Uafregnet",
+      "value": "Værdi af tid",
+      "descriptionTitle": "Beskrivelse"
+    },
+    "tasks": {
+      "title": "Opgaver",
+      "openCount": "{count} åbne",
+      "placeholder": "Ny opgave…",
+      "due": "Frist",
+      "add": "Tilføj",
+      "empty": "Ingen opgaver endnu."
     }
   }
 }
