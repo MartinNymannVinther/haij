@@ -102,7 +102,8 @@
       "companySettings": "Company",
       "invoices": "Invoices",
       "economy": "Economy",
-      "projects": "Projects"
+      "projects": "Projects",
+      "ai": "AI"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -592,5 +593,28 @@
       "rateEmpty": "Empty uses the project/customer rate",
       "invalidRate": "Could not read the rate. Try e.g. 1,400."
     }
+  },
+  "ai": {
+    "title": "AI",
+    "subtitle": "The language model behind upcoming AI features, e.g. signal scoring.",
+    "providerTitle": "Language model",
+    "providerHint": "Chosen in .env on the server. Keys never live in the database or the code.",
+    "provider": "Provider",
+    "model": "Model",
+    "disabled": "Disabled",
+    "setupIntro": "AI is not set up yet. Add a few lines to your .env and restart the app:",
+    "setupOutro": "Mistral is EU-hosted (Paris). Ollama runs locally, so data never leaves the machine.",
+    "test": "Test the connection",
+    "testOk": "The connection works.",
+    "testOkDetail": "{model} answered: “{sample}”",
+    "testFailed": "The connection failed.",
+    "failAuth": "The key was rejected. Check MISTRAL_API_KEY in your .env and restart the app.",
+    "failUnreachable": "The service did not answer. Check network and address.",
+    "failConfig": "The setup is missing something: {detail}",
+    "failGeneric": "Something went wrong. Try again and check the server log if it persists.",
+    "principlesTitle": "How Haij uses AI",
+    "principleSovereign": "EU-hosted or local models only. The provider can be swapped without touching the rest of the platform.",
+    "principleApproval": "AI never sends anything out of the house. Everything it drafts requires your approval first.",
+    "principleUsage": "The first use is the phase 4 signals engine, scoring opportunities against your service profile."
   }
 }

@@ -19,6 +19,15 @@ const EnvSchema = z
     // Credentials for distribution.virk.dk (CVR_PROVIDER=virk).
     VIRK_CVR_USER: z.string().min(1).optional(),
     VIRK_CVR_PASSWORD: z.string().min(1).optional(),
+    // LLM adapter (CLAUDE.md: EU-hosted or local models behind an
+    // adapter): "mistral" (EU-hosted API), "ollama" (local or
+    // self-hosted, Ollama-compatible) or "none" to disable AI features.
+    LLM_PROVIDER: z.enum(["mistral", "ollama", "none"]).default("none"),
+    // Secret. Lives only in .env locally and in Coolify in production.
+    MISTRAL_API_KEY: z.string().min(1).optional(),
+    // Model override; sensible per-provider defaults apply when unset.
+    LLM_MODEL: z.string().min(1).optional(),
+    OLLAMA_BASE_URL: z.url().default("http://localhost:11434"),
   })
   .superRefine((value, ctx) => {
     if (value.CVR_PROVIDER === "virk" && (!value.VIRK_CVR_USER || !value.VIRK_CVR_PASSWORD)) {
@@ -26,6 +35,13 @@ const EnvSchema = z
         code: "custom",
         message: "CVR_PROVIDER=virk requires VIRK_CVR_USER and VIRK_CVR_PASSWORD",
         path: ["CVR_PROVIDER"],
+      });
+    }
+    if (value.LLM_PROVIDER === "mistral" && !value.MISTRAL_API_KEY) {
+      ctx.addIssue({
+        code: "custom",
+        message: "LLM_PROVIDER=mistral requires MISTRAL_API_KEY",
+        path: ["LLM_PROVIDER"],
       });
     }
   });

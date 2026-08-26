@@ -102,7 +102,8 @@
       "companySettings": "Virksomhed",
       "invoices": "Fakturaer",
       "economy": "Økonomi",
-      "projects": "Projekter"
+      "projects": "Projekter",
+      "ai": "AI"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -592,5 +593,28 @@
       "rateEmpty": "Tom bruger projektets/kundens pris",
       "invalidRate": "Prisen kunne ikke læses. Skriv fx 1.400."
     }
+  },
+  "ai": {
+    "title": "AI",
+    "subtitle": "Sprogmodellen bag de kommende AI-funktioner, fx scoring af signaler.",
+    "providerTitle": "Sprogmodel",
+    "providerHint": "Vælges i .env på serveren. Nøgler ligger aldrig i databasen eller i koden.",
+    "provider": "Udbyder",
+    "model": "Model",
+    "disabled": "Slået fra",
+    "setupIntro": "AI er ikke sat op endnu. Tilføj et par linjer i din .env og genstart appen:",
+    "setupOutro": "Mistral er EU-hostet (Paris). Ollama kører lokalt, så data aldrig forlader maskinen.",
+    "test": "Test forbindelsen",
+    "testOk": "Forbindelsen virker.",
+    "testOkDetail": "{model} svarede: “{sample}”",
+    "testFailed": "Forbindelsen fejlede.",
+    "failAuth": "Nøglen blev afvist. Tjek MISTRAL_API_KEY i din .env og genstart appen.",
+    "failUnreachable": "Tjenesten svarede ikke. Tjek netværk og adresse.",
+    "failConfig": "Opsætningen mangler noget: {detail}",
+    "failGeneric": "Noget gik galt. Prøv igen, og tjek serverloggen hvis det fortsætter.",
+    "principlesTitle": "Sådan bruger Haij AI",
+    "principleSovereign": "Kun EU-hostede eller lokale modeller. Udbyderen kan skiftes uden at røre resten af platformen.",
+    "principleApproval": "AI sender aldrig noget ud af huset. Alt den udarbejder, kræver din godkendelse først.",
+    "principleUsage": "Første anvendelse bliver signalmotoren i fase 4, der scorer muligheder mod din serviceprofil."
   }
 }
