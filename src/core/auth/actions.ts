@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { APIError } from "better-auth";
 import { z } from "zod";
+import { organizationSlug } from "@/lib/slug";
 import { auth } from "./auth";
 
 const RegisterSchema = z.object({
@@ -14,22 +15,6 @@ const RegisterSchema = z.object({
 
 export type RegisterResult =
   { ok: true } | { ok: false; error: "invalid" | "emailExists" | "generic" };
-
-/** ASCII slug from a (Danish) organization name, plus a random suffix. */
-function organizationSlug(name: string): string {
-  const base = name
-    .toLowerCase()
-    .replaceAll("æ", "ae")
-    .replaceAll("ø", "oe")
-    .replaceAll("å", "aa")
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-  const suffix = crypto.randomUUID().slice(0, 8);
-  return `${base || "org"}-${suffix}`;
-}
 
 /** Turns the set-cookie headers of an API response into a cookie header. */
 function cookieHeaderFrom(responseHeaders: Headers): Headers {

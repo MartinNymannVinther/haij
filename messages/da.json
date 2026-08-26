@@ -5,9 +5,110 @@
     "save": "Gem",
     "cancel": "Annuller",
     "close": "Luk",
+    "back": "Tilbage",
     "error": "Noget gik galt. Prøv igen."
   },
   "home": {
     "tagline": "Forretningsplatformen til selvstændige og mikrovirksomheder."
+  },
+  "auth": {
+    "login": {
+      "title": "Log ind",
+      "subtitle": "Velkommen tilbage.",
+      "email": "E-mail",
+      "password": "Adgangskode",
+      "submit": "Log ind",
+      "or": "eller",
+      "withPasskey": "Log ind med passkey",
+      "noAccount": "Har du ikke en konto?",
+      "registerLink": "Opret konto",
+      "error": "Forkert e-mail eller adgangskode.",
+      "passkeyError": "Login med passkey mislykkedes. Prøv igen."
+    },
+    "register": {
+      "title": "Opret konto",
+      "subtitle": "Din konto og din organisation oprettes samtidig.",
+      "name": "Dit navn",
+      "email": "E-mail",
+      "organizationName": "Virksomhedens navn",
+      "password": "Adgangskode",
+      "passwordHint": "Mindst 12 tegn.",
+      "submit": "Opret konto",
+      "haveAccount": "Har du allerede en konto?",
+      "loginLink": "Log ind",
+      "errorInvalid": "Tjek felterne og prøv igen.",
+      "errorEmailExists": "Der findes allerede en konto med denne e-mail.",
+      "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen."
+    },
+    "twoFactor": {
+      "title": "Totrinsbekræftelse",
+      "subtitle": "Indtast koden fra din authenticator-app.",
+      "submit": "Bekræft",
+      "error": "Forkert kode. Prøv igen."
+    },
+    "onboarding": {
+      "title": "Opret din organisation",
+      "subtitle": "Du mangler en organisation, før du kan komme i gang.",
+      "organizationName": "Virksomhedens navn",
+      "submit": "Opret organisation",
+      "error": "Organisationen kunne ikke oprettes. Prøv igen."
+    }
+  },
+  "app": {
+    "nav": {
+      "dashboard": "Overblik",
+      "security": "Sikkerhed",
+      "logout": "Log ud",
+      "language": "Sprog",
+      "danish": "Dansk",
+      "english": "English"
+    },
+    "orgSwitcher": {
+      "label": "Organisation",
+      "create": "Opret organisation",
+      "createTitle": "Opret ny organisation",
+      "name": "Navn",
+      "createSubmit": "Opret",
+      "error": "Organisationen kunne ikke oprettes. Prøv igen."
+    },
+    "dashboard": {
+      "title": "Overblik",
+      "emptyTitle": "Her er tomt endnu",
+      "emptyBody": "Dine kunder, timer og fakturaer kommer til at bo her. De første moduler er på vej.",
+      "passkeyPromptTitle": "Gør din konto mere sikker",
+      "passkeyPromptBody": "Tilføj en passkey, så du kan logge ind uden adgangskode.",
+      "passkeyPromptCta": "Tilføj passkey"
+    },
+    "security": {
+      "title": "Sikkerhed",
+      "subtitle": "Passkeys og totrinsbekræftelse for din konto.",
+      "passkeys": {
+        "title": "Passkeys",
+        "description": "Log ind uden adgangskode med Touch ID, Face ID eller en sikkerhedsnøgle.",
+        "empty": "Ingen passkeys endnu.",
+        "nameLabel": "Navn",
+        "namePlaceholder": "F.eks. MacBook",
+        "add": "Tilføj passkey",
+        "remove": "Fjern",
+        "addedAt": "Tilføjet {date}",
+        "error": "Passkey kunne ikke tilføjes. Prøv igen."
+      },
+      "totp": {
+        "title": "Totrinsbekræftelse (TOTP)",
+        "description": "Kræv en kode fra din authenticator-app ved login.",
+        "statusEnabled": "Slået til",
+        "statusDisabled": "Slået fra",
+        "enable": "Slå til",
+        "disable": "Slå fra",
+        "password": "Bekræft med din adgangskode",
+        "scan": "Scan QR-koden med din authenticator-app, og indtast koden nedenfor.",
+        "backupCodes": "Backupkoder",
+        "backupHint": "Gem koderne et sikkert sted. De kan bruges, hvis du mister din telefon.",
+        "verifyLabel": "Kode fra appen",
+        "verify": "Bekræft",
+        "verifyError": "Forkert kode. Prøv igen.",
+        "error": "Handlingen mislykkedes. Tjek adgangskoden, og prøv igen."
+      }
+    }
   }
 }

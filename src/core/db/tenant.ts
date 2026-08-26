@@ -1,12 +1,19 @@
-import { sql } from "drizzle-orm";
+import { sql, type ExtractTablesWithRelations } from "drizzle-orm";
+import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
+import type { PgTransaction } from "drizzle-orm/pg-core";
 import { appDb } from "./client";
+import type * as schema from "./schema";
 
 export type OrgContext = {
   orgId: string;
   userId: string;
 };
 
-export type AppTransaction = Parameters<Parameters<typeof appDb.transaction>[0]>[0];
+export type AppTransaction = PgTransaction<
+  NodePgQueryResultHKT,
+  typeof schema,
+  ExtractTablesWithRelations<typeof schema>
+>;
 
 /**
  * Runs `fn` inside a transaction on the application role with the tenant

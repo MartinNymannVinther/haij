@@ -62,6 +62,9 @@ export const accounts = pgTable(
   "accounts",
   {
     id: text("id").primaryKey(),
+    // Account identity is scoped by issuer since Better Auth 1.7
+    // (e.g. "local:credential" for password accounts).
+    issuer: text("issuer").notNull(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: text("user_id")
@@ -76,7 +79,10 @@ export const accounts = pgTable(
     password: text("password"),
     ...timestamps,
   },
-  (t) => [index("accounts_user_id_idx").on(t.userId)],
+  (t) => [
+    index("accounts_user_id_idx").on(t.userId),
+    uniqueIndex("accounts_issuer_account_uq").on(t.issuer, t.accountId),
+  ],
 );
 
 export const verifications = pgTable(

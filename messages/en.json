@@ -5,9 +5,110 @@
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
+    "back": "Back",
     "error": "Something went wrong. Please try again."
   },
   "home": {
     "tagline": "The business platform for solo consultants and micro-businesses."
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Welcome back.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "or": "or",
+      "withPasskey": "Sign in with a passkey",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create account",
+      "error": "Wrong email or password.",
+      "passkeyError": "Passkey sign-in failed. Please try again."
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Your account and your organization are created together.",
+      "name": "Your name",
+      "email": "Email",
+      "organizationName": "Company name",
+      "password": "Password",
+      "passwordHint": "At least 12 characters.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "errorInvalid": "Check the fields and try again.",
+      "errorEmailExists": "An account with this email already exists.",
+      "errorGeneric": "The account could not be created. Please try again."
+    },
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "subtitle": "Enter the code from your authenticator app.",
+      "submit": "Verify",
+      "error": "Wrong code. Please try again."
+    },
+    "onboarding": {
+      "title": "Create your organization",
+      "subtitle": "You need an organization before you can get started.",
+      "organizationName": "Company name",
+      "submit": "Create organization",
+      "error": "The organization could not be created. Please try again."
+    }
+  },
+  "app": {
+    "nav": {
+      "dashboard": "Overview",
+      "security": "Security",
+      "logout": "Sign out",
+      "language": "Language",
+      "danish": "Dansk",
+      "english": "English"
+    },
+    "orgSwitcher": {
+      "label": "Organization",
+      "create": "Create organization",
+      "createTitle": "Create new organization",
+      "name": "Name",
+      "createSubmit": "Create",
+      "error": "The organization could not be created. Please try again."
+    },
+    "dashboard": {
+      "title": "Overview",
+      "emptyTitle": "Nothing here yet",
+      "emptyBody": "Your customers, hours and invoices will live here. The first modules are on their way.",
+      "passkeyPromptTitle": "Make your account more secure",
+      "passkeyPromptBody": "Add a passkey so you can sign in without a password.",
+      "passkeyPromptCta": "Add passkey"
+    },
+    "security": {
+      "title": "Security",
+      "subtitle": "Passkeys and two-factor authentication for your account.",
+      "passkeys": {
+        "title": "Passkeys",
+        "description": "Sign in without a password using Touch ID, Face ID or a security key.",
+        "empty": "No passkeys yet.",
+        "nameLabel": "Name",
+        "namePlaceholder": "E.g. MacBook",
+        "add": "Add passkey",
+        "remove": "Remove",
+        "addedAt": "Added {date}",
+        "error": "The passkey could not be added. Please try again."
+      },
+      "totp": {
+        "title": "Two-factor authentication (TOTP)",
+        "description": "Require a code from your authenticator app at sign-in.",
+        "statusEnabled": "Enabled",
+        "statusDisabled": "Disabled",
+        "enable": "Enable",
+        "disable": "Disable",
+        "password": "Confirm with your password",
+        "scan": "Scan the QR code with your authenticator app and enter the code below.",
+        "backupCodes": "Backup codes",
+        "backupHint": "Store the codes somewhere safe. They can be used if you lose your phone.",
+        "verifyLabel": "Code from the app",
+        "verify": "Verify",
+        "verifyError": "Wrong code. Please try again.",
+        "error": "The action failed. Check the password and try again."
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
-  "id": "66380b4b-f1b1-4b13-95b6-8e5e8ac65587",
-  "prevId": "71194c3a-3ea4-443c-9350-1fe4094c91c7",
+  "id": "bc4a6053-c181-40a8-9354-e2b4ef69f605",
+  "prevId": "58afd1bb-2d2a-4776-9d7c-2cf233bbb93b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -12,6 +12,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "issuer": {
+          "name": "issuer",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "account_id": {
@@ -101,6 +107,27 @@
             }
           ],
           "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "accounts_issuer_account_uq": {
+          "name": "accounts_issuer_account_uq",
+          "columns": [
+            {
+              "expression": "issuer",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "account_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
           "with": {},
           "method": "btree",
           "concurrently": false
