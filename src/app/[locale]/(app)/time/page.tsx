@@ -4,6 +4,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getOrgContext, getSession } from "@/core/auth/session";
+import { todayInCopenhagen } from "@/core/dates";
 import {
   formatMinutes,
   isoWeekMonday,
@@ -21,15 +22,6 @@ import { EntryDeleteButton } from "./entry-delete-button";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("time");
   return { title: t("title") };
-}
-
-function todayInCopenhagen(): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Copenhagen",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
 }
 
 export default async function TimePage({
