@@ -28,6 +28,10 @@ const EnvSchema = z
     // Model override; sensible per-provider defaults apply when unset.
     LLM_MODEL: z.string().min(1).optional(),
     OLLAMA_BASE_URL: z.url().default("http://localhost:11434"),
+    // Bearer secret for the unattended signal-refresh endpoint; the
+    // endpoint answers 404 until this is set. pg-boss takes over when
+    // Haij is deployed (ADR 0005).
+    SIGNALS_CRON_SECRET: z.string().min(16).optional(),
   })
   .superRefine((value, ctx) => {
     if (value.CVR_PROVIDER === "virk" && (!value.VIRK_CVR_USER || !value.VIRK_CVR_PASSWORD)) {
