@@ -669,6 +669,75 @@ export const signals = pgTable(
   ],
 );
 
+/* ------------------------------------------------------------------ */
+/* Phase 5: knowledge center — curated sources with AI digests. Same   */
+/* posture as signals: fetched content is untrusted, sanitized data.   */
+/* ------------------------------------------------------------------ */
+
+export const knowledgeSources = pgTable(
+  "knowledge_sources",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    url: text("url").notNull(),
+    kind: text("kind").notNull().default("rss"),
+    active: boolean("active").notNull().default(true),
+    lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    index("knowledge_sources_org_idx").on(t.orgId),
+    check("knowledge_sources_kind_valid", sql`kind in ('rss')`),
+  ],
+);
+
+export const knowledgeItems = pgTable(
+  "knowledge_items",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    sourceId: text("source_id")
+      .notNull()
+      .references(() => knowledgeSources.id, { onDelete: "cascade" }),
+    /** Stable per source, for dedupe across fetches. */
+    sourceRef: text("source_ref").notNull(),
+    title: text("title").notNull(),
+    /** Sanitized plain text. */
+    summary: text("summary"),
+    url: text("url"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("knowledge_items_source_ref_uq").on(t.orgId, t.sourceId, t.sourceRef),
+    index("knowledge_items_org_published_idx").on(t.orgId, t.publishedAt),
+  ],
+);
+
+/** AI summaries over a window of items; plain text, kept as documents. */
+export const knowledgeDigests = pgTable(
+  "knowledge_digests",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    itemCount: integer("item_count").notNull(),
+    model: text("model"),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("knowledge_digests_org_idx").on(t.orgId, t.createdAt)],
+);
+
 /**
  * Append-only audit log; one row per mutation (who, what, when, org,
  * before/after). Written by database triggers plus semantic auth events.

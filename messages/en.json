@@ -104,7 +104,8 @@
       "economy": "Economy",
       "projects": "Projects",
       "ai": "AI",
-      "signals": "Signals"
+      "signals": "Signals",
+      "knowledge": "Knowledge"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -672,6 +673,34 @@
       "rssLabel": "RSS feeds (one per line, optionally \"url | name\")",
       "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisation&format=rss | Jobindex",
       "savedToast": "Signal settings saved."
+    }
+  },
+  "knowledge": {
+    "title": "Knowledge",
+    "fetch": "Fetch new",
+    "digest": "Create digest",
+    "fetchedToast": "{count} new articles fetched.",
+    "fetchedEmptyToast": "Nothing new from the sources.",
+    "fetchPartialToast": "Sources that did not answer: {sources}",
+    "digestToast": "Digest generated.",
+    "digestNoProvider": "AI is not set up. Pick a language model under Settings → AI.",
+    "digestNoItems": "No articles from the last week to summarize. Fetch first.",
+    "digestTitle": "Latest digests",
+    "digestMeta": "{count} articles summarized",
+    "itemsTitle": "Latest articles",
+    "empty": "No articles yet",
+    "emptyHint": "Add sources on the right and hit Fetch new. The digest button summarizes the week's articles with AI.",
+    "sources": {
+      "title": "Sources",
+      "hint": "RSS feeds from media, authorities and blogs you want to follow.",
+      "empty": "No sources yet. Add the first one below.",
+      "namePlaceholder": "Name, e.g. Version2",
+      "urlPlaceholder": "https://…/feed",
+      "add": "Add",
+      "invalid": "Check name and address. The source must be a valid link.",
+      "limit": "At most 15 sources. Delete one before adding more.",
+      "deletedToast": "The source and its articles are removed.",
+      "activeToggle": "Enable {name}"
     }
   }
 }

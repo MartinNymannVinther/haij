@@ -104,7 +104,8 @@
       "economy": "Økonomi",
       "projects": "Projekter",
       "ai": "AI",
-      "signals": "Signaler"
+      "signals": "Signaler",
+      "knowledge": "Viden"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -672,6 +673,34 @@
       "rssLabel": "RSS-feeds (ét pr. linje, evt. \"url | navn\")",
       "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisering&format=rss | Jobindex",
       "savedToast": "Signal-indstillingerne er gemt."
+    }
+  },
+  "knowledge": {
+    "title": "Viden",
+    "fetch": "Hent nyt",
+    "digest": "Lav digest",
+    "fetchedToast": "{count} nye artikler hentet.",
+    "fetchedEmptyToast": "Intet nyt fra kilderne.",
+    "fetchPartialToast": "Kilder der ikke svarede: {sources}",
+    "digestToast": "Digest genereret.",
+    "digestNoProvider": "AI er ikke sat op. Vælg en sprogmodel under Indstillinger → AI.",
+    "digestNoItems": "Ingen artikler fra den seneste uge at sammenfatte. Hent nyt først.",
+    "digestTitle": "Seneste digests",
+    "digestMeta": "{count} artikler sammenfattet",
+    "itemsTitle": "Seneste artikler",
+    "empty": "Ingen artikler endnu",
+    "emptyHint": "Tilføj kilder til højre, og tryk Hent nyt. Digest-knappen sammenfatter ugens artikler med AI.",
+    "sources": {
+      "title": "Kilder",
+      "hint": "RSS-feeds fra medier, myndigheder og blogs du vil følge.",
+      "empty": "Ingen kilder endnu. Tilføj den første herunder.",
+      "namePlaceholder": "Navn, fx Version2",
+      "urlPlaceholder": "https://…/feed",
+      "add": "Tilføj",
+      "invalid": "Tjek navn og adresse. Kilden skal være et gyldigt link.",
+      "limit": "Højst 15 kilder. Slet en, før du tilføjer flere.",
+      "deletedToast": "Kilden og dens artikler er fjernet.",
+      "activeToggle": "Aktivér {name}"
     }
   }
 }

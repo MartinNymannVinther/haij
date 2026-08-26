@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/invoices", key: "invoices" },
   { href: "/economy", key: "economy" },
   { href: "/signals", key: "signals" },
+  { href: "/knowledge", key: "knowledge" },
 ] as const;
 
 export function NavLinks() {
