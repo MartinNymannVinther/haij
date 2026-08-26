@@ -2,7 +2,8 @@ import { FolderKanban } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import {
   Table,
   TableBody,
@@ -64,7 +65,7 @@ export default async function ProjectsPage({
           className={cn(
             "rounded-md border px-2.5 py-1 text-sm transition-colors",
             !filter
-              ? "border-transparent bg-secondary font-medium"
+              ? "border-transparent bg-accent text-accent-foreground font-medium"
               : "border-border text-muted-foreground hover:text-foreground",
           )}
         >
@@ -77,7 +78,7 @@ export default async function ProjectsPage({
             className={cn(
               "rounded-md border px-2.5 py-1 text-sm transition-colors",
               filter === s
-                ? "border-transparent bg-secondary font-medium"
+                ? "border-transparent bg-accent text-accent-foreground font-medium"
                 : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
@@ -87,23 +88,13 @@ export default async function ProjectsPage({
       </div>
 
       {projects.length === 0 ? (
-        <Card className="border-dashed shadow-none">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-              <FolderKanban className="size-5" />
-            </div>
-            <div>
-              <p className="font-medium">{filter ? t("noResults") : t("empty")}</p>
-              {!filter ? (
-                <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                  {t("emptyHint")}
-                </p>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={FolderKanban}
+          title={filter ? t("noResults") : t("empty")}
+          hint={filter ? undefined : t("emptyHint")}
+        />
       ) : (
-        <Card className="py-0 shadow-none">
+        <Card className="py-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>

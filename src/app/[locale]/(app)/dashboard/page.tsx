@@ -3,6 +3,7 @@ import { ArrowRight, LayoutDashboard } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getOrgContext } from "@/core/auth/session";
 import { organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
@@ -83,17 +84,11 @@ export default async function DashboardPage() {
       <PasskeyPrompt />
 
       {totalCompanies === 0 ? (
-        <Card className="border-dashed shadow-none">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-              <LayoutDashboard className="size-5" />
-            </div>
-            <div>
-              <p className="font-medium">{t("emptyTitle")}</p>
-              <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                {t("emptyBody")}
-              </p>
-            </div>
+        <EmptyState
+          icon={LayoutDashboard}
+          title={t("emptyTitle")}
+          hint={t("emptyBody")}
+          action={
             <Link
               href="/companies"
               className="text-primary inline-flex items-center gap-1 text-sm font-medium hover:underline"
@@ -101,8 +96,8 @@ export default async function DashboardPage() {
               {t("viewAll")}
               <ArrowRight className="size-3.5" />
             </Link>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

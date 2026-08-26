@@ -1,7 +1,7 @@
 import { Radar } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getOrgContext } from "@/core/auth/session";
 import { SIGNAL_STATUSES, type SignalStatus } from "@/core/db/schema";
 import { todayInCopenhagen } from "@/core/dates";
@@ -76,7 +76,7 @@ export default async function SignalsPage({
             className={cn(
               "rounded-md border px-2.5 py-1 text-sm transition-colors",
               active === s
-                ? "border-transparent bg-secondary font-medium"
+                ? "border-transparent bg-accent text-accent-foreground font-medium"
                 : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
@@ -87,19 +87,11 @@ export default async function SignalsPage({
       </div>
 
       {rows.length === 0 ? (
-        <Card className="border-dashed shadow-none">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-              <Radar className="size-5" />
-            </div>
-            <div>
-              <p className="font-medium">{configured ? t("empty") : t("unconfiguredTitle")}</p>
-              <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                {configured ? t("emptyHint") : t("unconfiguredHint")}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Radar}
+          title={configured ? t("empty") : t("unconfiguredTitle")}
+          hint={configured ? t("emptyHint") : t("unconfiguredHint")}
+        />
       ) : (
         <div className="flex flex-col gap-3">
           {rows.map((signal) => (

@@ -75,7 +75,7 @@ export function SignalCard({ signal, today }: { signal: SignalRow; today: string
   const overdue = signal.followUpAt !== null && signal.followUpAt <= today;
 
   return (
-    <Card className="py-4 shadow-none">
+    <Card className="py-4">
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1">

@@ -34,7 +34,8 @@
     "footer": {
       "license": "Open source under AGPL-3.0",
       "language": "Dansk"
-    }
+    },
+    "modulesLabel": "Everything in one tool"
   },
   "notFound": {
     "title": "Page not found",

@@ -2,7 +2,8 @@ import { Building2, Search } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -62,23 +63,13 @@ export default async function CompaniesPage({
       </form>
 
       {companies.length === 0 ? (
-        <Card className="border-dashed shadow-none">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-              <Building2 className="size-5" />
-            </div>
-            <div>
-              <p className="font-medium">{query ? t("noResults") : t("empty")}</p>
-              {!query ? (
-                <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                  {t("emptyHint")}
-                </p>
-              ) : null}
-            </div>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Building2}
+          title={query ? t("noResults") : t("empty")}
+          hint={query ? undefined : t("emptyHint")}
+        />
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
+        <Card className="py-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -94,7 +85,7 @@ export default async function CompaniesPage({
                   <TableCell className="p-0">
                     <Link
                       href={`/companies/${company.id}`}
-                      className="block px-3 py-2.5 font-medium hover:underline"
+                      className="block py-2.5 pr-3 pl-5 font-medium hover:underline"
                     >
                       {company.name}
                     </Link>
@@ -112,7 +103,7 @@ export default async function CompaniesPage({
               ))}
             </TableBody>
           </Table>
-        </div>
+        </Card>
       )}
     </div>
   );

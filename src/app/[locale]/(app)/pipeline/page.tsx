@@ -1,7 +1,7 @@
 import { KanbanSquare } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getOrgContext } from "@/core/auth/session";
 import type { PipelineStage } from "@/core/db/schema";
 import { listCompaniesForPipeline } from "@/modules/crm/service";
@@ -36,14 +36,7 @@ export default async function PipelinePage() {
       <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
 
       {companies.length === 0 ? (
-        <Card className="border-dashed shadow-none">
-          <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
-            <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-              <KanbanSquare className="size-5" />
-            </div>
-            <p className="text-muted-foreground text-sm">{t("empty")}</p>
-          </CardContent>
-        </Card>
+        <EmptyState icon={KanbanSquare} title={t("empty")} />
       ) : (
         <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6">
           <div className="flex min-w-max gap-4">

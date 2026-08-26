@@ -90,7 +90,7 @@ export default async function EconomyPage({
         </div>
       </div>
 
-      <Card className="py-0 shadow-none">
+      <Card className="py-0">
         <CardHeader className="pt-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <CardTitle>{t("monthsTitle")}</CardTitle>
@@ -149,7 +149,7 @@ export default async function EconomyPage({
         </div>
       </Card>
 
-      <Card className="py-0 shadow-none">
+      <Card className="py-0">
         <CardHeader className="pt-6">
           <CardTitle>{t("customersTitle")}</CardTitle>
         </CardHeader>

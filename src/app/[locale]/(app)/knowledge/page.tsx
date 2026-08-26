@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { getOrgContext } from "@/core/auth/session";
 import { listDigests, listItems, listSources } from "@/modules/knowledge/service";
 import { redirect } from "@/i18n/navigation";
@@ -68,17 +69,12 @@ export default async function KnowledgePage() {
             </CardHeader>
             <CardContent>
               {items.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 py-10 text-center">
-                  <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
-                    <BookOpen className="size-5" />
-                  </div>
-                  <div>
-                    <p className="font-medium">{t("empty")}</p>
-                    <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">
-                      {t("emptyHint")}
-                    </p>
-                  </div>
-                </div>
+                <EmptyState
+                  variant="inline"
+                  icon={BookOpen}
+                  title={t("empty")}
+                  hint={t("emptyHint")}
+                />
               ) : (
                 <ol className="flex flex-col">
                   {items.map((item) => (

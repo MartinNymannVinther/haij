@@ -34,7 +34,8 @@
     "footer": {
       "license": "Open source under AGPL-3.0",
       "language": "English"
-    }
+    },
+    "modulesLabel": "Alt samlet i ét værktøj"
   },
   "notFound": {
     "title": "Siden findes ikke",
