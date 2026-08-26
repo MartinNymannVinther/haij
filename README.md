@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Haij
 
-## Getting Started
+Haij ([haij.dk](https://haij.dk)) is an open source business platform for
+solo consultants and micro-businesses. It is Danish-first: CVR lookups,
+fakturakrav, moms and Peppol e-invoicing are the defaults, not plugins.
+It is EU-sovereign by design — every byte lives on EU-owned infrastructure,
+everything runs in Docker, and leaving for another provider is a one-day
+job, not a migration project. It is secure by design: multi-tenant
+isolation is enforced in the database with Postgres RLS, every mutation
+lands in an append-only audit log, and passkeys + TOTP work from day one.
+And it is AI-native: built so an assistant can safely draft, summarize and
+spot opportunities — while a human approves everything that leaves the house.
 
-First, run the development server:
+The project constitution — values, architecture and rules — lives in
+[CLAUDE.md](CLAUDE.md). Decisions and their trade-offs live in
+[docs/adr](docs/adr/).
+
+## Quickstart
+
+Requirements: Node 22+, pnpm (via `corepack enable`), Docker.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url> haij && cd haij
+pnpm install
+cp .env.example .env                            # defaults work for local dev
+docker compose -f docker-compose.dev.yml up -d  # Postgres 16 + runtime roles
+pnpm db:migrate                                 # tables, RLS, audit triggers
+pnpm dev                                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Register at `/register` — signup creates your user and your organization —
+then add a passkey under Indstillinger → Sikkerhed.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm test        # RLS tenant-isolation suite (the phase-0 acceptance tests)
+pnpm lint && pnpm typecheck
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployment: [docs/deploy.md](docs/deploy.md). Security policy:
+[SECURITY.md](SECURITY.md). License: [AGPL-3.0](LICENSE).
