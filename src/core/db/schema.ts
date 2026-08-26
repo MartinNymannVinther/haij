@@ -347,6 +347,9 @@ export type InvoiceType = (typeof INVOICE_TYPES)[number];
 export const VAT_CATEGORIES = ["standard", "zero", "exempt"] as const;
 export type VatCategory = (typeof VAT_CATEGORIES)[number];
 
+/** Danish standard VAT, 25%, in basis points. Verify before changing. */
+export const VAT_RATE_STANDARD_BP = 2500;
+
 export const INVOICE_UNITS = ["hour", "day", "piece", "fixed"] as const;
 export type InvoiceUnit = (typeof INVOICE_UNITS)[number];
 
