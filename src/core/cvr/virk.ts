@@ -111,7 +111,11 @@ export class VirkCvrProvider implements CvrProvider {
       // Typeless endpoint: works on current clusters where the old
       // /cvr-permanent/virksomhed/_search type path is rejected. The term
       // query only matches company documents anyway.
-      response = await this.fetchFn("https://distribution.virk.dk/cvr-permanent/_search", {
+      //
+      // Plain http by necessity: Erhvervsstyrelsen's distribution host does
+      // not answer on 443 at all (verified 2026-08: TLS connects time out,
+      // http responds). The credentials only unlock public register data.
+      response = await this.fetchFn("http://distribution.virk.dk/cvr-permanent/_search", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
