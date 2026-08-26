@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
+import { LayoutDashboard } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getOrgContext } from "@/core/auth/session";
 import { organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
@@ -41,12 +42,16 @@ export default async function DashboardPage() {
         <p className="text-muted-foreground text-sm">{organization.name}</p>
       </div>
       <PasskeyPrompt />
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("emptyTitle")}</CardTitle>
-          <CardDescription>{t("emptyBody")}</CardDescription>
-        </CardHeader>
-        <CardContent />
+      <Card className="border-dashed shadow-none">
+        <CardContent className="flex flex-col items-center gap-3 py-14 text-center">
+          <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-lg">
+            <LayoutDashboard className="size-5" />
+          </div>
+          <div>
+            <p className="font-medium">{t("emptyTitle")}</p>
+            <p className="text-muted-foreground mx-auto mt-1 max-w-md text-sm">{t("emptyBody")}</p>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

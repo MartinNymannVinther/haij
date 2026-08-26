@@ -1,8 +1,10 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import QRCode from "qrcode";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,6 +57,7 @@ export function TotpManager({ initialEnabled }: { initialEnabled: boolean }) {
     setStep({ kind: "idle" });
     setCode("");
     setEnabled(true);
+    toast.success(t("enabledToast"));
     router.refresh();
   }
 
@@ -70,6 +73,7 @@ export function TotpManager({ initialEnabled }: { initialEnabled: boolean }) {
     }
     setPassword("");
     setEnabled(false);
+    toast.success(t("disabledToast"));
     router.refresh();
   }
 
@@ -122,6 +126,7 @@ export function TotpManager({ initialEnabled }: { initialEnabled: boolean }) {
                 </InputOTP>
               </Field>
               <Button type="submit" disabled={pending || code.length !== 6} className="self-start">
+                {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
                 {t("verify")}
               </Button>
             </form>
@@ -143,6 +148,7 @@ export function TotpManager({ initialEnabled }: { initialEnabled: boolean }) {
               />
             </Field>
             <Button type="submit" variant={enabled ? "destructive" : "default"} disabled={pending}>
+              {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
               {enabled ? t("disable") : t("enable")}
             </Button>
           </form>

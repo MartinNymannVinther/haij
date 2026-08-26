@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { authClient } from "@/core/auth/client";
 import { useRouter } from "@/i18n/navigation";
 import { organizationSlug } from "@/lib/slug";
@@ -30,7 +31,13 @@ export function OrgSwitcher() {
 
   async function switchTo(organizationId: string) {
     if (organizationId === activeOrganization?.id) return;
-    await authClient.organization.setActive({ organizationId });
+    const target = organizations?.find((o) => o.id === organizationId);
+    const { error: switchError } = await authClient.organization.setActive({ organizationId });
+    if (switchError) {
+      toast.error(t("error"));
+      return;
+    }
+    if (target) toast.success(t("switched", { name: target.name }));
     router.refresh();
   }
 
@@ -50,6 +57,7 @@ export function OrgSwitcher() {
     }
     await authClient.organization.setActive({ organizationId: data.id });
     setDialogOpen(false);
+    toast.success(t("created", { name: data.name }));
     router.refresh();
   }
 
@@ -96,6 +104,7 @@ export function OrgSwitcher() {
             </p>
           ) : null}
           <Button type="submit" disabled={pending}>
+            {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("createSubmit")}
           </Button>
         </form>

@@ -1,8 +1,9 @@
 "use client";
 
-import { KeyRound, Trash2 } from "lucide-react";
+import { KeyRound, Loader2, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -54,11 +55,13 @@ export function PasskeyManager() {
       return;
     }
     setName("");
+    toast.success(t("addedToast"));
     await refresh();
   }
 
   async function handleRemove(id: string) {
     await authClient.passkey.deletePasskey({ id });
+    toast.success(t("removedToast"));
     await refresh();
   }
 
@@ -119,6 +122,7 @@ export function PasskeyManager() {
             />
           </Field>
           <Button type="submit" disabled={pending}>
+            {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("add")}
           </Button>
         </form>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ export function TwoFactorForm() {
             </p>
           ) : null}
           <Button type="submit" disabled={pending || code.length !== 6} className="w-full">
+            {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("submit")}
           </Button>
         </form>

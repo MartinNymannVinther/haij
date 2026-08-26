@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRound } from "lucide-react";
+import { KeyRound, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -95,6 +95,7 @@ export function LoginForm() {
             </p>
           ) : null}
           <Button type="submit" disabled={pending} className="w-full">
+            {pending ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
             {t("submit")}
           </Button>
         </form>
