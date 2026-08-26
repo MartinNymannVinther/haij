@@ -1,0 +1,13 @@
+{
+  "common": {
+    "appName": "Haij",
+    "loading": "Indlæser…",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "close": "Luk",
+    "error": "Noget gik galt. Prøv igen."
+  },
+  "home": {
+    "tagline": "Forretningsplatformen til selvstændige og mikrovirksomheder."
+  }
+}

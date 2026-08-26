@@ -1,0 +1,13 @@
+{
+  "common": {
+    "appName": "Haij",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "error": "Something went wrong. Please try again."
+  },
+  "home": {
+    "tagline": "The business platform for solo consultants and micro-businesses."
+  }
+}
