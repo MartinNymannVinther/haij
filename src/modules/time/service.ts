@@ -1,5 +1,5 @@
 import { and, asc, between, desc, eq, sql } from "drizzle-orm";
-import { companies, timeEntries } from "@/core/db/schema";
+import { companies, projects, timeEntries } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { weekDates } from "./duration";
 
@@ -11,6 +11,7 @@ import { weekDates } from "./duration";
 
 export type TimeEntryInput = {
   companyId?: string | null;
+  projectId?: string | null;
   entryDate: string; // yyyy-mm-dd
   durationMinutes: number;
   note?: string | null;
@@ -30,9 +31,12 @@ export async function listWeek(ctx: OrgContext, mondayIso: string) {
         entryDate: timeEntries.entryDate,
         durationMinutes: timeEntries.durationMinutes,
         note: timeEntries.note,
+        projectId: timeEntries.projectId,
+        projectName: projects.name,
       })
       .from(timeEntries)
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
       .where(between(timeEntries.entryDate, monday, sunday))
       .orderBy(asc(timeEntries.entryDate), desc(timeEntries.createdAt)),
   );
@@ -40,13 +44,26 @@ export async function listWeek(ctx: OrgContext, mondayIso: string) {
 
 export async function addEntry(ctx: OrgContext, input: TimeEntryInput) {
   return withOrgContext(ctx, async (tx) => {
-    if (input.companyId) {
+    let companyId = input.companyId ?? null;
+    if (input.projectId) {
+      // A project entry inherits the project's company unless one was
+      // chosen explicitly; the RLS-scoped lookup also blocks
+      // cross-tenant links (FK constraints don't know about tenants).
+      const [project] = await tx
+        .select({ id: projects.id, companyId: projects.companyId })
+        .from(projects)
+        .where(and(eq(projects.id, input.projectId), eq(projects.status, "active")))
+        .limit(1);
+      if (!project) throw new Error("PROJECT_NOT_FOUND");
+      companyId = companyId ?? project.companyId;
+    }
+    if (companyId) {
       // FK constraints don't know about tenants; RLS-scoped existence
       // check prevents attaching time to another org's company.
       const [company] = await tx
         .select({ id: companies.id })
         .from(companies)
-        .where(eq(companies.id, input.companyId))
+        .where(eq(companies.id, companyId))
         .limit(1);
       if (!company) throw new Error("COMPANY_NOT_FOUND");
     }
@@ -54,7 +71,8 @@ export async function addEntry(ctx: OrgContext, input: TimeEntryInput) {
       .insert(timeEntries)
       .values({
         orgId: ctx.orgId,
-        companyId: input.companyId ?? null,
+        companyId,
+        projectId: input.projectId ?? null,
         userId: ctx.userId,
         entryDate: input.entryDate,
         durationMinutes: input.durationMinutes,

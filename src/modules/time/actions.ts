@@ -17,6 +17,13 @@ const EntrySchema = z.object({
     .transform((value) => (value.length > 0 ? value : null))
     .nullish()
     .transform((value) => value ?? null),
+  projectId: z
+    .string()
+    .trim()
+    .max(64)
+    .transform((value) => (value.length > 0 ? value : null))
+    .nullish()
+    .transform((value) => value ?? null),
   entryDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   duration: z.string().trim().min(1).max(20),
   note: z
@@ -40,13 +47,17 @@ export async function addTimeEntryAction(input: unknown): Promise<TimeActionResu
   try {
     await addEntry(ctx, {
       companyId: parsed.data.companyId,
+      projectId: parsed.data.projectId,
       entryDate: parsed.data.entryDate,
       durationMinutes,
       note: parsed.data.note,
     });
     return { ok: true };
   } catch (error) {
-    if (error instanceof Error && error.message === "COMPANY_NOT_FOUND") {
+    if (
+      error instanceof Error &&
+      (error.message === "COMPANY_NOT_FOUND" || error.message === "PROJECT_NOT_FOUND")
+    ) {
       return { ok: false, error: "notFound" };
     }
     console.error("time: add entry failed", error);

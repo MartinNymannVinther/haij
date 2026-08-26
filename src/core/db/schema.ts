@@ -323,14 +323,70 @@ export const timeEntries = pgTable(
     invoiceLineId: text("invoice_line_id").references(() => invoiceLines.id, {
       onDelete: "set null",
     }),
+    /** Optional link to a project (phase 3); survives project deletion as null. */
+    projectId: text("project_id").references(() => projects.id, { onDelete: "set null" }),
     ...timestamps,
   },
   (t) => [
     index("time_entries_org_date_idx").on(t.orgId, t.entryDate),
     index("time_entries_org_user_date_idx").on(t.orgId, t.userId, t.entryDate),
     index("time_entries_org_company_idx").on(t.orgId, t.companyId),
+    index("time_entries_org_project_idx").on(t.orgId, t.projectId),
     check("time_entries_duration_valid", sql`duration_minutes between 1 and 1440`),
   ],
+);
+
+/* ------------------------------------------------------------------ */
+/* Phase 3: light project management — projects, tasks, linked time.   */
+/* ------------------------------------------------------------------ */
+
+export const PROJECT_STATUSES = ["active", "done", "archived"] as const;
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
+
+export const projects = pgTable(
+  "projects",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    companyId: text("company_id").references(() => companies.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    status: text("status").notNull().default("active"),
+    /** Agreed frame for this project, if any: hours and/or amount. */
+    budgetMinutes: integer("budget_minutes"),
+    budgetAmountOere: bigint("budget_amount_oere", { mode: "number" }),
+    deadline: date("deadline"),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    index("projects_org_status_idx").on(t.orgId, t.status),
+    index("projects_org_company_idx").on(t.orgId, t.companyId),
+    check("projects_status_valid", sql`status in ('active', 'done', 'archived')`),
+  ],
+);
+
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    isDone: boolean("is_done").notNull().default(false),
+    doneAt: timestamp("done_at", { withTimezone: true }),
+    dueDate: date("due_date"),
+    position: integer("position").notNull().default(0),
+    createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [index("tasks_org_project_idx").on(t.orgId, t.projectId)],
 );
 
 /* ------------------------------------------------------------------ */
