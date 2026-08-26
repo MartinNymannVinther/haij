@@ -8,8 +8,36 @@
     "back": "Tilbage",
     "error": "Noget gik galt. Prøv igen."
   },
-  "home": {
-    "tagline": "Forretningsplatformen til selvstændige og mikrovirksomheder."
+  "landing": {
+    "nav": {
+      "login": "Log ind",
+      "register": "Opret konto"
+    },
+    "hero": {
+      "title": "Kunder, timer og fakturaer. På dine betingelser.",
+      "subtitle": "Haij er en open source-forretningsplatform til selvstændige og mikrovirksomheder. Dansk først, hostet i EU, og bygget så du kan tage alle dine data med dig, den dag du vil.",
+      "ctaPrimary": "Opret gratis konto",
+      "ctaSecondary": "Log ind",
+      "trust": "Open source · AGPL-3.0 · Data i EU"
+    },
+    "values": {
+      "danishTitle": "Dansk fra bunden",
+      "danishBody": "CVR-opslag, danske fakturakrav og moms er udgangspunktet, ikke en tilpasning. Platformen taler dansk, fordi din virksomhed gør.",
+      "dataTitle": "Dine data er dine",
+      "dataBody": "Alt kører på EU-ejet infrastruktur, og du kan eksportere hele din organisation når som helst. Ingen indlåsning, ingen forbehold.",
+      "securityTitle": "Sikkerhed som standard",
+      "securityBody": "Passkeys og totrinsbekræftelse fra første dag, adskillelse mellem organisationer helt nede i databasen, og hver ændring i et revisionsspor."
+    },
+    "status": "Under åben udvikling. Fundamentet er på plads; CRM og tidsregistrering er de næste moduler.",
+    "footer": {
+      "license": "Open source under AGPL-3.0",
+      "language": "English"
+    }
+  },
+  "notFound": {
+    "title": "Siden findes ikke",
+    "body": "Adressen er enten forkert, eller også er siden flyttet.",
+    "cta": "Til forsiden"
   },
   "auth": {
     "login": {
@@ -59,6 +87,10 @@
       "dashboard": "Overblik",
       "security": "Sikkerhed",
       "logout": "Log ud",
+      "appearance": "Udseende",
+      "light": "Lys",
+      "dark": "Mørk",
+      "system": "Følg systemet",
       "language": "Sprog",
       "danish": "Dansk",
       "english": "English"
@@ -69,12 +101,14 @@
       "createTitle": "Opret ny organisation",
       "name": "Navn",
       "createSubmit": "Opret",
+      "switched": "Skiftet til {name}",
+      "created": "{name} er oprettet",
       "error": "Organisationen kunne ikke oprettes. Prøv igen."
     },
     "dashboard": {
       "title": "Overblik",
       "emptyTitle": "Her er tomt endnu",
-      "emptyBody": "Dine kunder, timer og fakturaer kommer til at bo her. De første moduler er på vej.",
+      "emptyBody": "Dine kunder, timer og fakturaer kommer til at bo her. CRM og tidsregistrering er de første moduler på vej.",
       "passkeyPromptTitle": "Gør din konto mere sikker",
       "passkeyPromptBody": "Tilføj en passkey, så du kan logge ind uden adgangskode.",
       "passkeyPromptCta": "Tilføj passkey"
@@ -91,6 +125,8 @@
         "add": "Tilføj passkey",
         "remove": "Fjern",
         "addedAt": "Tilføjet {date}",
+        "addedToast": "Passkey tilføjet",
+        "removedToast": "Passkey fjernet",
         "error": "Passkey kunne ikke tilføjes. Prøv igen."
       },
       "totp": {
@@ -107,6 +143,8 @@
         "verifyLabel": "Kode fra appen",
         "verify": "Bekræft",
         "verifyError": "Forkert kode. Prøv igen.",
+        "enabledToast": "Totrinsbekræftelse er slået til",
+        "disabledToast": "Totrinsbekræftelse er slået fra",
         "error": "Handlingen mislykkedes. Tjek adgangskoden, og prøv igen."
       }
     }

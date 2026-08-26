@@ -8,8 +8,36 @@
     "back": "Back",
     "error": "Something went wrong. Please try again."
   },
-  "home": {
-    "tagline": "The business platform for solo consultants and micro-businesses."
+  "landing": {
+    "nav": {
+      "login": "Sign in",
+      "register": "Create account"
+    },
+    "hero": {
+      "title": "Customers, hours and invoices. On your terms.",
+      "subtitle": "Haij is an open source business platform for solo consultants and micro-businesses. Danish-first, hosted in the EU, and built so you can take all of your data with you the day you want to.",
+      "ctaPrimary": "Create free account",
+      "ctaSecondary": "Sign in",
+      "trust": "Open source · AGPL-3.0 · Data in the EU"
+    },
+    "values": {
+      "danishTitle": "Danish from the ground up",
+      "danishBody": "CVR lookups, Danish invoicing rules and VAT are the starting point, not an adaptation. The platform speaks Danish because your business does.",
+      "dataTitle": "Your data is yours",
+      "dataBody": "Everything runs on EU-owned infrastructure, and you can export your entire organization at any time. No lock-in, no fine print.",
+      "securityTitle": "Security by default",
+      "securityBody": "Passkeys and two-factor authentication from day one, tenant isolation enforced in the database itself, and every change in an audit trail."
+    },
+    "status": "In open development. The foundation is in place; CRM and time tracking are the next modules.",
+    "footer": {
+      "license": "Open source under AGPL-3.0",
+      "language": "Dansk"
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The address is wrong, or the page has moved.",
+    "cta": "Back to the front page"
   },
   "auth": {
     "login": {
@@ -59,6 +87,10 @@
       "dashboard": "Overview",
       "security": "Security",
       "logout": "Sign out",
+      "appearance": "Appearance",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Follow system",
       "language": "Language",
       "danish": "Dansk",
       "english": "English"
@@ -69,12 +101,14 @@
       "createTitle": "Create new organization",
       "name": "Name",
       "createSubmit": "Create",
+      "switched": "Switched to {name}",
+      "created": "{name} has been created",
       "error": "The organization could not be created. Please try again."
     },
     "dashboard": {
       "title": "Overview",
       "emptyTitle": "Nothing here yet",
-      "emptyBody": "Your customers, hours and invoices will live here. The first modules are on their way.",
+      "emptyBody": "Your customers, hours and invoices will live here. CRM and time tracking are the first modules on their way.",
       "passkeyPromptTitle": "Make your account more secure",
       "passkeyPromptBody": "Add a passkey so you can sign in without a password.",
       "passkeyPromptCta": "Add passkey"
@@ -91,6 +125,8 @@
         "add": "Add passkey",
         "remove": "Remove",
         "addedAt": "Added {date}",
+        "addedToast": "Passkey added",
+        "removedToast": "Passkey removed",
         "error": "The passkey could not be added. Please try again."
       },
       "totp": {
@@ -107,6 +143,8 @@
         "verifyLabel": "Code from the app",
         "verify": "Verify",
         "verifyError": "Wrong code. Please try again.",
+        "enabledToast": "Two-factor authentication enabled",
+        "disabledToast": "Two-factor authentication disabled",
         "error": "The action failed. Check the password and try again."
       }
     }
