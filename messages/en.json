@@ -103,7 +103,8 @@
       "invoices": "Invoices",
       "economy": "Economy",
       "projects": "Projects",
-      "ai": "AI"
+      "ai": "AI",
+      "signals": "Signals"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -616,5 +617,61 @@
     "principleSovereign": "EU-hosted or local models only. The provider can be swapped without touching the rest of the platform.",
     "principleApproval": "AI never sends anything out of the house. Everything it drafts requires your approval first.",
     "principleUsage": "The first use is the phase 4 signals engine, scoring opportunities against your service profile."
+  },
+  "signals": {
+    "title": "Signals",
+    "status": {
+      "new": "New",
+      "saved": "Saved",
+      "dismissed": "Dismissed"
+    },
+    "source": {
+      "cvr": "CVR",
+      "ted": "Tender",
+      "rss": "Feed",
+      "manual": "Manual"
+    },
+    "empty": "No signals here.",
+    "emptyHint": "Hit Refresh to pull new signals from your sources.",
+    "unconfiguredTitle": "The signals engine is not set up yet",
+    "unconfiguredHint": "Open Sources and write your service profile, pick branch codes, tender keywords and RSS feeds. Then Refresh brings new opportunities to you.",
+    "refresh": "Refresh",
+    "refreshedToast": "{count} new signals fetched.",
+    "refreshedEmptyToast": "Nothing new this time.",
+    "refreshPartialToast": "Some sources did not answer: {sources}",
+    "convert": "Create customer",
+    "convertedToast": "The signal is linked to a customer.",
+    "openCompany": "Open customer",
+    "followUp": "Follow up",
+    "followUpTitle": "Follow-up date",
+    "followUpLabel": "Date (empty removes the follow-up)",
+    "dismiss": "Dismiss",
+    "reopen": "Reopen",
+    "add": {
+      "trigger": "Save as signal",
+      "title": "Save as signal",
+      "hint": "For anything you spot yourself, e.g. a LinkedIn post or a conversation. Paste a link and notes; the signal is scored and followed up like the automatic ones.",
+      "titleLabel": "Headline",
+      "urlLabel": "Link (optional)",
+      "noteLabel": "Notes",
+      "cvrLabel": "CVR (optional, links to a customer)",
+      "submit": "Save signal",
+      "addedToast": "Signal saved.",
+      "invalid": "Check the fields. CVR must be 8 digits, the link must be a valid URL."
+    },
+    "settings": {
+      "trigger": "Sources",
+      "title": "Service profile and sources",
+      "hint": "The service profile is the yardstick the AI scores signals against. The sources decide what gets fetched.",
+      "profileLabel": "Service profile",
+      "profilePlaceholder": "E.g.: We advise municipalities and SMEs on digital strategy, tenders and platform implementations…",
+      "tedLabel": "Tender keywords (TED, comma separated)",
+      "tedPlaceholder": "digitalisation, it consulting",
+      "cvrLabel": "CVR branch codes (prefixes, comma separated)",
+      "cvrPlaceholder": "6201, 7022",
+      "rssLabel": "RSS feeds (one per line, optionally \"url | name\")",
+      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisation&format=rss | Jobindex",
+      "savedToast": "Signal settings saved."
+    }
   }
 }

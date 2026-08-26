@@ -103,7 +103,8 @@
       "invoices": "Fakturaer",
       "economy": "Økonomi",
       "projects": "Projekter",
-      "ai": "AI"
+      "ai": "AI",
+      "signals": "Signaler"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -616,5 +617,61 @@
     "principleSovereign": "Kun EU-hostede eller lokale modeller. Udbyderen kan skiftes uden at røre resten af platformen.",
     "principleApproval": "AI sender aldrig noget ud af huset. Alt den udarbejder, kræver din godkendelse først.",
     "principleUsage": "Første anvendelse bliver signalmotoren i fase 4, der scorer muligheder mod din serviceprofil."
+  },
+  "signals": {
+    "title": "Signaler",
+    "status": {
+      "new": "Nye",
+      "saved": "Gemte",
+      "dismissed": "Afviste"
+    },
+    "source": {
+      "cvr": "CVR",
+      "ted": "Udbud",
+      "rss": "Kilde",
+      "manual": "Manuel"
+    },
+    "empty": "Ingen signaler her.",
+    "emptyHint": "Tryk Opdatér for at hente nye signaler fra dine kilder.",
+    "unconfiguredTitle": "Signalmotoren er ikke sat op endnu",
+    "unconfiguredHint": "Åbn Kilder og skriv din serviceprofil, vælg brancher, udbuds-søgeord og RSS-feeds. Derefter henter Opdatér-knappen nye muligheder til dig.",
+    "refresh": "Opdatér",
+    "refreshedToast": "{count} nye signaler hentet.",
+    "refreshedEmptyToast": "Ingen nye signaler denne gang.",
+    "refreshPartialToast": "Nogle kilder svarede ikke: {sources}",
+    "convert": "Opret kunde",
+    "convertedToast": "Signalet er knyttet til en kunde.",
+    "openCompany": "Åbn kunde",
+    "followUp": "Følg op",
+    "followUpTitle": "Opfølgningsdato",
+    "followUpLabel": "Dato (tom fjerner opfølgningen)",
+    "dismiss": "Afvis",
+    "reopen": "Genåbn",
+    "add": {
+      "trigger": "Gem som signal",
+      "title": "Gem som signal",
+      "hint": "Til alt du selv spotter, fx et LinkedIn-opslag eller en samtale. Indsæt link og noter, så kan signalet scores og følges op som de automatiske.",
+      "titleLabel": "Overskrift",
+      "urlLabel": "Link (valgfrit)",
+      "noteLabel": "Noter",
+      "cvrLabel": "CVR (valgfrit, kobler til kunde)",
+      "submit": "Gem signal",
+      "addedToast": "Signalet er gemt.",
+      "invalid": "Tjek felterne. CVR skal være 8 cifre, link skal være en gyldig adresse."
+    },
+    "settings": {
+      "trigger": "Kilder",
+      "title": "Serviceprofil og kilder",
+      "hint": "Serviceprofilen er målestokken, AI'en scorer signaler imod. Kilderne afgør, hvad der hentes.",
+      "profileLabel": "Serviceprofil",
+      "profilePlaceholder": "Fx: Vi rådgiver kommuner og SMV'er om digital strategi, udbud og implementering af nye platforme…",
+      "tedLabel": "Udbuds-søgeord (TED, komma-adskilt)",
+      "tedPlaceholder": "digitalisering, it-rådgivning",
+      "cvrLabel": "CVR-branchekoder (præfikser, komma-adskilt)",
+      "cvrPlaceholder": "6201, 7022",
+      "rssLabel": "RSS-feeds (ét pr. linje, evt. \"url | navn\")",
+      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisering&format=rss | Jobindex",
+      "savedToast": "Signal-indstillingerne er gemt."
+    }
   }
 }
