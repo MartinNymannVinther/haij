@@ -19,9 +19,16 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { authClient } from "@/core/auth/client";
 import { useRouter } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { organizationSlug } from "@/lib/slug";
 
-export function OrgSwitcher() {
+export function OrgSwitcher({
+  triggerClassName,
+  align = "start",
+}: {
+  triggerClassName?: string;
+  align?: "start" | "end" | "center";
+}) {
   const t = useTranslations("app.orgSwitcher");
   const router = useRouter();
   const { data: organizations } = authClient.useListOrganizations();
@@ -67,13 +74,13 @@ export function OrgSwitcher() {
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <Button variant="ghost" size="sm" className="gap-2 font-medium">
-              {activeOrganization?.name ?? t("label")}
-              <ChevronsUpDown data-slot="icon" className="opacity-50" />
+            <Button variant="ghost" size="sm" className={cn("gap-2 font-medium", triggerClassName)}>
+              <span className="truncate">{activeOrganization?.name ?? t("label")}</span>
+              <ChevronsUpDown data-slot="icon" className="shrink-0 opacity-50" />
             </Button>
           }
         />
-        <DropdownMenuContent align="start" className="min-w-56">
+        <DropdownMenuContent align={align} className="min-w-56">
           {/* Base UI: a GroupLabel must live inside a Group. */}
           <DropdownMenuGroup>
             <DropdownMenuLabel>{t("label")}</DropdownMenuLabel>

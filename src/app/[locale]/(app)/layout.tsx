@@ -1,7 +1,8 @@
 import { getLocale } from "next-intl/server";
 import { getSession } from "@/core/auth/session";
 import { redirect } from "@/i18n/navigation";
-import { AppHeader } from "./app-header";
+import { AppSidebar } from "./app-sidebar";
+import { MobileHeader } from "./mobile-header";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
@@ -16,9 +17,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
-      <AppHeader userName={session.user.name} userEmail={session.user.email} />
-      <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:px-6 sm:py-8">{children}</main>
+    <div className="flex min-h-svh">
+      <AppSidebar userName={session.user.name} userEmail={session.user.email} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <MobileHeader userName={session.user.name} userEmail={session.user.email} />
+        <main className="@container mx-auto w-full max-w-5xl flex-1 p-4 sm:p-6 lg:px-10 lg:py-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

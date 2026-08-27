@@ -9,7 +9,7 @@ export const SOURCE_BADGE_CLASS: Record<SignalSource, string> = {
 };
 
 export function scoreBadgeClass(score: number): string {
-  if (score >= 70) return "border-transparent bg-primary text-primary-foreground";
-  if (score >= 40) return "border-transparent bg-primary/15 text-primary";
+  if (score >= 70) return "border-transparent bg-success text-success-foreground";
+  if (score >= 40) return "border-transparent bg-warning/15 text-warning dark:bg-warning/20";
   return "border-border bg-transparent text-muted-foreground";
 }

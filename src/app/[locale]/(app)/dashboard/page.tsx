@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { ArrowRight, LayoutDashboard } from "lucide-react";
+import { ArrowRight, Banknote, Building2, Clock, KanbanSquare, LayoutDashboard } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,35 @@ import { PasskeyPrompt } from "./passkey-prompt";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app.dashboard");
   return { title: t("title") };
+}
+
+function StatCard({
+  icon,
+  tint,
+  label,
+  value,
+  footer,
+}: {
+  icon: React.ReactNode;
+  tint: string;
+  label: string;
+  value: string;
+  footer?: React.ReactNode;
+}) {
+  return (
+    <Card>
+      <CardContent className="pt-0">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-muted-foreground text-sm">{label}</p>
+          <span className={`flex size-7 shrink-0 items-center justify-center rounded-md ${tint}`}>
+            {icon}
+          </span>
+        </div>
+        <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">{value}</p>
+        {footer}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default async function DashboardPage() {
@@ -100,44 +129,38 @@ export default async function DashboardPage() {
         />
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground text-sm">{t("statCompanies")}</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
-                  {totalCompanies}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground text-sm">{t("statPipeline")}</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
-                  {activePipeline}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground text-sm">{t("statWeek")}</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
-                  {formatMinutes(weekMinutes)}
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-0">
-                <p className="text-muted-foreground text-sm">{t("statOutstanding")}</p>
-                <p className="mt-1 text-3xl font-semibold tracking-tight tabular-nums">
-                  {formatOere(invoicing.outstandingOere)}
-                </p>
-                {invoicing.overdueOere > 0 ? (
+          <div className="grid gap-4 @lg:grid-cols-2 @4xl:grid-cols-4">
+            <StatCard
+              icon={<Building2 className="size-4" />}
+              tint="bg-primary/10 text-primary"
+              label={t("statCompanies")}
+              value={String(totalCompanies)}
+            />
+            <StatCard
+              icon={<KanbanSquare className="size-4" />}
+              tint="bg-warning/12 text-warning"
+              label={t("statPipeline")}
+              value={String(activePipeline)}
+            />
+            <StatCard
+              icon={<Clock className="size-4" />}
+              tint="bg-accent text-accent-foreground"
+              label={t("statWeek")}
+              value={formatMinutes(weekMinutes)}
+            />
+            <StatCard
+              icon={<Banknote className="size-4" />}
+              tint="bg-success/12 text-success"
+              label={t("statOutstanding")}
+              value={formatOere(invoicing.outstandingOere)}
+              footer={
+                invoicing.overdueOere > 0 ? (
                   <p className="text-destructive mt-1 text-xs font-medium">
                     {t("statOverdue", { amount: formatOere(invoicing.overdueOere) })}
                   </p>
-                ) : null}
-              </CardContent>
-            </Card>
+                ) : null
+              }
+            />
           </div>
 
           <Card>

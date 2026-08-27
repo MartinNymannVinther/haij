@@ -140,7 +140,7 @@ export function IssuedView({ invoice, lines }: { invoice: Invoice; lines: Line[]
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
         <Card className="min-w-0">
           <CardHeader>
             <CardTitle>{t("linesTitle")}</CardTitle>

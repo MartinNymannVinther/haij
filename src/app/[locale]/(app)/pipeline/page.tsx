@@ -38,7 +38,7 @@ export default async function PipelinePage() {
       {companies.length === 0 ? (
         <EmptyState icon={KanbanSquare} title={t("empty")} />
       ) : (
-        <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6">
+        <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
           <div className="flex min-w-max gap-4">
             {columns.map((column) => (
               <section key={column.stage} className="w-64 shrink-0">

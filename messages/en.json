@@ -106,7 +106,9 @@
       "projects": "Projects",
       "ai": "AI",
       "signals": "Signals",
-      "knowledge": "Knowledge"
+      "knowledge": "Knowledge",
+      "openMenu": "Open menu",
+      "menuTitle": "Navigation"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -168,6 +170,12 @@
         "disabledToast": "Two-factor authentication disabled",
         "error": "The action failed. Check the password and try again."
       }
+    },
+    "navGroups": {
+      "sales": "Sales",
+      "work": "Work",
+      "economy": "Finances",
+      "insight": "Insight"
     }
   },
   "crm": {

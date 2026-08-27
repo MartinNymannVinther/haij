@@ -3,6 +3,7 @@
 import {
   Building2,
   Check,
+  ChevronsUpDown,
   Languages,
   LogOut,
   Monitor,
@@ -46,7 +47,15 @@ const THEME_OPTIONS = [
   { value: "system", labelKey: "system", icon: Monitor },
 ] as const;
 
-export function UserMenu({ name, email }: { name: string; email: string }) {
+export function UserMenu({
+  name,
+  email,
+  variant = "icon",
+}: {
+  name: string;
+  email: string;
+  variant?: "icon" | "row";
+}) {
   const t = useTranslations("app.nav");
   const router = useRouter();
   const pathname = usePathname();
@@ -63,12 +72,30 @@ export function UserMenu({ name, email }: { name: string; email: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="outline" size="icon" className="rounded-full text-xs font-semibold">
-            {initials(name)}
-          </Button>
+          variant === "row" ? (
+            <Button
+              variant="ghost"
+              className="h-auto w-full justify-start gap-2.5 px-2 py-2 text-left"
+            >
+              <span className="bg-primary/12 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+                {initials(name)}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-medium">{name}</span>
+                <span className="text-muted-foreground block truncate text-xs font-normal">
+                  {email}
+                </span>
+              </span>
+              <ChevronsUpDown data-slot="icon" className="shrink-0 opacity-50" />
+            </Button>
+          ) : (
+            <Button variant="outline" size="icon" className="rounded-full text-xs font-semibold">
+              {initials(name)}
+            </Button>
+          )
         }
       />
-      <DropdownMenuContent align="end" className="min-w-56">
+      <DropdownMenuContent align={variant === "row" ? "start" : "end"} className="min-w-56">
         {/* Base UI: a GroupLabel must live inside a Group. */}
         <DropdownMenuGroup>
           <DropdownMenuLabel>

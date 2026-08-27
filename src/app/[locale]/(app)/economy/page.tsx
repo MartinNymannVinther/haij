@@ -133,7 +133,7 @@ export default async function EconomyPage({
                     <TableCell
                       className={cn(
                         "text-right tabular-nums",
-                        gap != null && gap < 0 ? "text-destructive" : "text-muted-foreground",
+                        gap != null && gap < 0 ? "text-destructive" : "text-success",
                       )}
                     >
                       {gap != null ? formatOere(gap) : ""}

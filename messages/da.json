@@ -106,7 +106,9 @@
       "projects": "Projekter",
       "ai": "AI",
       "signals": "Signaler",
-      "knowledge": "Viden"
+      "knowledge": "Viden",
+      "openMenu": "Åbn menu",
+      "menuTitle": "Navigation"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -168,6 +170,12 @@
         "disabledToast": "Totrinsbekræftelse er slået fra",
         "error": "Handlingen mislykkedes. Tjek adgangskoden, og prøv igen."
       }
+    },
+    "navGroups": {
+      "sales": "Salg",
+      "work": "Arbejde",
+      "economy": "Økonomi",
+      "insight": "Indsigt"
     }
   },
   "crm": {

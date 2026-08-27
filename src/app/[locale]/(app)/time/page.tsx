@@ -125,17 +125,31 @@ export default async function TimePage({
             const dayEntries = byDay.get(day) ?? [];
             if (dayEntries.length === 0) return null;
             const dayTotal = dayEntries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
+            const isToday = day === today;
             return (
               <div key={day}>
-                <div className="text-muted-foreground mb-1.5 flex items-center justify-between text-xs font-medium tracking-wide uppercase">
-                  <span className={day === today ? "text-primary" : undefined}>
-                    {format.dateTime(new Date(`${day}T12:00:00Z`), {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "short",
-                    })}
+                <div className="mb-1.5 flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      className={cn(
+                        "flex size-7 shrink-0 items-center justify-center rounded-md text-sm font-semibold tabular-nums",
+                        isToday ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
+                      )}
+                    >
+                      {Number(day.slice(8, 10))}
+                    </span>
+                    <span
+                      className={cn(
+                        "truncate text-sm font-medium capitalize",
+                        isToday ? "text-primary" : "text-muted-foreground",
+                      )}
+                    >
+                      {format.dateTime(new Date(`${day}T12:00:00Z`), { weekday: "long" })}
+                    </span>
+                  </div>
+                  <span className="text-muted-foreground text-sm tabular-nums">
+                    {formatMinutes(dayTotal)}
                   </span>
-                  <span className="tabular-nums">{formatMinutes(dayTotal)}</span>
                 </div>
                 <ul className="flex flex-col divide-y rounded-lg border">
                   {dayEntries.map((entry) => (

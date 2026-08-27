@@ -36,7 +36,7 @@ export default async function KnowledgePage() {
         <KnowledgeToolbar hasSources={sources.some((s) => s.active)} hasItems={items.length > 0} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="flex min-w-0 flex-col gap-6">
           {digests.length > 0 ? (
             <Card>

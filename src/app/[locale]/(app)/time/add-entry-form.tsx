@@ -168,7 +168,7 @@ export function AddEntryForm({
       <CardContent>
         <form
           onSubmit={handleSubmit}
-          className="grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[9rem_minmax(8rem,1fr)_minmax(8rem,1fr)_minmax(8rem,1fr)_minmax(8rem,1fr)_6rem_minmax(8rem,1.2fr)_auto]"
+          className="grid items-end gap-3 @lg:grid-cols-2 @3xl:grid-cols-4"
         >
           <Field>
             <FieldLabel htmlFor="entry-date">{t("date")}</FieldLabel>

@@ -60,7 +60,7 @@ function FrameBar({ label, ratio }: { label: string; ratio: number }) {
       <span
         className={cn(
           "text-xs tabular-nums",
-          over ? "text-destructive font-medium" : warn ? "font-medium" : "text-muted-foreground",
+          over ? "text-destructive font-medium" : warn ? "text-warning font-medium" : "text-muted-foreground",
         )}
       >
         {label}
@@ -70,7 +70,7 @@ function FrameBar({ label, ratio }: { label: string; ratio: number }) {
         <div
           className={cn(
             "h-full rounded-full transition-all",
-            over ? "bg-destructive" : warn ? "bg-primary/70" : "bg-primary",
+            over ? "bg-destructive" : warn ? "bg-warning" : "bg-primary",
           )}
           style={{ width: `${clamped * 100}%` }}
         />
