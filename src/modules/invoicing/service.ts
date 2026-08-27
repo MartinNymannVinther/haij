@@ -146,6 +146,31 @@ export async function getInvoicingOverview(ctx: OrgContext) {
   });
 }
 
+/**
+ * Issued or sent invoices past their due date, newest first. The dashboard
+ * turns these into the first rows of "needs attention".
+ */
+export async function listOverdueInvoices(ctx: OrgContext, limit = 5) {
+  return withOrgContext(ctx, (tx) =>
+    tx
+      .select({
+        id: invoices.id,
+        invoiceNumber: invoices.invoiceNumber,
+        buyerName: invoices.buyerName,
+        companyName: companies.name,
+        dueDate: invoices.dueDate,
+        grossOere: invoices.grossOere,
+      })
+      .from(invoices)
+      .leftJoin(companies, eq(companies.id, invoices.companyId))
+      .where(
+        sql`${invoices.status} in ('issued', 'sent') and ${invoices.type} = 'invoice' and ${invoices.dueDate} < current_date`,
+      )
+      .orderBy(asc(invoices.dueDate))
+      .limit(limit),
+  );
+}
+
 /* ------------------------------ Drafts ------------------------------ */
 
 export async function createDraft(ctx: OrgContext, companyId?: string | null) {

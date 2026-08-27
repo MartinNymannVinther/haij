@@ -1,4 +1,4 @@
-import { ArrowUpRight, BookOpen, Sparkles } from "lucide-react";
+import { ArrowUpRight, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +71,6 @@ export default async function KnowledgePage() {
               {items.length === 0 ? (
                 <EmptyState
                   variant="inline"
-                  icon={BookOpen}
                   title={t("empty")}
                   hint={t("emptyHint")}
                 />

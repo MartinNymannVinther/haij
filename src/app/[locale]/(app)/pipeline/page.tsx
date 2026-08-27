@@ -1,4 +1,3 @@
-import { KanbanSquare } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -39,7 +38,7 @@ export default async function PipelinePage() {
       </div>
 
       {companies.length === 0 ? (
-        <EmptyState icon={KanbanSquare} title={t("empty")} hint={t("emptyHint")} />
+        <EmptyState title={t("empty")} hint={t("emptyHint")} />
       ) : (
         <PipelineBoard companies={companies} />
       )}

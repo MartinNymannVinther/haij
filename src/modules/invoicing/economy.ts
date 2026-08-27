@@ -1,5 +1,14 @@
 import { asc, eq, sql } from "drizzle-orm";
-import { budgets, companies, invoices, timeEntries } from "@/core/db/schema";
+import {
+  budgets,
+  companies,
+  invoices,
+  orgProfiles,
+  projects,
+  roles,
+  tasks,
+  timeEntries,
+} from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 
 /**
@@ -173,5 +182,45 @@ export async function setCustomerFrame(
       .where(eq(companies.id, companyId))
       .returning({ id: companies.id });
     return result.length > 0;
+  });
+}
+
+/**
+ * Unbilled time per customer, valued with the full rate hierarchy resolved
+ * per entry in SQL: role -> task -> project -> customer -> org default.
+ * The customer list and the customer page both show this number, so it is
+ * computed once here rather than twice in the views.
+ */
+export async function getUnbilledByCompany(
+  ctx: OrgContext,
+): Promise<Map<string, { minutes: number; valueOere: number }>> {
+  return withOrgContext(ctx, async (tx) => {
+    const [profile] = await tx
+      .select({ defaultRate: orgProfiles.defaultHourlyRateOere })
+      .from(orgProfiles)
+      .where(eq(orgProfiles.orgId, ctx.orgId))
+      .limit(1);
+    const defaultRate = profile?.defaultRate ?? 0;
+
+    const rows = await tx
+      .select({
+        companyId: timeEntries.companyId,
+        minutes: sql<number>`coalesce(sum(${timeEntries.durationMinutes}), 0)::int`,
+        valueOere: sql<number>`coalesce(sum(round(${timeEntries.durationMinutes} * coalesce(${roles.hourlyRateOere}, ${tasks.hourlyRateOere}, ${projects.hourlyRateOere}, ${companies.hourlyRateOere}, ${defaultRate}, 0) / 60.0)), 0)::bigint`,
+      })
+      .from(timeEntries)
+      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
+      .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .leftJoin(companies, eq(companies.id, timeEntries.companyId))
+      .where(sql`${timeEntries.invoiceLineId} is null`)
+      .groupBy(timeEntries.companyId);
+
+    const map = new Map<string, { minutes: number; valueOere: number }>();
+    for (const row of rows) {
+      if (!row.companyId) continue;
+      map.set(row.companyId, { minutes: Number(row.minutes), valueOere: Number(row.valueOere) });
+    }
+    return map;
   });
 }

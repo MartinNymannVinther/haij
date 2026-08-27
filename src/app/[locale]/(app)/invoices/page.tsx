@@ -1,9 +1,10 @@
-import { FileText } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { SegmentedFilter } from "@/components/ui/segmented";
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import { getOrgContext } from "@/core/auth/session";
 import { INVOICE_STATUSES, type InvoiceStatus } from "@/core/db/schema";
 import { formatDateDa } from "@/core/dates";
 import { formatOere } from "@/modules/invoicing/money";
-import { listInvoices } from "@/modules/invoicing/service";
+import { getInvoicingOverview, listInvoices } from "@/modules/invoicing/service";
 import { INVOICE_STATUS_BADGE_CLASS } from "@/modules/invoicing/status-meta";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -43,50 +44,44 @@ export default async function InvoicesPage({
   }
   const { status } = await searchParams;
   const filter = isStatus(status) ? status : undefined;
-  const [t, tStatus, invoices] = await Promise.all([
+  const today = new Date().toISOString().slice(0, 10);
+  const [t, tStatus, invoices, overview] = await Promise.all([
     getTranslations("invoicing.list"),
     getTranslations("invoicing.status"),
     listInvoices(context, filter),
+    getInvoicingOverview(context),
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <NewInvoiceButton />
-      </div>
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={
+          overview.overdueOere > 0
+            ? t("summaryOverdue", {
+                outstanding: formatOere(overview.outstandingOere),
+                overdue: formatOere(overview.overdueOere),
+              })
+            : t("summary", { outstanding: formatOere(overview.outstandingOere) })
+        }
+        actions={<NewInvoiceButton />}
+      />
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <Link
-          href="/invoices"
-          className={cn(
-            "rounded-md border px-2.5 py-1 text-sm transition-colors",
-            !filter
-              ? "border-transparent bg-accent text-accent-foreground font-medium"
-              : "border-border text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {t("filterAll")}
-        </Link>
-        {INVOICE_STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={{ pathname: "/invoices", query: { status: s } }}
-            className={cn(
-              "rounded-md border px-2.5 py-1 text-sm transition-colors",
-              filter === s
-                ? "border-transparent bg-accent text-accent-foreground font-medium"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tStatus(s)}
-          </Link>
-        ))}
-      </div>
+      <SegmentedFilter
+        className="self-start"
+        items={[
+          { key: "all", label: t("filterAll"), href: "/invoices", active: !filter },
+          ...INVOICE_STATUSES.map((s) => ({
+            key: s,
+            label: tStatus(s),
+            href: { pathname: "/invoices" as const, query: { status: s } },
+            active: filter === s,
+          })),
+        ]}
+      />
 
       {invoices.length === 0 ? (
         <EmptyState
-          icon={FileText}
           title={filter ? t("noResults") : t("empty")}
           hint={filter ? undefined : t("emptyHint")}
         />
@@ -104,28 +99,46 @@ export default async function InvoicesPage({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {invoices.map((invoice) => (
+              {invoices.map((invoice) => {
+                const overdue =
+                  invoice.type === "invoice" &&
+                  invoice.status === "sent" &&
+                  Boolean(invoice.dueDate) &&
+                  invoice.dueDate! < today;
+                return (
                 <TableRow key={invoice.id} className="relative">
-                  <TableCell className="font-medium">
+                  <TableCell className="text-[0.845rem] font-semibold">
                     <Link href={`/invoices/${invoice.id}`} className="after:absolute after:inset-0">
                       {invoice.invoiceNumber ?? t("draftLabel")}
                       {invoice.type === "credit_note" ? (
-                        <span className="text-muted-foreground ml-1.5 text-xs">
+                        <span className="text-meta ml-1.5 text-xs font-normal">
                           {t("creditNote")}
                         </span>
                       ) : null}
                     </Link>
                   </TableCell>
-                  <TableCell>{invoice.buyerName ?? invoice.companyName ?? "—"}</TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-[0.8125rem]">
+                    {invoice.buyerName ?? invoice.companyName ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-meta text-[0.8125rem]">
                     {invoice.invoiceDate ? formatDateDa(invoice.invoiceDate) : ""}
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell
+                    className={cn(
+                      "text-[0.8125rem]",
+                      overdue ? "text-destructive font-medium" : "text-meta",
+                    )}
+                  >
                     {invoice.type === "invoice" && invoice.dueDate
                       ? formatDateDa(invoice.dueDate)
                       : ""}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums">
+                  <TableCell
+                    className={cn(
+                      "text-right text-[0.8125rem] tabular-nums",
+                      invoice.type === "credit_note" && "text-destructive",
+                    )}
+                  >
                     {formatOere(invoice.grossOere)}
                   </TableCell>
                   <TableCell>
@@ -134,7 +147,8 @@ export default async function InvoicesPage({
                     </Badge>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </Card>

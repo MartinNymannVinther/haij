@@ -1,4 +1,3 @@
-import { Radar } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -88,7 +87,6 @@ export default async function SignalsPage({
 
       {rows.length === 0 ? (
         <EmptyState
-          icon={Radar}
           title={configured ? t("empty") : t("unconfiguredTitle")}
           hint={configured ? t("emptyHint") : t("unconfiguredHint")}
         />

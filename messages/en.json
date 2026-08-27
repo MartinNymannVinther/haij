@@ -135,8 +135,31 @@
       "latestTitle": "Latest activity",
       "latestEmpty": "No activity yet.",
       "viewAll": "View all customers",
-      "statOutstanding": "Outstanding (incl. VAT)",
-      "statOverdue": "Of which overdue: {amount}"
+      "statOutstanding": "Outstanding",
+      "statOverdue": "Of which overdue: {amount}",
+      "week": "week {week}",
+      "greeting": {
+        "morning": "Good morning, {name}",
+        "day": "Hello, {name}",
+        "evening": "Good evening, {name}"
+      },
+      "greetingBody": "You have {hours} tracked today. {count, plural, =0 {Nothing is waiting for you.} =1 {One thing is waiting for you.} other {# things are waiting for you.}}",
+      "actionTrackTime": "Track time",
+      "actionNewInvoice": "New invoice",
+      "statWeekShare": "Billable share {share} %",
+      "statUnbilled": "Unbilled",
+      "statUnbilledMeta": "ready to invoice across {count, plural, =1 {one customer} other {# customers}}",
+      "statPipelineMeta": "of {count} customers in total",
+      "weekTitle": "The week so far",
+      "weekLink": "See time tracking",
+      "actionsTitle": "Needs attention",
+      "actionsEmpty": "Nothing needs your attention right now.",
+      "actionOverdue": "Invoice {number} is {days} days overdue",
+      "actionOpen": "Open",
+      "actionUnbilled": "{amount} in unbilled hours",
+      "actionUnbilledMeta": "across {count, plural, =1 {one customer} other {# customers}}",
+      "actionInvoice": "Invoice",
+      "emptyAction": "Create your first customer"
     },
     "security": {
       "title": "Security",
@@ -199,7 +222,10 @@
       "name": "Name",
       "cvr": "CVR",
       "city": "City",
-      "stage": "Stage"
+      "stage": "Stage",
+      "summary": "{count} customers · {active} active in pipeline",
+      "unbilled": "Unbilled",
+      "filterAll": "All"
     },
     "create": {
       "title": "Create customer",
@@ -379,7 +405,9 @@
       "amount": "Amount (incl. VAT)",
       "statusHead": "Status",
       "draftLabel": "Draft",
-      "creditNote": "Credit note"
+      "creditNote": "Credit note",
+      "summary": "{outstanding} outstanding",
+      "summaryOverdue": "{outstanding} outstanding · {overdue} overdue"
     },
     "status": {
       "draft": "Draft",
@@ -556,7 +584,8 @@
       "tracked": "Tracked time",
       "deadline": "Deadline",
       "frame": "Agreed frame (excl. VAT)",
-      "statusHead": "Status"
+      "statusHead": "Status",
+      "summary": "{count} projects · {active} active"
     },
     "status": {
       "active": "Active",

@@ -1,9 +1,10 @@
-import { FolderKanban } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { SegmentedFilter } from "@/components/ui/segmented";
 import {
   Table,
   TableBody,
@@ -20,7 +21,6 @@ import { listProjects } from "@/modules/projects/service";
 import { PROJECT_STATUS_BADGE_CLASS } from "@/modules/projects/status-meta";
 import { formatMinutes } from "@/modules/time/duration";
 import { Link, redirect } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
 import { FrameIndicator } from "../economy/frame-indicator";
 import { CreateProjectDialog } from "./create-project-dialog";
 
@@ -53,43 +53,33 @@ export default async function ProjectsPage({
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <CreateProjectDialog companies={companies.map((c) => ({ id: c.id, name: c.name }))} />
-      </div>
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={t("summary", {
+          count: projects.length,
+          active: projects.filter((project) => project.status === "active").length,
+        })}
+        actions={
+          <CreateProjectDialog companies={companies.map((c) => ({ id: c.id, name: c.name }))} />
+        }
+      />
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <Link
-          href="/projects"
-          className={cn(
-            "rounded-md border px-2.5 py-1 text-sm transition-colors",
-            !filter
-              ? "border-transparent bg-accent text-accent-foreground font-medium"
-              : "border-border text-muted-foreground hover:text-foreground",
-          )}
-        >
-          {t("filterAll")}
-        </Link>
-        {PROJECT_STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={{ pathname: "/projects", query: { status: s } }}
-            className={cn(
-              "rounded-md border px-2.5 py-1 text-sm transition-colors",
-              filter === s
-                ? "border-transparent bg-accent text-accent-foreground font-medium"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {tStatus(s)}
-          </Link>
-        ))}
-      </div>
+      <SegmentedFilter
+        className="self-start"
+        items={[
+          { key: "all", label: t("filterAll"), href: "/projects", active: !filter },
+          ...PROJECT_STATUSES.map((s) => ({
+            key: s,
+            label: tStatus(s),
+            href: { pathname: "/projects" as const, query: { status: s } },
+            active: filter === s,
+          })),
+        ]}
+      />
 
       {projects.length === 0 ? (
         <EmptyState
-          icon={FolderKanban}
           title={filter ? t("noResults") : t("empty")}
           hint={filter ? undefined : t("emptyHint")}
         />
@@ -111,7 +101,7 @@ export default async function ProjectsPage({
               <TableBody>
                 {projects.map((project) => (
                   <TableRow key={project.id} className="relative">
-                    <TableCell className="font-medium">
+                    <TableCell className="text-[0.845rem] font-semibold">
                       <Link
                         href={`/projects/${project.id}`}
                         className="after:absolute after:inset-0"
@@ -119,10 +109,10 @@ export default async function ProjectsPage({
                         {project.name}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-meta text-[0.8125rem]">
                       {project.companyName ?? ""}
                     </TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
+                    <TableCell className="text-meta text-[0.8125rem] tabular-nums">
                       {project.openTasks + project.doneTasks > 0
                         ? t("taskCount", {
                             done: project.doneTasks,
@@ -130,10 +120,10 @@ export default async function ProjectsPage({
                           })
                         : ""}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums">
+                    <TableCell className="text-right text-[0.8125rem] tabular-nums">
                       {project.trackedMinutes > 0 ? formatMinutes(project.trackedMinutes) : ""}
                     </TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
+                    <TableCell className="text-meta text-[0.8125rem] tabular-nums">
                       {project.deadline ? formatDateDa(project.deadline) : ""}
                     </TableCell>
                     <TableCell className="min-w-44">
