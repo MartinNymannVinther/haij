@@ -3,11 +3,9 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getOrgContext } from "@/core/auth/session";
-import type { PipelineStage } from "@/core/db/schema";
 import { listCompaniesForPipeline } from "@/modules/crm/service";
-import { STAGE_ORDER } from "@/modules/crm/stage-meta";
-import { Link, redirect } from "@/i18n/navigation";
-import { StageSelect } from "../companies/[companyId]/stage-select";
+import { redirect } from "@/i18n/navigation";
+import { PipelineBoard } from "./pipeline-board";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("crm.pipeline");
@@ -20,64 +18,30 @@ export default async function PipelinePage() {
     redirect({ href: "/onboarding", locale: await getLocale() });
     return null;
   }
-  const [t, tStages, companies] = await Promise.all([
+  const [t, companies] = await Promise.all([
     getTranslations("crm.pipeline"),
-    getTranslations("crm.stages"),
     listCompaniesForPipeline(context),
   ]);
 
-  const columns = STAGE_ORDER.map((stage) => ({
-    stage,
-    items: companies.filter((company) => company.pipelineStage === stage),
-  }));
+  const open = companies.filter((company) =>
+    ["lead", "dialogue", "proposal"].includes(company.pipelineStage),
+  ).length;
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+        {companies.length > 0 ? (
+          <p className="text-muted-foreground text-sm">
+            {t("summary", { open, total: companies.length })}
+          </p>
+        ) : null}
+      </div>
 
       {companies.length === 0 ? (
-        <EmptyState icon={KanbanSquare} title={t("empty")} />
+        <EmptyState icon={KanbanSquare} title={t("empty")} hint={t("emptyHint")} />
       ) : (
-        <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
-          <div className="flex min-w-max gap-4">
-            {columns.map((column) => (
-              <section key={column.stage} className="w-64 shrink-0">
-                <h2 className="text-muted-foreground mb-2 flex items-center justify-between text-xs font-medium tracking-wide uppercase">
-                  {tStages(column.stage)}
-                  <span className="tabular-nums">{column.items.length}</span>
-                </h2>
-                <div className="flex flex-col gap-2">
-                  {column.items.map((company) => (
-                    <div key={company.id} className="bg-card rounded-lg border p-3">
-                      <Link
-                        href={`/companies/${company.id}`}
-                        className="block truncate text-sm font-medium hover:underline"
-                      >
-                        {company.name}
-                      </Link>
-                      {company.city ? (
-                        <p className="text-muted-foreground mt-0.5 text-xs">{company.city}</p>
-                      ) : null}
-                      <div className="mt-2">
-                        <StageSelect
-                          companyId={company.id}
-                          stage={company.pipelineStage as PipelineStage}
-                          companyName={company.name}
-                          size="sm"
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  {column.items.length === 0 ? (
-                    <div className="border-border/60 text-muted-foreground/50 rounded-lg border border-dashed p-3 text-center text-xs">
-                      –
-                    </div>
-                  ) : null}
-                </div>
-              </section>
-            ))}
-          </div>
-        </div>
+        <PipelineBoard companies={companies} />
       )}
     </div>
   );

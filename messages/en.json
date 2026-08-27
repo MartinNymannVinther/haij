@@ -277,7 +277,13 @@
       "empty": "No customers in the pipeline yet.",
       "moveTo": "Move to…",
       "movedToast": "{name} moved to {stage}",
-      "count": "{count} customers"
+      "count": "{count} customers",
+      "summary": "{open} active of {total} customers",
+      "emptyHint": "Customers you create start as leads here, and can be dragged through the stages.",
+      "emptyColumn": "Nothing here",
+      "dropHere": "Drop here",
+      "moveCard": "Move {name} to another stage",
+      "moveFailed": "Could not move the customer. Please try again."
     }
   },
   "time": {

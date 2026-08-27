@@ -10,3 +10,12 @@ export const STAGE_BADGE_CLASS: Record<PipelineStage, string> = {
   won: "border-transparent bg-success text-success-foreground",
   lost: "border-transparent bg-destructive/10 text-destructive",
 };
+
+/** Accent bar/dot color per stage for the pipeline board. */
+export const STAGE_ACCENT_CLASS: Record<PipelineStage, string> = {
+  lead: "bg-muted-foreground/40",
+  dialogue: "bg-primary",
+  proposal: "bg-warning",
+  won: "bg-success",
+  lost: "bg-destructive",
+};

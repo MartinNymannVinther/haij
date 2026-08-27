@@ -277,7 +277,13 @@
       "empty": "Ingen kunder i pipelinen endnu.",
       "moveTo": "Flyt til…",
       "movedToast": "{name} flyttet til {stage}",
-      "count": "{count} kunder"
+      "count": "{count} kunder",
+      "summary": "{open} aktive af {total} kunder",
+      "emptyHint": "Kunder du opretter lander som emner her, og kan trækkes videre gennem faserne.",
+      "emptyColumn": "Ingen her",
+      "dropHere": "Slip her",
+      "moveCard": "Flyt {name} til en anden fase",
+      "moveFailed": "Kunne ikke flytte kunden. Prøv igen."
     }
   },
   "time": {
