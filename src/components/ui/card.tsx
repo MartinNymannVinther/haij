@@ -2,6 +2,11 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Card spacing is deliberately plain: p-5 / gap-5 (p-4 for size="sm")
+ * written as literal utilities on every part, so the padding never depends
+ * on custom-property indirection that a stale dev-server CSS cache can drop.
+ */
 function Card({
   className,
   size = "default",
@@ -12,7 +17,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground shadow-(--surface-shadow) ring-1 ring-foreground/8 [--card-spacing:--spacing(5)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(4)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl dark:ring-foreground/12",
+        "group/card bg-card text-card-foreground ring-foreground/10 flex flex-col gap-5 overflow-hidden rounded-xl py-5 text-sm shadow-[var(--surface-shadow)] ring-1 data-[size=sm]:gap-4 data-[size=sm]:py-4 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
         className,
       )}
       {...props}
@@ -25,7 +30,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
+        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-5 group-data-[size=sm]/card:px-4 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-5",
         className,
       )}
       {...props}
@@ -68,7 +73,11 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div data-slot="card-content" className={cn("px-(--card-spacing)", className)} {...props} />
+    <div
+      data-slot="card-content"
+      className={cn("px-5 group-data-[size=sm]/card:px-4", className)}
+      {...props}
+    />
   );
 }
 
@@ -77,7 +86,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-footer"
       className={cn(
-        "flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
+        "bg-muted/50 flex items-center rounded-b-xl border-t p-5 group-data-[size=sm]/card:p-4",
         className,
       )}
       {...props}

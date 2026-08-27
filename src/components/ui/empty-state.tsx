@@ -32,7 +32,7 @@ function EmptyState({
         className,
       )}
     >
-      <div className="bg-card text-muted-foreground shadow-(--surface-shadow) ring-foreground/8 flex size-11 items-center justify-center rounded-xl ring-1">
+      <div className="bg-card text-muted-foreground shadow-[var(--surface-shadow)] ring-foreground/10 flex size-11 items-center justify-center rounded-xl ring-1">
         <Icon className="size-5" aria-hidden />
       </div>
       <div className="flex max-w-md flex-col gap-1">

@@ -103,7 +103,7 @@ export default async function HomePage() {
           {VALUES.map((value) => (
             <div
               key={value.titleKey}
-              className="bg-card ring-foreground/8 shadow-(--surface-shadow) rounded-xl p-6 ring-1 transition-shadow hover:shadow-md"
+              className="bg-card ring-foreground/10 shadow-[var(--surface-shadow)] rounded-xl p-6 ring-1 transition-shadow hover:shadow-md"
             >
               <div className="bg-accent text-accent-foreground mb-4 flex size-9 items-center justify-center rounded-lg">
                 <value.icon className="size-4.5" />
