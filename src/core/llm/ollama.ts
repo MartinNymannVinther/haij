@@ -101,7 +101,9 @@ export class OllamaProvider implements LlmProvider {
     try {
       const payload = (await response.json()) as { models?: Array<{ name?: string }> };
       const names = (payload.models ?? []).map((m) => m.name ?? "");
-      const present = names.some((name) => name === this.model || name.startsWith(`${this.model}:`));
+      const present = names.some(
+        (name) => name === this.model || name.startsWith(`${this.model}:`),
+      );
       if (!present) {
         return {
           ok: false,

@@ -127,10 +127,9 @@ describe("entry guards", () => {
       taskId,
       note: "Specialarbejde",
     });
-    const row = await admin.query(
-      `select project_id, company_id from time_entries where id = $1`,
-      [entryId],
-    );
+    const row = await admin.query(`select project_id, company_id from time_entries where id = $1`, [
+      entryId,
+    ]);
     expect(row.rows[0].project_id).toBe(projectId);
     expect(row.rows[0].company_id).toBe(companyId);
   });

@@ -358,4 +358,3 @@ export async function listOpenTasksForPicker(ctx: OrgContext) {
       .orderBy(asc(tasks.position), asc(tasks.createdAt)),
   );
 }
-

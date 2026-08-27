@@ -37,8 +37,7 @@ type ActionError =
   | "generic";
 
 export type InvoicingResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: ActionError };
+  { ok: true; data: T } | { ok: false; error: ActionError };
 
 const DOMAIN_ERRORS: Record<InvoiceError, ActionError> = {
   INVOICE_NOT_FOUND: "notFound",

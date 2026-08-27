@@ -112,9 +112,7 @@ async function insertFetched(
         summary: sanitizeText(item.summary, 2000),
         url: item.url?.slice(0, 1000) ?? null,
         publishedAt:
-          item.publishedAt && !Number.isNaN(item.publishedAt.getTime())
-            ? item.publishedAt
-            : null,
+          item.publishedAt && !Number.isNaN(item.publishedAt.getTime()) ? item.publishedAt : null,
         companyCvr: item.companyCvr,
         payload: item.payload ?? null,
       })
@@ -190,9 +188,7 @@ export async function refreshSignals(
   for (const adapter of buildAdapters(settings, resolved)) {
     const result = await adapter.fetchNew();
     if (result.status === "ok") {
-      const count = await withOrgContext(ctx, (tx) =>
-        insertFetched(tx, ctx.orgId, result.items),
-      );
+      const count = await withOrgContext(ctx, (tx) => insertFetched(tx, ctx.orgId, result.items));
       inserted += count;
       sources.push({ source: adapter.source, status: "ok", fetched: result.items.length });
     } else {

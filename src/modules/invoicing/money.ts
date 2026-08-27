@@ -29,9 +29,7 @@ export function lineVatOere(netOere: number, vatRateBp: number): number {
  * amounts — the same convention Danish accounting systems (Dinero,
  * e-conomic) use, so pushed invoices match øre for øre.
  */
-export function invoiceTotals(
-  lines: ReadonlyArray<{ lineNetOere: number; lineVatOere: number }>,
-): {
+export function invoiceTotals(lines: ReadonlyArray<{ lineNetOere: number; lineVatOere: number }>): {
   netOere: number;
   vatOere: number;
   grossOere: number;
@@ -77,9 +75,7 @@ function parseDanishDecimal(input: string): number | null {
   let normalized: string;
   if (lastComma >= 0 && lastDot >= 0) {
     normalized =
-      lastComma > lastDot
-        ? text.replace(/\./g, "").replace(",", ".")
-        : text.replace(/,/g, "");
+      lastComma > lastDot ? text.replace(/\./g, "").replace(",", ".") : text.replace(/,/g, "");
   } else if (lastComma >= 0) {
     if (text.indexOf(",") !== lastComma) return null; // "1,2,3"
     normalized = text.replace(",", ".");

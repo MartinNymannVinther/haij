@@ -42,10 +42,10 @@ export default async function SignalsPage({
   const today = todayInCopenhagen();
   const configured = Boolean(
     settings &&
-      (settings.serviceProfile ||
-        settings.tedKeywords ||
-        settings.cvrBranchePrefixes ||
-        (Array.isArray(settings.rssFeeds) && settings.rssFeeds.length > 0)),
+    (settings.serviceProfile ||
+      settings.tedKeywords ||
+      settings.cvrBranchePrefixes ||
+      (Array.isArray(settings.rssFeeds) && settings.rssFeeds.length > 0)),
   );
 
   return (
@@ -55,18 +55,18 @@ export default async function SignalsPage({
         subtitle={configured ? t("summary", { count: counts.new ?? 0 }) : undefined}
         actions={
           <>
-          <AddSignalDialog />
-          <SignalsSettingsDialog
-            settings={{
-              serviceProfile: settings?.serviceProfile ?? "",
-              tedKeywords: settings?.tedKeywords ?? "",
-              cvrBranchePrefixes: settings?.cvrBranchePrefixes ?? "",
-              rssFeeds: Array.isArray(settings?.rssFeeds)
-                ? (settings!.rssFeeds as Array<{ url: string; label?: string | null }>)
-                : [],
-            }}
-          />
-          <RefreshButton disabled={!configured} />
+            <AddSignalDialog />
+            <SignalsSettingsDialog
+              settings={{
+                serviceProfile: settings?.serviceProfile ?? "",
+                tedKeywords: settings?.tedKeywords ?? "",
+                cvrBranchePrefixes: settings?.cvrBranchePrefixes ?? "",
+                rssFeeds: Array.isArray(settings?.rssFeeds)
+                  ? (settings!.rssFeeds as Array<{ url: string; label?: string | null }>)
+                  : [],
+              }}
+            />
+            <RefreshButton disabled={!configured} />
           </>
         }
       />
@@ -78,7 +78,9 @@ export default async function SignalsPage({
           label: (
             <>
               {t(`status.${s}`)}
-              {counts[s] ? <span className="text-label ml-1.5 tabular-nums">{counts[s]}</span> : null}
+              {counts[s] ? (
+                <span className="text-label ml-1.5 tabular-nums">{counts[s]}</span>
+              ) : null}
             </>
           ),
           href: { pathname: "/signals" as const, query: s === "new" ? {} : { status: s } },

@@ -106,47 +106,52 @@ export default async function InvoicesPage({
                   Boolean(invoice.dueDate) &&
                   invoice.dueDate! < today;
                 return (
-                <TableRow key={invoice.id} className="relative">
-                  <TableCell className="text-[0.845rem] font-semibold">
-                    <Link href={`/invoices/${invoice.id}`} className="after:absolute after:inset-0">
-                      {invoice.invoiceNumber ?? t("draftLabel")}
-                      {invoice.type === "credit_note" ? (
-                        <span className="text-meta ml-1.5 text-xs font-normal">
-                          {t("creditNote")}
-                        </span>
-                      ) : null}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-[0.8125rem]">
-                    {invoice.buyerName ?? invoice.companyName ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-meta text-[0.8125rem]">
-                    {invoice.invoiceDate ? formatDateDa(invoice.invoiceDate) : ""}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-[0.8125rem]",
-                      overdue ? "text-destructive font-medium" : "text-meta",
-                    )}
-                  >
-                    {invoice.type === "invoice" && invoice.dueDate
-                      ? formatDateDa(invoice.dueDate)
-                      : ""}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "text-right text-[0.8125rem] tabular-nums",
-                      invoice.type === "credit_note" && "text-destructive",
-                    )}
-                  >
-                    {formatOere(invoice.grossOere)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={INVOICE_STATUS_BADGE_CLASS[invoice.status as InvoiceStatus]}>
-                      {tStatus(invoice.status)}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
+                  <TableRow key={invoice.id} className="relative">
+                    <TableCell className="text-[0.845rem] font-semibold">
+                      <Link
+                        href={`/invoices/${invoice.id}`}
+                        className="after:absolute after:inset-0"
+                      >
+                        {invoice.invoiceNumber ?? t("draftLabel")}
+                        {invoice.type === "credit_note" ? (
+                          <span className="text-meta ml-1.5 text-xs font-normal">
+                            {t("creditNote")}
+                          </span>
+                        ) : null}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-[0.8125rem]">
+                      {invoice.buyerName ?? invoice.companyName ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-meta text-[0.8125rem]">
+                      {invoice.invoiceDate ? formatDateDa(invoice.invoiceDate) : ""}
+                    </TableCell>
+                    <TableCell
+                      className={cn(
+                        "text-[0.8125rem]",
+                        overdue ? "text-destructive font-medium" : "text-meta",
+                      )}
+                    >
+                      {invoice.type === "invoice" && invoice.dueDate
+                        ? formatDateDa(invoice.dueDate)
+                        : ""}
+                    </TableCell>
+                    <TableCell
+                      className={cn(
+                        "text-right text-[0.8125rem] tabular-nums",
+                        invoice.type === "credit_note" && "text-destructive",
+                      )}
+                    >
+                      {formatOere(invoice.grossOere)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={INVOICE_STATUS_BADGE_CLASS[invoice.status as InvoiceStatus]}
+                      >
+                        {tStatus(invoice.status)}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>

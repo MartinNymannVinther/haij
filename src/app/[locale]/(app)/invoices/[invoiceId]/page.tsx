@@ -13,11 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("title") };
 }
 
-export default async function InvoicePage({
-  params,
-}: {
-  params: Promise<{ invoiceId: string }>;
-}) {
+export default async function InvoicePage({ params }: { params: Promise<{ invoiceId: string }> }) {
   const context = await getOrgContext();
   if (!context) {
     redirect({ href: "/onboarding", locale: await getLocale() });

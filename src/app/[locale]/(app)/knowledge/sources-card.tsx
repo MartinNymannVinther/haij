@@ -101,7 +101,12 @@ export function SourcesCard({ sources }: { sources: SourceRow[] }) {
                   className="accent-primary size-4 shrink-0 cursor-pointer"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className={cn("truncate font-medium", !source.active && "text-muted-foreground")}>
+                  <p
+                    className={cn(
+                      "truncate font-medium",
+                      !source.active && "text-muted-foreground",
+                    )}
+                  >
                     {source.name}
                   </p>
                   <p className="text-muted-foreground truncate text-xs">{source.url}</p>

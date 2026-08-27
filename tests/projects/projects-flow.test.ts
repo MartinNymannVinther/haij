@@ -85,12 +85,12 @@ describe("projects", () => {
   });
 
   it("rejects a foreign company on create and update", async () => {
-    await expect(
-      createProject(CTX_B, { name: "Smuglet", companyId: companyA }),
-    ).rejects.toThrow("COMPANY_NOT_FOUND");
-    await expect(
-      updateProject(CTX_B, projectId, { name: "Kapret" }),
-    ).rejects.toThrow("PROJECT_NOT_FOUND");
+    await expect(createProject(CTX_B, { name: "Smuglet", companyId: companyA })).rejects.toThrow(
+      "COMPANY_NOT_FOUND",
+    );
+    await expect(updateProject(CTX_B, projectId, { name: "Kapret" })).rejects.toThrow(
+      "PROJECT_NOT_FOUND",
+    );
   });
 
   it("tracks tasks with done state and ordering", async () => {

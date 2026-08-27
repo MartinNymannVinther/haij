@@ -41,10 +41,10 @@ beforeAll(async () => {
        ($2, 'Konsulent B ApS', '22222227', 'Bgade 2', '2100', 'København Ø')`,
     [ORG_A, ORG_B],
   );
-  await admin.query(
-    `insert into invoice_counters (org_id, next_number) values ($1, 5), ($2, 9)`,
-    [ORG_A, ORG_B],
-  );
+  await admin.query(`insert into invoice_counters (org_id, next_number) values ($1, 5), ($2, 9)`, [
+    ORG_A,
+    ORG_B,
+  ]);
   await admin.query(
     `insert into budgets (id, org_id, year, month, revenue_target_oere) values
        ('budget_a', $1, 2026, 9, 10000000),
@@ -86,7 +86,13 @@ afterAll(async () => {
   await admin?.end();
 });
 
-const TABLES = ["org_profiles", "invoice_counters", "invoices", "invoice_lines", "budgets"] as const;
+const TABLES = [
+  "org_profiles",
+  "invoice_counters",
+  "invoices",
+  "invoice_lines",
+  "budgets",
+] as const;
 
 describe("read isolation", () => {
   it.each(TABLES)("%s: org A sees only its own rows", async (table) => {
@@ -190,7 +196,9 @@ describe("default deny without context", () => {
 describe("invoice immutability after issue", () => {
   it("drafts stay fully editable and deletable", async () => {
     await asApp(app, CTX_A, async (c) => {
-      const update = await c.query(`update invoices set note = 'redigeret' where id = 'inv_a_draft'`);
+      const update = await c.query(
+        `update invoices set note = 'redigeret' where id = 'inv_a_draft'`,
+      );
       expect(update.rowCount).toBe(1);
       // Deleting a draft cascades to its lines; both triggers must allow it.
       const del = await c.query(`delete from invoices where id = 'inv_a_draft'`);
@@ -267,11 +275,13 @@ describe("invoice immutability after issue", () => {
 
   it("even a superuser cannot change or delete an issued invoice", async () => {
     expect(
-      await expectSqlError(admin.query(`update invoices set net_oere = 1 where id = 'inv_a_issued'`)),
+      await expectSqlError(
+        admin.query(`update invoices set net_oere = 1 where id = 'inv_a_issued'`),
+      ),
     ).toBe("P0001");
-    expect(await expectSqlError(admin.query(`delete from invoices where id = 'inv_a_issued'`))).toBe(
-      "P0001",
-    );
+    expect(
+      await expectSqlError(admin.query(`delete from invoices where id = 'inv_a_issued'`)),
+    ).toBe("P0001");
     expect(
       await expectSqlError(
         admin.query(`update invoice_lines set line_net_oere = 1 where id = 'line_a_issued'`),

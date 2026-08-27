@@ -15,10 +15,7 @@ export type YearBar = {
  * dependency for twenty-four rectangles.
  */
 export function YearChart({ bars }: { bars: YearBar[] }) {
-  const peak = Math.max(
-    1,
-    ...bars.map((bar) => Math.max(bar.realizedOere, bar.targetOere ?? 0)),
-  );
+  const peak = Math.max(1, ...bars.map((bar) => Math.max(bar.realizedOere, bar.targetOere ?? 0)));
   const height = (value: number) => `${Math.max(value > 0 ? 2 : 0, (value / peak) * 140)}px`;
 
   return (
@@ -29,18 +26,12 @@ export function YearChart({ bars }: { bars: YearBar[] }) {
             {!bar.isFuture ? (
               <div
                 title={bar.label}
-                className={cn(
-                  "w-3.5 rounded-t-[5px]",
-                  bar.isCurrent ? "bg-chart-2" : "bg-primary",
-                )}
+                className={cn("w-3.5 rounded-t-[5px]", bar.isCurrent ? "bg-chart-2" : "bg-primary")}
                 style={{ height: height(bar.realizedOere) }}
               />
             ) : null}
             <div
-              className={cn(
-                "w-3.5 rounded-t-[5px]",
-                bar.isFuture ? "bg-muted" : "bg-chart-5",
-              )}
+              className={cn("w-3.5 rounded-t-[5px]", bar.isFuture ? "bg-muted" : "bg-chart-5")}
               style={{ height: height(bar.targetOere ?? 0) }}
             />
           </div>

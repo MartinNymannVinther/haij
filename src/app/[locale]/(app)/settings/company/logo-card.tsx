@@ -82,7 +82,11 @@ export function LogoCard({ logoDataUrl }: { logoDataUrl: string | null }) {
         <div className="border-border bg-background flex h-20 w-40 items-center justify-center overflow-hidden rounded-lg border">
           {logoDataUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoDataUrl} alt={t("previewAlt")} className="max-h-full max-w-full object-contain" />
+            <img
+              src={logoDataUrl}
+              alt={t("previewAlt")}
+              className="max-h-full max-w-full object-contain"
+            />
           ) : (
             <ImageIcon className="text-muted-foreground size-6" />
           )}

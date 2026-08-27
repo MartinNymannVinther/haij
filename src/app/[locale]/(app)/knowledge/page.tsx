@@ -39,7 +39,10 @@ export default async function KnowledgePage() {
           items: items.length,
         })}
         actions={
-          <KnowledgeToolbar hasSources={sources.some((s) => s.active)} hasItems={items.length > 0} />
+          <KnowledgeToolbar
+            hasSources={sources.some((s) => s.active)}
+            hasItems={items.length > 0}
+          />
         }
       />
 
@@ -57,7 +60,10 @@ export default async function KnowledgePage() {
                 {digests.slice(0, 3).map((digest) => (
                   <article key={digest.id} className="flex flex-col gap-2">
                     <p className="text-accent-foreground/70 text-xs">
-                      {format.dateTime(digest.createdAt, { dateStyle: "medium", timeStyle: "short" })}
+                      {format.dateTime(digest.createdAt, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
                       {" · "}
                       {t("digestMeta", { count: digest.itemCount })}
                     </p>
@@ -76,11 +82,7 @@ export default async function KnowledgePage() {
             </CardHeader>
             <CardContent>
               {items.length === 0 ? (
-                <EmptyState
-                  variant="inline"
-                  title={t("empty")}
-                  hint={t("emptyHint")}
-                />
+                <EmptyState variant="inline" title={t("empty")} hint={t("emptyHint")} />
               ) : (
                 <ol className="flex flex-col">
                   {items.map((item) => (

@@ -118,7 +118,8 @@ export const MCP_TOOLS: ToolDef[] = [
   },
   {
     name: "haij_list_invoices",
-    description: "List invoices with status (draft/issued/sent/paid), numbers and gross amounts in øre.",
+    description:
+      "List invoices with status (draft/issued/sent/paid), numbers and gross amounts in øre.",
     schema: z.object({ status: z.enum(INVOICE_STATUSES).optional() }),
     inputSchema: {
       type: "object",
@@ -146,7 +147,11 @@ export const MCP_TOOLS: ToolDef[] = [
   {
     name: "haij_add_task",
     description: "Add a task to a project's checklist, with an optional due date.",
-    schema: z.object({ projectId: Id, title: z.string().min(1).max(300), dueDate: DateIso.optional() }),
+    schema: z.object({
+      projectId: Id,
+      title: z.string().min(1).max(300),
+      dueDate: DateIso.optional(),
+    }),
     inputSchema: {
       type: "object",
       properties: {

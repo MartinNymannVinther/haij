@@ -763,10 +763,7 @@ export const apiKeys = pgTable(
     revokedAt: timestamp("revoked_at", { withTimezone: true }),
     ...timestamps,
   },
-  (t) => [
-    uniqueIndex("api_keys_hash_uq").on(t.keyHash),
-    index("api_keys_org_idx").on(t.orgId),
-  ],
+  (t) => [uniqueIndex("api_keys_hash_uq").on(t.keyHash), index("api_keys_org_idx").on(t.orgId)],
 );
 
 /**

@@ -17,8 +17,7 @@ import {
 type ActionError = "unauthorized" | "invalid" | "notFound" | "generic";
 
 export type SignalActionResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: ActionError };
+  { ok: true; data: T } | { ok: false; error: ActionError };
 
 const Id = z.string().min(1).max(64);
 

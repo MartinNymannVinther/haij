@@ -101,7 +101,11 @@ describe("signals flow", () => {
       cvrBranchePrefixes: "7022",
     });
 
-    const result = await refreshSignals(CTX_A, { fetchFn: fakeFetch, virkUser: "u", virkPassword: "p" });
+    const result = await refreshSignals(CTX_A, {
+      fetchFn: fakeFetch,
+      virkUser: "u",
+      virkPassword: "p",
+    });
     expect(result.inserted).toBe(3); // ted + cvr + rss
     expect(result.scored).toBe(0); // LLM disabled in tests
     expect(result.sources.map((s) => s.status)).toEqual(["ok", "ok", "ok"]);
@@ -115,7 +119,11 @@ describe("signals flow", () => {
   });
 
   it("a second refresh dedupes on (source, ref)", async () => {
-    const again = await refreshSignals(CTX_A, { fetchFn: fakeFetch, virkUser: "u", virkPassword: "p" });
+    const again = await refreshSignals(CTX_A, {
+      fetchFn: fakeFetch,
+      virkUser: "u",
+      virkPassword: "p",
+    });
     expect(again.inserted).toBe(0);
     const { counts } = await listSignals(CTX_A, "new");
     expect(counts.new).toBe(3);

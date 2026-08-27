@@ -14,8 +14,7 @@ import {
 type ActionError = "unauthorized" | "invalid" | "notFound" | "limit" | "generic";
 
 export type KnowledgeActionResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: ActionError };
+  { ok: true; data: T } | { ok: false; error: ActionError };
 
 const Id = z.string().min(1).max(64);
 
@@ -63,7 +62,9 @@ export async function setKnowledgeSourceActiveAction(
   }
 }
 
-export async function deleteKnowledgeSourceAction(sourceId: unknown): Promise<KnowledgeActionResult> {
+export async function deleteKnowledgeSourceAction(
+  sourceId: unknown,
+): Promise<KnowledgeActionResult> {
   const ctx = await requireOrgContext();
   if (!ctx) return { ok: false, error: "unauthorized" };
   const id = Id.safeParse(sourceId);

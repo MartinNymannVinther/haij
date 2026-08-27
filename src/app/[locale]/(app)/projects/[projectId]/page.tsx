@@ -57,7 +57,9 @@ export default async function ProjectDetailPage({
             <p className="text-muted-foreground text-sm">
               {[
                 company ? company.name : null,
-                project.deadline ? t("deadlineLine", { date: formatDateDa(project.deadline) }) : null,
+                project.deadline
+                  ? t("deadlineLine", { date: formatDateDa(project.deadline) })
+                  : null,
               ]
                 .filter(Boolean)
                 .join(" · ")}

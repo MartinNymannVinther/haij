@@ -78,7 +78,8 @@ export class TedAdapter implements SourceAdapter {
         300,
       );
       if (!ref || !title) continue;
-      const buyers = notice["buyer-name"]?.dan ?? Object.values(notice["buyer-name"] ?? {})[0] ?? [];
+      const buyers =
+        notice["buyer-name"]?.dan ?? Object.values(notice["buyer-name"] ?? {})[0] ?? [];
       const buyerLine = sanitizeText(buyers.join(", "), 300);
       items.push({
         source: "ted",

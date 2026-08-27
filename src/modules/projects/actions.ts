@@ -17,8 +17,7 @@ import {
 type ActionError = "unauthorized" | "invalid" | "notFound" | "generic";
 
 export type ProjectActionResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: ActionError };
+  { ok: true; data: T } | { ok: false; error: ActionError };
 
 const Id = z.string().min(1).max(64);
 
@@ -48,7 +47,13 @@ const ProjectSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .nullish()
     .transform((v) => v ?? null),
-  budgetMinutes: z.number().int().min(1).max(10_000_000).nullish().transform((v) => v ?? null),
+  budgetMinutes: z
+    .number()
+    .int()
+    .min(1)
+    .max(10_000_000)
+    .nullish()
+    .transform((v) => v ?? null),
   budgetAmountOere: z
     .number()
     .int()

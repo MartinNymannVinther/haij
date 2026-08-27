@@ -50,4 +50,3 @@ export async function POST(request: NextRequest) {
 export function GET() {
   return new Response("Method not allowed", { status: 405 });
 }
-

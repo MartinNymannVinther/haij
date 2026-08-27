@@ -31,7 +31,9 @@ export default async function PipelinePage() {
     <div className="flex flex-col gap-[22px]">
       <PageHeader
         title={t("title")}
-        subtitle={companies.length > 0 ? t("summary", { open, total: companies.length }) : undefined}
+        subtitle={
+          companies.length > 0 ? t("summary", { open, total: companies.length }) : undefined
+        }
       />
 
       {companies.length === 0 ? (

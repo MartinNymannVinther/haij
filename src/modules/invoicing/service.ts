@@ -114,8 +114,9 @@ export async function getInvoiceDetail(ctx: OrgContext, invoiceId: string) {
       .orderBy(asc(invoiceLines.position), asc(invoiceLines.createdAt));
 
     const company = invoice.companyId
-      ? ((await tx.select().from(companies).where(eq(companies.id, invoice.companyId)).limit(1))[0] ??
-        null)
+      ? ((
+          await tx.select().from(companies).where(eq(companies.id, invoice.companyId)).limit(1)
+        )[0] ?? null)
       : null;
 
     const [profile] = await tx

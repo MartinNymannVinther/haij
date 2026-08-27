@@ -23,11 +23,7 @@ import {
   setTaskDoneAction,
   setTaskRateAction,
 } from "@/modules/projects/actions";
-import {
-  formatOere,
-  oereToInputValue,
-  parseKronerToOere,
-} from "@/modules/invoicing/money";
+import { formatOere, oereToInputValue, parseKronerToOere } from "@/modules/invoicing/money";
 import { useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -215,7 +211,11 @@ export function TaskList({ projectId, tasks: items }: { projectId: string; tasks
           <DialogHeader>
             <DialogTitle>{t("ratePrompt")}</DialogTitle>
           </DialogHeader>
-          <form key={rateTask?.id ?? "none"} onSubmit={handleRateSubmit} className="flex flex-col gap-4">
+          <form
+            key={rateTask?.id ?? "none"}
+            onSubmit={handleRateSubmit}
+            className="flex flex-col gap-4"
+          >
             <Field>
               <FieldLabel htmlFor="taskRate">{t("ratePlaceholder")}</FieldLabel>
               <Input

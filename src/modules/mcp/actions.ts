@@ -7,8 +7,7 @@ import { createApiKey, revokeApiKey } from "./keys";
 type ActionError = "unauthorized" | "invalid" | "notFound" | "generic";
 
 export type McpActionResult<T = undefined> =
-  | { ok: true; data: T }
-  | { ok: false; error: ActionError };
+  { ok: true; data: T } | { ok: false; error: ActionError };
 
 export async function createApiKeyAction(
   name: unknown,

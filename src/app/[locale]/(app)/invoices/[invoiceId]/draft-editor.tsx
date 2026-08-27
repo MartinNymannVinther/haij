@@ -504,7 +504,10 @@ function LinesCard({ invoiceId, lines }: { invoiceId: string; lines: Line[] }) {
               </Field>
               <Field>
                 <FieldLabel>{t("lineUnit")}</FieldLabel>
-                <UnitSelect items={unitItems} defaultValue={(editing?.unit as InvoiceUnit) ?? "hour"} />
+                <UnitSelect
+                  items={unitItems}
+                  defaultValue={(editing?.unit as InvoiceUnit) ?? "hour"}
+                />
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-4">

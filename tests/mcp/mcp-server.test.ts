@@ -67,9 +67,10 @@ afterAll(async () => {
 describe("api keys", () => {
   it("stores only a hash and resolves the bearer to the creator's context", async () => {
     expect(plaintext).toMatch(/^haij_[0-9a-f]{40}$/);
-    const stored = await admin.query(`select key_hash, key_prefix from api_keys where org_id = $1`, [
-      ORG_A,
-    ]);
+    const stored = await admin.query(
+      `select key_hash, key_prefix from api_keys where org_id = $1`,
+      [ORG_A],
+    );
     expect(stored.rows[0].key_hash).not.toContain(plaintext);
     expect(plaintext.startsWith(stored.rows[0].key_prefix)).toBe(true);
 

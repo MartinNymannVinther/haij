@@ -121,12 +121,14 @@ export async function getCustomerEconomy(ctx: OrgContext): Promise<CustomerEcono
     const billing = tx
       .select({
         companyId: invoices.companyId,
-        invoicedNetOere: sql<number>`coalesce(sum(net_oere) filter (where status <> 'draft'), 0)::bigint`.as(
-          "invoiced_net_oere",
-        ),
-        paidGrossOere: sql<number>`coalesce(sum(gross_oere) filter (where status = 'paid'), 0)::bigint`.as(
-          "paid_gross_oere",
-        ),
+        invoicedNetOere:
+          sql<number>`coalesce(sum(net_oere) filter (where status <> 'draft'), 0)::bigint`.as(
+            "invoiced_net_oere",
+          ),
+        paidGrossOere:
+          sql<number>`coalesce(sum(gross_oere) filter (where status = 'paid'), 0)::bigint`.as(
+            "paid_gross_oere",
+          ),
         outstandingGrossOere:
           sql<number>`coalesce(sum(gross_oere) filter (where status in ('issued', 'sent')), 0)::bigint`.as(
             "outstanding_gross_oere",

@@ -125,7 +125,10 @@ export default async function CompaniesPage({
                 return (
                   <TableRow key={company.id} className="relative">
                     <TableCell className="text-[0.845rem] font-semibold">
-                      <Link href={`/companies/${company.id}`} className="after:absolute after:inset-0">
+                      <Link
+                        href={`/companies/${company.id}`}
+                        className="after:absolute after:inset-0"
+                      >
                         {company.name}
                       </Link>
                     </TableCell>

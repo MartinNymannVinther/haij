@@ -44,9 +44,7 @@ export class CvrEventsAdapter implements SourceAdapter {
   ) {}
 
   async fetchNew(): Promise<AdapterResult> {
-    const prefixes = this.branchePrefixes
-      .map((p) => p.trim())
-      .filter((p) => /^\d{2,6}$/.test(p));
+    const prefixes = this.branchePrefixes.map((p) => p.trim()).filter((p) => /^\d{2,6}$/.test(p));
     if (prefixes.length === 0) return { status: "skipped", detail: "no branch prefixes" };
     if (!this.user || !this.password) {
       return { status: "unavailable", detail: "virk credentials are not configured" };

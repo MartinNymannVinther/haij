@@ -29,7 +29,9 @@ export class RssAdapter implements SourceAdapter {
     for (const feed of this.feeds.slice(0, 10)) {
       try {
         const response = await this.fetchFn(feed.url, {
-          headers: { Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml" },
+          headers: {
+            Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml",
+          },
           signal: AbortSignal.timeout(10_000),
         });
         if (!response.ok) {

@@ -141,11 +141,7 @@ export async function listItems(ctx: OrgContext, limit = 50) {
 
 export async function listDigests(ctx: OrgContext, limit = 10) {
   return withOrgContext(ctx, (tx) =>
-    tx
-      .select()
-      .from(knowledgeDigests)
-      .orderBy(desc(knowledgeDigests.createdAt))
-      .limit(limit),
+    tx.select().from(knowledgeDigests).orderBy(desc(knowledgeDigests.createdAt)).limit(limit),
   );
 }
 
@@ -177,7 +173,9 @@ export async function generateDigest(
 
   const corpus = items
     .map((item, index) =>
-      [`${index + 1}. [${item.sourceName}] ${item.title}`, item.summary].filter(Boolean).join(" — "),
+      [`${index + 1}. [${item.sourceName}] ${item.title}`, item.summary]
+        .filter(Boolean)
+        .join(" — "),
     )
     .join("\n");
 
@@ -217,4 +215,3 @@ export async function generateDigest(
     return { error: "FAILED" };
   }
 }
-

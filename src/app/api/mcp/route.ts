@@ -40,10 +40,7 @@ function rpcResult(id: unknown, result: unknown): Response {
 }
 
 function rpcError(id: unknown, code: number, message: string, status = 200): Response {
-  return Response.json(
-    { jsonrpc: "2.0", id: id ?? null, error: { code, message } },
-    { status },
-  );
+  return Response.json({ jsonrpc: "2.0", id: id ?? null, error: { code, message } }, { status });
 }
 
 export async function POST(request: NextRequest) {

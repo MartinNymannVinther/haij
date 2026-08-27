@@ -60,7 +60,11 @@ function FrameBar({ label, ratio }: { label: string; ratio: number }) {
       <span
         className={cn(
           "text-xs tabular-nums",
-          over ? "text-destructive font-medium" : warn ? "text-warning font-medium" : "text-muted-foreground",
+          over
+            ? "text-destructive font-medium"
+            : warn
+              ? "text-warning font-medium"
+              : "text-muted-foreground",
         )}
       >
         {label}

@@ -57,12 +57,24 @@ const styles = StyleSheet.create({
   wordmark: { fontSize: 12, fontFamily: "Helvetica-Bold" },
   logo: { maxHeight: 44, maxWidth: 160, objectFit: "contain" },
   partyRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 24 },
-  partyLabel: { fontSize: 7, color: muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 },
+  partyLabel: {
+    fontSize: 7,
+    color: muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: 4,
+  },
   partyName: { fontFamily: "Helvetica-Bold", marginBottom: 2 },
   partyLine: { marginBottom: 1.5 },
   metaBox: { flexDirection: "row", gap: 24, marginBottom: 24 },
   metaItem: { minWidth: 70 },
-  metaLabel: { fontSize: 7, color: muted, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 2 },
+  metaLabel: {
+    fontSize: 7,
+    color: muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
+    marginBottom: 2,
+  },
   metaValue: { fontFamily: "Helvetica-Bold" },
   table: { marginBottom: 16 },
   th: {
@@ -152,13 +164,17 @@ export function InvoicePdf({
           <View>
             <Text style={styles.partyLabel}>{isCredit ? "Krediteres til" : "Faktureres til"}</Text>
             <Text style={styles.partyName}>{invoice.buyerName}</Text>
-            {invoice.buyerAddress ? <Text style={styles.partyLine}>{invoice.buyerAddress}</Text> : null}
+            {invoice.buyerAddress ? (
+              <Text style={styles.partyLine}>{invoice.buyerAddress}</Text>
+            ) : null}
             {invoice.buyerZipcode || invoice.buyerCity ? (
               <Text style={styles.partyLine}>
                 {[invoice.buyerZipcode, invoice.buyerCity].filter(Boolean).join(" ")}
               </Text>
             ) : null}
-            {invoice.buyerCvr ? <Text style={styles.partyLine}>CVR: {invoice.buyerCvr}</Text> : null}
+            {invoice.buyerCvr ? (
+              <Text style={styles.partyLine}>CVR: {invoice.buyerCvr}</Text>
+            ) : null}
             {invoice.buyerEanGln ? (
               <Text style={styles.partyLine}>EAN/GLN: {invoice.buyerEanGln}</Text>
             ) : null}
@@ -174,8 +190,12 @@ export function InvoicePdf({
               {[invoice.sellerZipcode, invoice.sellerCity].filter(Boolean).join(" ")}
             </Text>
             <Text style={styles.partyLine}>CVR: {invoice.sellerCvr}</Text>
-            {invoice.sellerEmail ? <Text style={styles.partyLine}>{invoice.sellerEmail}</Text> : null}
-            {invoice.sellerPhone ? <Text style={styles.partyLine}>{invoice.sellerPhone}</Text> : null}
+            {invoice.sellerEmail ? (
+              <Text style={styles.partyLine}>{invoice.sellerEmail}</Text>
+            ) : null}
+            {invoice.sellerPhone ? (
+              <Text style={styles.partyLine}>{invoice.sellerPhone}</Text>
+            ) : null}
           </View>
         </View>
 

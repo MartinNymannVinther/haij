@@ -53,9 +53,9 @@ describe("TedAdapter", () => {
     expect(await new TedAdapter([], fetchReturning({}).fetchFn).fetchNew()).toMatchObject({
       status: "skipped",
     });
-    expect(
-      await new TedAdapter(["x"], fetchReturning({}, 500).fetchFn).fetchNew(),
-    ).toMatchObject({ status: "unavailable" });
+    expect(await new TedAdapter(["x"], fetchReturning({}, 500).fetchFn).fetchNew()).toMatchObject({
+      status: "unavailable",
+    });
   });
 });
 
@@ -157,9 +157,9 @@ describe("RssAdapter", () => {
   });
 
   it("skips without feeds and reports total failure", async () => {
-    expect(await new RssAdapter([], fetchReturning("", 200, true).fetchFn).fetchNew()).toMatchObject(
-      { status: "skipped" },
-    );
+    expect(
+      await new RssAdapter([], fetchReturning("", 200, true).fetchFn).fetchNew(),
+    ).toMatchObject({ status: "skipped" });
     const failing: typeof fetch = async () => {
       throw new Error("down");
     };

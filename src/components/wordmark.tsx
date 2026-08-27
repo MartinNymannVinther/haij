@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
  * needs no network request. The wordmark beside it is live text in Archivo
  * 600, per the design handoff - it is never part of the SVG.
  */
-export function HaijMark({ className, tone = "brand" }: { className?: string; tone?: "brand" | "ink" }) {
+export function HaijMark({
+  className,
+  tone = "brand",
+}: {
+  className?: string;
+  tone?: "brand" | "ink";
+}) {
   const fills =
     tone === "ink"
       ? ["currentColor", "currentColor", "currentColor"]
@@ -44,7 +50,9 @@ export function WordmarkLockup({ organization }: { organization?: string }) {
     <span className="flex items-center gap-2.5">
       <HaijMark className="h-5" />
       <span className="flex min-w-0 flex-col">
-        <span className="text-[1.0625rem] leading-none font-semibold tracking-[-0.045em]">Haij</span>
+        <span className="text-[1.0625rem] leading-none font-semibold tracking-[-0.045em]">
+          Haij
+        </span>
         {organization ? (
           <span className="text-meta mt-1 truncate text-[0.72rem] leading-none font-normal">
             {organization}

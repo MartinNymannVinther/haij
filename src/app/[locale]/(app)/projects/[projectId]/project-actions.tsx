@@ -139,7 +139,11 @@ export function ProjectActions({
 
   return (
     <div className="flex items-center gap-2">
-      <Select items={statusItems} value={status} onValueChange={(v) => handleStatus(v as ProjectStatus)}>
+      <Select
+        items={statusItems}
+        value={status}
+        onValueChange={(v) => handleStatus(v as ProjectStatus)}
+      >
         <SelectTrigger size="sm" aria-label={tStatus(status)}>
           <SelectValue />
         </SelectTrigger>
@@ -173,7 +177,13 @@ export function ProjectActions({
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             <Field>
               <FieldLabel htmlFor="edit-name">{tCreate("name")}</FieldLabel>
-              <Input id="edit-name" name="name" required maxLength={200} defaultValue={project.name} />
+              <Input
+                id="edit-name"
+                name="name"
+                required
+                maxLength={200}
+                defaultValue={project.name}
+              />
             </Field>
             <Field>
               <FieldLabel>{tCreate("customer")}</FieldLabel>

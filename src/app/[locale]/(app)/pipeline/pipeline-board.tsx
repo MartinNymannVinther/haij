@@ -68,129 +68,129 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="grid gap-3 @lg:grid-cols-2 @3xl:grid-cols-4">
-      {STAGE_ORDER.filter((stage) => stage !== "lost").map((stage) => {
-        const cards = items.filter((item) => item.pipelineStage === stage);
-        const isTarget = dropTarget === stage;
-        return (
-          <section
-            key={stage}
-            onDragOver={(event) => {
-              if (!dragging) return;
-              event.preventDefault();
-              event.dataTransfer.dropEffect = "move";
-              setDropTarget(stage);
-            }}
-            onDragLeave={(event) => {
-              if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
-              setDropTarget((current) => (current === stage ? null : current));
-            }}
-            onDrop={(event) => {
-              event.preventDefault();
-              const id = event.dataTransfer.getData(DRAG_TYPE) || dragging;
-              setDropTarget(null);
-              setDragging(null);
-              const company = items.find((item) => item.id === id);
-              if (company) void move(company, stage);
-            }}
-            className={cn(
-              "flex min-w-0 flex-col gap-2 rounded-xl transition-colors",
-              isTarget && "bg-accent/50 ring-primary/30 ring-2",
-            )}
-          >
-            <h2 className="flex items-center gap-2 px-1 text-[0.8125rem] font-semibold">
-              <span className="min-w-0 flex-1 truncate">{tStages(stage)}</span>
-              <span className="text-meta text-xs font-normal tabular-nums">{cards.length}</span>
-            </h2>
+        {STAGE_ORDER.filter((stage) => stage !== "lost").map((stage) => {
+          const cards = items.filter((item) => item.pipelineStage === stage);
+          const isTarget = dropTarget === stage;
+          return (
+            <section
+              key={stage}
+              onDragOver={(event) => {
+                if (!dragging) return;
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+                setDropTarget(stage);
+              }}
+              onDragLeave={(event) => {
+                if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+                setDropTarget((current) => (current === stage ? null : current));
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                const id = event.dataTransfer.getData(DRAG_TYPE) || dragging;
+                setDropTarget(null);
+                setDragging(null);
+                const company = items.find((item) => item.id === id);
+                if (company) void move(company, stage);
+              }}
+              className={cn(
+                "flex min-w-0 flex-col gap-2 rounded-xl transition-colors",
+                isTarget && "bg-accent/50 ring-primary/30 ring-2",
+              )}
+            >
+              <h2 className="flex items-center gap-2 px-1 text-[0.8125rem] font-semibold">
+                <span className="min-w-0 flex-1 truncate">{tStages(stage)}</span>
+                <span className="text-meta text-xs font-normal tabular-nums">{cards.length}</span>
+              </h2>
 
-            <div className="flex min-h-14 flex-col gap-2">
-              {cards.map((company) => (
-                <article
-                  key={company.id}
-                  draggable
-                  onDragStart={(event) => {
-                    event.dataTransfer.setData(DRAG_TYPE, company.id);
-                    event.dataTransfer.effectAllowed = "move";
-                    setDragging(company.id);
-                  }}
-                  onDragEnd={() => {
-                    setDragging(null);
-                    setDropTarget(null);
-                  }}
-                  className={cn(
-                    "group/card border-border relative flex flex-col gap-1 rounded-[13px] border px-4 py-3.5 transition-opacity",
-                    stage === "won" ? "bg-accent border-[oklch(0.885_0.025_150)]" : "bg-card",
-                    dragging === company.id ? "opacity-40" : "cursor-grab active:cursor-grabbing",
-                  )}
-                >
-                  <Link
-                    href={`/companies/${company.id}`}
+              <div className="flex min-h-14 flex-col gap-2">
+                {cards.map((company) => (
+                  <article
+                    key={company.id}
+                    draggable
+                    onDragStart={(event) => {
+                      event.dataTransfer.setData(DRAG_TYPE, company.id);
+                      event.dataTransfer.effectAllowed = "move";
+                      setDragging(company.id);
+                    }}
+                    onDragEnd={() => {
+                      setDragging(null);
+                      setDropTarget(null);
+                    }}
                     className={cn(
-                      "pr-5 text-[0.8125rem] leading-snug font-semibold hover:underline",
-                      stage === "won" && "text-accent-foreground",
+                      "group/card border-border relative flex flex-col gap-1 rounded-[13px] border px-4 py-3.5 transition-opacity",
+                      stage === "won" ? "bg-accent border-[oklch(0.885_0.025_150)]" : "bg-card",
+                      dragging === company.id ? "opacity-40" : "cursor-grab active:cursor-grabbing",
                     )}
                   >
-                    {company.name}
-                  </Link>
-                  {company.city ? (
-                    <p
+                    <Link
+                      href={`/companies/${company.id}`}
                       className={cn(
-                        "truncate text-xs",
-                        stage === "won" ? "text-accent-foreground/75" : "text-meta",
+                        "pr-5 text-[0.8125rem] leading-snug font-semibold hover:underline",
+                        stage === "won" && "text-accent-foreground",
                       )}
                     >
-                      {company.city}
-                    </p>
-                  ) : null}
-                  {/* Always present for touch and keyboard; fades in on pointer devices. */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button
-                          variant="ghost"
-                          size="icon-xs"
-                          aria-label={t("moveCard", { name: company.name })}
-                          className="text-muted-foreground absolute top-1.5 right-1.5 opacity-100 focus-visible:opacity-100 aria-expanded:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/card:opacity-100"
-                        />
-                      }
-                    >
-                      <MoveHorizontal />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {STAGE_ORDER.map((option) => (
-                        <DropdownMenuItem
-                          key={option}
-                          disabled={option === company.pipelineStage}
-                          onClick={() => void move(company, option)}
-                        >
-                          <span
-                            aria-hidden
-                            className={cn(
-                              "size-1.5 shrink-0 rounded-full",
-                              STAGE_ACCENT_CLASS[option],
-                            )}
+                      {company.name}
+                    </Link>
+                    {company.city ? (
+                      <p
+                        className={cn(
+                          "truncate text-xs",
+                          stage === "won" ? "text-accent-foreground/75" : "text-meta",
+                        )}
+                      >
+                        {company.city}
+                      </p>
+                    ) : null}
+                    {/* Always present for touch and keyboard; fades in on pointer devices. */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger
+                        render={
+                          <Button
+                            variant="ghost"
+                            size="icon-xs"
+                            aria-label={t("moveCard", { name: company.name })}
+                            className="text-muted-foreground absolute top-1.5 right-1.5 opacity-100 focus-visible:opacity-100 aria-expanded:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/card:opacity-100"
                           />
-                          {tStages(option)}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </article>
-              ))}
+                        }
+                      >
+                        <MoveHorizontal />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {STAGE_ORDER.map((option) => (
+                          <DropdownMenuItem
+                            key={option}
+                            disabled={option === company.pipelineStage}
+                            onClick={() => void move(company, option)}
+                          >
+                            <span
+                              aria-hidden
+                              className={cn(
+                                "size-1.5 shrink-0 rounded-full",
+                                STAGE_ACCENT_CLASS[option],
+                              )}
+                            />
+                            {tStages(option)}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </article>
+                ))}
 
-              {cards.length === 0 ? (
-                <p
-                  className={cn(
-                    "rounded-[13px] border border-dashed px-3 py-5 text-center text-xs transition-colors",
-                    isTarget ? "border-primary/50 text-primary" : "border-border text-label",
-                  )}
-                >
-                  {dragging ? t("dropHere") : t("emptyColumn")}
-                </p>
-              ) : null}
-            </div>
-          </section>
-        );
-      })}
+                {cards.length === 0 ? (
+                  <p
+                    className={cn(
+                      "rounded-[13px] border border-dashed px-3 py-5 text-center text-xs transition-colors",
+                      isTarget ? "border-primary/50 text-primary" : "border-border text-label",
+                    )}
+                  >
+                    {dragging ? t("dropHere") : t("emptyColumn")}
+                  </p>
+                ) : null}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       {lost.length > 0 ? (

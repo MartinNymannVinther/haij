@@ -7,11 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  createRoleAction,
-  deleteRoleAction,
-  updateRoleAction,
-} from "@/modules/invoicing/actions";
+import { createRoleAction, deleteRoleAction, updateRoleAction } from "@/modules/invoicing/actions";
 import { formatOere, oereToInputValue, parseKronerToOere } from "@/modules/invoicing/money";
 import { useRouter } from "@/i18n/navigation";
 

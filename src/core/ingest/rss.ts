@@ -69,7 +69,9 @@ export function parseFeed(xml: string, maxItems = 30): FeedItem[] {
       1500,
     );
     const publishedAt = parseDate(
-      tagContent(block, "pubDate") ?? tagContent(block, "updated") ?? tagContent(block, "published"),
+      tagContent(block, "pubDate") ??
+        tagContent(block, "updated") ??
+        tagContent(block, "published"),
     );
     items.push({ ref, title, summary, url, publishedAt });
   }

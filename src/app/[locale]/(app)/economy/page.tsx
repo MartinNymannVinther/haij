@@ -2,13 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import {
   Table,
@@ -62,8 +56,7 @@ export default async function EconomyPage({
   const currentYear = Number(todayInCopenhagen().slice(0, 4));
   const { year: yearParam } = await searchParams;
   const parsed = Number(yearParam);
-  const year =
-    Number.isInteger(parsed) && parsed >= 2000 && parsed <= 2100 ? parsed : currentYear;
+  const year = Number.isInteger(parsed) && parsed >= 2000 && parsed <= 2100 ? parsed : currentYear;
 
   const [t, months, customers] = await Promise.all([
     getTranslations("economy"),
@@ -85,21 +78,21 @@ export default async function EconomyPage({
         })}
         actions={
           <div className="flex items-center gap-1">
-          <Link
-            href={{ pathname: "/economy", query: { year: year - 1 } }}
-            aria-label={t("prevYear")}
-            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
-          >
-            <ChevronLeft />
-          </Link>
-          <span className="w-14 text-center text-sm font-semibold tabular-nums">{year}</span>
-          <Link
-            href={{ pathname: "/economy", query: { year: year + 1 } }}
-            aria-label={t("nextYear")}
-            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
-          >
-            <ChevronRight />
-          </Link>
+            <Link
+              href={{ pathname: "/economy", query: { year: year - 1 } }}
+              aria-label={t("prevYear")}
+              className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
+            >
+              <ChevronLeft />
+            </Link>
+            <span className="w-14 text-center text-sm font-semibold tabular-nums">{year}</span>
+            <Link
+              href={{ pathname: "/economy", query: { year: year + 1 } }}
+              aria-label={t("nextYear")}
+              className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
+            >
+              <ChevronRight />
+            </Link>
           </div>
         }
       />
@@ -179,7 +172,9 @@ export default async function EconomyPage({
           <CardTitle>{t("customersTitle")}</CardTitle>
         </CardHeader>
         {customers.length === 0 ? (
-          <CardContent className="text-muted-foreground pb-6 text-sm">{t("noCustomers")}</CardContent>
+          <CardContent className="text-muted-foreground pb-6 text-sm">
+            {t("noCustomers")}
+          </CardContent>
         ) : (
           <div className="overflow-x-auto">
             <Table>

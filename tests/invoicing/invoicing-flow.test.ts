@@ -66,7 +66,13 @@ beforeAll(async () => {
 
   companyA = await createCompany(
     CTX_A,
-    { name: "Kunde Alfa ApS", cvr: "11111118", address: "Alfavej 1", zipcode: "8000", city: "Aarhus C" },
+    {
+      name: "Kunde Alfa ApS",
+      cvr: "11111118",
+      address: "Alfavej 1",
+      zipcode: "8000",
+      city: "Aarhus C",
+    },
     "manual",
   );
   companyB = await createCompany(CTX_B, { name: "Kunde Beta A/S" }, "manual");

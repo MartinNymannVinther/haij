@@ -126,9 +126,10 @@ describe("knowledge flow", () => {
     }
     const code = await asApp(app, { orgId: ORG_B, userId: "user_know_b" }, (c) =>
       expectSqlError(
-        c.query(`insert into knowledge_sources (org_id, name, url) values ($1, 'Smuglet', 'https://x.dk')`, [
-          ORG_A,
-        ]),
+        c.query(
+          `insert into knowledge_sources (org_id, name, url) values ($1, 'Smuglet', 'https://x.dk')`,
+          [ORG_A],
+        ),
       ),
     );
     expect(code).toBe("42501");

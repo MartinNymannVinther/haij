@@ -27,9 +27,10 @@ beforeAll(async () => {
        ($1, 'Numbering 1', 'numbering-1', now()), ($2, 'Numbering 2', 'numbering-2', now())`,
     [ORG_1, ORG_2],
   );
-  await admin.query(`insert into users (id, name, email) values ($1, 'N', 'numbering@example.com')`, [
-    USER,
-  ]);
+  await admin.query(
+    `insert into users (id, name, email) values ($1, 'N', 'numbering@example.com')`,
+    [USER],
+  );
 });
 
 afterAll(async () => {
@@ -62,10 +63,9 @@ describe("allocateInvoiceNumber", () => {
   });
 
   it("never duplicates or skips under concurrent issuance", async () => {
-    const before = await admin.query(
-      `select next_number from invoice_counters where org_id = $1`,
-      [ORG_1],
-    );
+    const before = await admin.query(`select next_number from invoice_counters where org_id = $1`, [
+      ORG_1,
+    ]);
     const start = before.rows[0].next_number as number;
 
     const allocated = await Promise.all(
