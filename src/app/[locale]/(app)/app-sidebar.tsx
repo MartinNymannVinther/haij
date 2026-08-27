@@ -1,27 +1,44 @@
-import { Wordmark } from "@/components/wordmark";
+import { getTranslations } from "next-intl/server";
+import { WordmarkLockup } from "@/components/wordmark";
 import { Link } from "@/i18n/navigation";
 import { OrgSwitcher } from "./org-switcher";
-import { SidebarNav } from "./sidebar-nav";
+import { SidebarNav, SidebarSettingsLink } from "./sidebar-nav";
 import { UserMenu } from "./user-menu";
 
-/** Desktop navigation rail: brand and org on top, nav in the middle, user at the bottom. */
-export function AppSidebar({ userName, userEmail }: { userName: string; userEmail: string }) {
+/**
+ * The 2a navigation rail: 236 px on the sidebar ground with no outer edge of
+ * its own - the content area carries the dividing line. Lockup on top,
+ * navigation in the middle, settings and the user card at the foot.
+ */
+export async function AppSidebar({
+  userName,
+  userEmail,
+  organization,
+}: {
+  userName: string;
+  userEmail: string;
+  organization: string;
+}) {
+  const t = await getTranslations("app.orgSwitcher");
+  const switchLabel = t("switch");
   return (
-    <aside className="bg-sidebar sticky top-0 hidden h-svh w-60 shrink-0 flex-col border-r lg:flex">
-      <div className="flex flex-col gap-1 px-4 pt-5 pb-2">
+    <aside className="bg-sidebar sticky top-0 hidden h-svh w-[236px] shrink-0 flex-col lg:flex">
+      <div className="px-4 pt-5 pb-3">
         <Link
           href="/dashboard"
           aria-label="Haij"
-          className="w-fit transition-opacity hover:opacity-80"
+          className="block w-fit transition-opacity hover:opacity-80"
         >
-          <Wordmark className="text-xl" />
+          <WordmarkLockup organization={organization} />
         </Link>
       </div>
-      <div className="px-3 pb-1">
-        <OrgSwitcher triggerClassName="w-full justify-between px-2.5" />
-      </div>
       <SidebarNav />
-      <div className="border-t p-2">
+      <div className="flex flex-col gap-1.5 px-3 pt-1 pb-3">
+        <OrgSwitcher
+          triggerClassName="text-sidebar-foreground hover:bg-sidebar-hover h-auto w-full justify-between rounded-[9px] px-3 py-2.5 text-sm font-normal"
+          label={switchLabel}
+        />
+        <SidebarSettingsLink />
         <UserMenu name={userName} email={userEmail} variant="row" />
       </div>
     </aside>

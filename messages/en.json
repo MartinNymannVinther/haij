@@ -108,7 +108,8 @@
       "signals": "Signals",
       "knowledge": "Knowledge",
       "openMenu": "Open menu",
-      "menuTitle": "Navigation"
+      "menuTitle": "Navigation",
+      "settings": "Settings"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -118,7 +119,8 @@
       "createSubmit": "Create",
       "switched": "Switched to {name}",
       "created": "{name} has been created",
-      "error": "The organization could not be created. Please try again."
+      "error": "The organization could not be created. Please try again.",
+      "switch": "Switch organization"
     },
     "dashboard": {
       "title": "Overview",

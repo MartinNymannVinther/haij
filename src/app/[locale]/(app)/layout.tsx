@@ -1,5 +1,8 @@
+import { eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
-import { getSession } from "@/core/auth/session";
+import { getOrgContext, getSession } from "@/core/auth/session";
+import { organizations } from "@/core/db/schema";
+import { withOrgContext } from "@/core/db/tenant";
 import { redirect } from "@/i18n/navigation";
 import { AppSidebar } from "./app-sidebar";
 import { MobileHeader } from "./mobile-header";
@@ -16,12 +19,32 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     return null;
   }
 
+  // Named in the sidebar lockup, so the tenant is visible on every screen.
+  const context = await getOrgContext();
+  const [organization] = context
+    ? await withOrgContext(context, (tx) =>
+        tx
+          .select({ name: organizations.name })
+          .from(organizations)
+          .where(eq(organizations.id, context.orgId))
+          .limit(1),
+      )
+    : [];
+
   return (
     <div className="flex min-h-svh">
-      <AppSidebar userName={session.user.name} userEmail={session.user.email} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <MobileHeader userName={session.user.name} userEmail={session.user.email} />
-        <main className="@container mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6 lg:px-10 lg:py-8">
+      <AppSidebar
+        userName={session.user.name}
+        userEmail={session.user.email}
+        organization={organization?.name ?? ""}
+      />
+      <div className="border-border flex min-w-0 flex-1 flex-col lg:border-l">
+        <MobileHeader
+          userName={session.user.name}
+          userEmail={session.user.email}
+          organization={organization?.name ?? ""}
+        />
+        <main className="@container mx-auto w-full max-w-6xl flex-1 px-5 py-6 sm:px-7 lg:px-8 lg:py-[30px]">
           {children}
         </main>
       </div>

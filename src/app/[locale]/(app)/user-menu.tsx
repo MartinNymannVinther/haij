@@ -8,8 +8,6 @@ import {
   LogOut,
   Monitor,
   Moon,
-  ShieldCheck,
-  Sparkles,
   Sun,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -75,16 +73,14 @@ export function UserMenu({
           variant === "row" ? (
             <Button
               variant="ghost"
-              className="h-auto w-full justify-start gap-2.5 px-2 py-2 text-left"
+              className="bg-sidebar-hover hover:bg-sidebar-accent h-auto w-full justify-start gap-2.5 rounded-[11px] px-3 py-2.5 text-left"
             >
-              <span className="bg-primary/12 text-primary flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
+              <span className="bg-primary text-primary-foreground flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold">
                 {initials(name)}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium">{name}</span>
-                <span className="text-muted-foreground block truncate text-xs font-normal">
-                  {email}
-                </span>
+                <span className="block truncate text-[0.8125rem] font-semibold">{name}</span>
+                <span className="text-meta block truncate text-[0.72rem] font-normal">{email}</span>
               </span>
               <ChevronsUpDown data-slot="icon" className="shrink-0 opacity-50" />
             </Button>
@@ -108,15 +104,7 @@ export function UserMenu({
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => router.push("/settings/company")}>
           <Building2 data-slot="icon" />
-          {t("companySettings")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/settings/security")}>
-          <ShieldCheck data-slot="icon" />
-          {t("security")}
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/settings/ai")}>
-          <Sparkles data-slot="icon" />
-          {t("ai")}
+          {t("settings")}
         </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>

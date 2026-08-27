@@ -25,9 +25,12 @@ import { organizationSlug } from "@/lib/slug";
 export function OrgSwitcher({
   triggerClassName,
   align = "start",
+  label,
 }: {
   triggerClassName?: string;
   align?: "start" | "end" | "center";
+  /** Overrides the trigger text; the 2a lockup already names the active org. */
+  label?: string;
 }) {
   const t = useTranslations("app.orgSwitcher");
   const router = useRouter();
@@ -75,7 +78,7 @@ export function OrgSwitcher({
         <DropdownMenuTrigger
           render={
             <Button variant="ghost" size="sm" className={cn("gap-2 font-medium", triggerClassName)}>
-              <span className="truncate">{activeOrganization?.name ?? t("label")}</span>
+              <span className="truncate">{label ?? activeOrganization?.name ?? t("label")}</span>
               <ChevronsUpDown data-slot="icon" className="shrink-0 opacity-50" />
             </Button>
           }

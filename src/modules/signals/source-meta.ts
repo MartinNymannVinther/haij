@@ -2,14 +2,14 @@ import type { SignalSource } from "@/core/db/schema";
 
 /** Badge styling per source, purely from theme tokens. */
 export const SOURCE_BADGE_CLASS: Record<SignalSource, string> = {
-  cvr: "border-transparent bg-primary/15 text-primary",
-  ted: "border-transparent bg-secondary text-secondary-foreground",
-  rss: "border-border bg-transparent text-muted-foreground",
-  manual: "border-border bg-transparent text-muted-foreground",
+  cvr: "bg-muted text-secondary-foreground",
+  ted: "bg-accent text-accent-foreground",
+  rss: "bg-muted text-secondary-foreground",
+  manual: "bg-muted text-secondary-foreground",
 };
 
 export function scoreBadgeClass(score: number): string {
-  if (score >= 70) return "border-transparent bg-success text-success-foreground";
-  if (score >= 40) return "border-transparent bg-warning/15 text-warning dark:bg-warning/20";
-  return "border-border bg-transparent text-muted-foreground";
+  if (score >= 70) return "bg-accent text-accent-foreground";
+  if (score >= 40) return "bg-success-tint text-success";
+  return "border-border bg-transparent text-meta";
 }

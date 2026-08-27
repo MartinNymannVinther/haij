@@ -132,13 +132,13 @@ export default async function DashboardPage() {
           <div className="grid gap-4 @lg:grid-cols-2 @4xl:grid-cols-4">
             <StatCard
               icon={<Building2 className="size-4" />}
-              tint="bg-primary/10 text-primary"
+              tint="bg-secondary text-secondary-foreground"
               label={t("statCompanies")}
               value={String(totalCompanies)}
             />
             <StatCard
               icon={<KanbanSquare className="size-4" />}
-              tint="bg-warning/12 text-warning"
+              tint="bg-warning-tint text-warning"
               label={t("statPipeline")}
               value={String(activePipeline)}
             />
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
             />
             <StatCard
               icon={<Banknote className="size-4" />}
-              tint="bg-success/12 text-success"
+              tint="bg-accent text-accent-foreground"
               label={t("statOutstanding")}
               value={formatOere(invoicing.outstandingOere)}
               footer={

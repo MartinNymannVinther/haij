@@ -4,18 +4,18 @@ export const STAGE_ORDER: PipelineStage[] = ["lead", "dialogue", "proposal", "wo
 
 /** Badge styling per stage, built purely from theme tokens. */
 export const STAGE_BADGE_CLASS: Record<PipelineStage, string> = {
-  lead: "border-border bg-transparent text-muted-foreground",
-  dialogue: "border-transparent bg-primary/12 text-primary dark:bg-primary/20",
-  proposal: "border-transparent bg-warning/15 text-warning dark:bg-warning/20",
-  won: "border-transparent bg-success text-success-foreground",
-  lost: "border-transparent bg-destructive/10 text-destructive",
+  lead: "bg-muted text-secondary-foreground",
+  dialogue: "bg-secondary text-secondary-foreground",
+  proposal: "bg-warning-tint text-warning",
+  won: "bg-accent text-accent-foreground",
+  lost: "border-border bg-transparent text-meta",
 };
 
 /** Accent bar/dot color per stage for the pipeline board. */
 export const STAGE_ACCENT_CLASS: Record<PipelineStage, string> = {
-  lead: "bg-muted-foreground/40",
-  dialogue: "bg-primary",
-  proposal: "bg-warning",
-  won: "bg-success",
-  lost: "bg-destructive",
+  lead: "bg-chart-3",
+  dialogue: "bg-chart-2",
+  proposal: "bg-chart-4",
+  won: "bg-primary",
+  lost: "bg-label",
 };

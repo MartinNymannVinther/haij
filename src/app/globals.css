@@ -29,9 +29,15 @@
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
+  --color-success-tint: var(--success-tint);
   --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-tint: var(--warning-tint);
+  --color-label: var(--label);
+  --color-meta: var(--meta);
+  --color-hairline: var(--hairline);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -71,6 +77,14 @@
   h2,
   h3 {
     text-wrap: balance;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  /* 2a reads numbers in columns: totals, hours and CVR always line up. */
+  table,
+  time,
+  [data-slot="badge"] {
+    font-variant-numeric: tabular-nums;
   }
 }
 

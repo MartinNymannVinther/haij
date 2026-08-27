@@ -1,9 +1,9 @@
 import type { InvoiceStatus } from "@/core/db/schema";
 
-/** Badge styling per invoice status, built purely from theme tokens. */
+/** Chip styling per invoice status: 2a tint plus ink, never a solid fill. */
 export const INVOICE_STATUS_BADGE_CLASS: Record<InvoiceStatus, string> = {
-  draft: "border-border bg-transparent text-muted-foreground",
-  issued: "border-transparent bg-primary/12 text-primary dark:bg-primary/20",
-  sent: "border-transparent bg-warning/15 text-warning dark:bg-warning/20",
-  paid: "border-transparent bg-success text-success-foreground",
+  draft: "border-border bg-transparent text-meta",
+  issued: "bg-secondary text-secondary-foreground",
+  sent: "bg-success-tint text-success",
+  paid: "bg-accent text-accent-foreground",
 };

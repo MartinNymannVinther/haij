@@ -5,20 +5,29 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Wordmark } from "@/components/wordmark";
+import { Wordmark, WordmarkLockup } from "@/components/wordmark";
 import { Link } from "@/i18n/navigation";
 import { OrgSwitcher } from "./org-switcher";
-import { SidebarNav } from "./sidebar-nav";
+import { SidebarNav, SidebarSettingsLink } from "./sidebar-nav";
 import { UserMenu } from "./user-menu";
 
 /** Slim top bar for small screens: burger menu, brand, user. */
-export function MobileHeader({ userName, userEmail }: { userName: string; userEmail: string }) {
+export function MobileHeader({
+  userName,
+  userEmail,
+  organization,
+}: {
+  userName: string;
+  userEmail: string;
+  organization: string;
+}) {
   const t = useTranslations("app.nav");
+  const tOrg = useTranslations("app.orgSwitcher");
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="bg-background/85 sticky top-0 z-40 border-b backdrop-blur-md lg:hidden">
-      <div className="flex h-14 items-center justify-between gap-3 px-4">
+    <header className="bg-background/90 border-border sticky top-0 z-40 border-b backdrop-blur-md lg:hidden">
+      <div className="flex h-[3.75rem] items-center justify-between gap-3 px-[18px]">
         <div className="flex min-w-0 items-center gap-2">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
@@ -26,15 +35,19 @@ export function MobileHeader({ userName, userEmail }: { userName: string; userEm
             >
               <Menu />
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side="left" className="bg-sidebar w-[262px]">
               <SheetTitle className="sr-only">{t("menuTitle")}</SheetTitle>
-              <div className="px-4 pt-5 pb-2">
-                <Wordmark className="text-xl" />
-              </div>
-              <div className="px-3 pb-1">
-                <OrgSwitcher triggerClassName="w-full justify-between px-2.5" />
+              <div className="px-4 pt-5 pb-3">
+                <WordmarkLockup organization={organization} />
               </div>
               <SidebarNav onNavigate={() => setOpen(false)} />
+              <div className="flex flex-col gap-1.5 px-3 pt-1 pb-3">
+                <OrgSwitcher
+                  triggerClassName="text-sidebar-foreground hover:bg-sidebar-hover h-auto w-full justify-between rounded-[9px] px-3 py-2.5 text-sm font-normal"
+                  label={tOrg("switch")}
+                />
+                <SidebarSettingsLink onNavigate={() => setOpen(false)} />
+              </div>
             </SheetContent>
           </Sheet>
           <Link href="/dashboard" aria-label="Haij">

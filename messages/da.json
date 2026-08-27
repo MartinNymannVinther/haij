@@ -108,7 +108,8 @@
       "signals": "Signaler",
       "knowledge": "Viden",
       "openMenu": "Åbn menu",
-      "menuTitle": "Navigation"
+      "menuTitle": "Navigation",
+      "settings": "Indstillinger"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -118,7 +119,8 @@
       "createSubmit": "Opret",
       "switched": "Skiftet til {name}",
       "created": "{name} er oprettet",
-      "error": "Organisationen kunne ikke oprettes. Prøv igen."
+      "error": "Organisationen kunne ikke oprettes. Prøv igen.",
+      "switch": "Skift virksomhed"
     },
     "dashboard": {
       "title": "Overblik",
