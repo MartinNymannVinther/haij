@@ -7,10 +7,11 @@ import { getOrgContext } from "@/core/auth/session";
 import type { PipelineStage } from "@/core/db/schema";
 import { formatMinutes } from "@/modules/time/duration";
 import { getCompanyDetail } from "@/modules/crm/service";
-import { getCustomerEconomy } from "@/modules/invoicing/economy";
+import { getCustomerEconomy, getUnbilledByCompany } from "@/modules/invoicing/economy";
 import { Link, redirect } from "@/i18n/navigation";
 import { ActivityComposer } from "./activity-composer";
 import { CompanyEconomyCard } from "./company-economy-card";
+import { UnbilledCard } from "./unbilled-card";
 import { AddContactDialog } from "./add-contact-dialog";
 import { CompanyActions } from "./company-actions";
 import { ContactDeleteButton } from "./contact-delete-button";
@@ -44,21 +45,24 @@ export default async function CompanyDetailPage({
   const format = await getFormatter();
   const { company, contacts, timeline, trackedMinutes } = detail;
   const economy = (await getCustomerEconomy(context)).find((row) => row.companyId === companyId);
+  const unbilledValueOere = (await getUnbilledByCompany(context)).get(companyId)?.valueOere ?? 0;
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <Link
           href="/companies"
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-sm"
+          className="text-meta hover:text-foreground inline-flex items-center gap-1.5 text-[0.78rem] font-medium"
         >
           <ArrowLeft className="size-3.5" />
           {t("back")}
         </Link>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{company.name}</h1>
-            <p className="text-muted-foreground text-sm">
+        <div className="mt-2.5 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-1.5">
+            <h1 className="text-[1.8125rem] leading-[1.1] font-semibold tracking-[-0.02em]">
+              {company.name}
+            </h1>
+            <p className="text-muted-foreground text-[0.845rem]">
               {[company.cvr ? `CVR ${company.cvr}` : null, company.companyType, company.city]
                 .filter(Boolean)
                 .join(" · ")}
@@ -83,6 +87,14 @@ export default async function CompanyDetailPage({
           </div>
         </div>
       </div>
+
+      {economy && economy.unbilledMinutes > 0 ? (
+        <UnbilledCard
+          minutes={economy.unbilledMinutes}
+          valueOere={unbilledValueOere}
+          action={<CompanyEconomyCard companyId={company.id} economy={economy} variant="action" />}
+        />
+      ) : null}
 
       <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
         <Card className="min-w-0">
@@ -138,7 +150,13 @@ export default async function CompanyDetailPage({
             </CardContent>
           </Card>
 
-          {economy ? <CompanyEconomyCard companyId={company.id} economy={economy} /> : null}
+          {economy ? (
+            <CompanyEconomyCard
+              companyId={company.id}
+              economy={economy}
+              showInvoiceButton={economy.unbilledMinutes === 0}
+            />
+          ) : null}
 
           <Card>
             <CardHeader>

@@ -4,6 +4,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { getOrgContext } from "@/core/auth/session";
 import { listDigests, listItems, listSources } from "@/modules/knowledge/service";
 import { redirect } from "@/i18n/navigation";
@@ -30,31 +31,37 @@ export default async function KnowledgePage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <KnowledgeToolbar hasSources={sources.some((s) => s.active)} hasItems={items.length > 0} />
-      </div>
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={t("summary", {
+          sources: sources.filter((s) => s.active).length,
+          items: items.length,
+        })}
+        actions={
+          <KnowledgeToolbar hasSources={sources.some((s) => s.active)} hasItems={items.length > 0} />
+        }
+      />
 
-      <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="flex min-w-0 flex-col gap-6">
+      <div className="grid gap-4 @3xl:grid-cols-[1.5fr_1fr]">
+        <div className="flex min-w-0 flex-col gap-4">
           {digests.length > 0 ? (
-            <Card>
+            <Card className="bg-accent border-[oklch(0.885_0.025_150)]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="text-primary size-4" />
+                <CardTitle className="text-accent-foreground flex items-center gap-2">
+                  <Sparkles className="size-4" />
                   {t("digestTitle")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
                 {digests.slice(0, 3).map((digest) => (
                   <article key={digest.id} className="flex flex-col gap-2">
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-accent-foreground/70 text-xs">
                       {format.dateTime(digest.createdAt, { dateStyle: "medium", timeStyle: "short" })}
                       {" · "}
                       {t("digestMeta", { count: digest.itemCount })}
                     </p>
-                    <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                    <div className="text-accent-foreground text-[0.845rem] leading-relaxed whitespace-pre-wrap">
                       {digest.content}
                     </div>
                   </article>

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { SegmentedFilter } from "@/components/ui/segmented";
 import { getOrgContext } from "@/core/auth/session";
 import { SIGNAL_STATUSES, type SignalStatus } from "@/core/db/schema";
 import { todayInCopenhagen } from "@/core/dates";
 import { getSignalSettings, listSignals } from "@/modules/signals/service";
-import { Link, redirect } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
+import { redirect } from "@/i18n/navigation";
 import { AddSignalDialog } from "./add-signal-dialog";
 import { RefreshButton } from "./refresh-button";
 import { SignalCard } from "./signal-card";
@@ -48,10 +49,12 @@ export default async function SignalsPage({
   );
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={configured ? t("summary", { count: counts.new ?? 0 }) : undefined}
+        actions={
+          <>
           <AddSignalDialog />
           <SignalsSettingsDialog
             settings={{
@@ -64,26 +67,24 @@ export default async function SignalsPage({
             }}
           />
           <RefreshButton disabled={!configured} />
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        {SIGNAL_STATUSES.map((s) => (
-          <Link
-            key={s}
-            href={{ pathname: "/signals", query: s === "new" ? undefined : { status: s } }}
-            className={cn(
-              "rounded-md border px-2.5 py-1 text-sm transition-colors",
-              active === s
-                ? "border-transparent bg-accent text-accent-foreground font-medium"
-                : "border-border text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t(`status.${s}`)}
-            {counts[s] ? <span className="text-muted-foreground ml-1.5">{counts[s]}</span> : null}
-          </Link>
-        ))}
-      </div>
+      <SegmentedFilter
+        className="self-start"
+        items={SIGNAL_STATUSES.map((s) => ({
+          key: s,
+          label: (
+            <>
+              {t(`status.${s}`)}
+              {counts[s] ? <span className="text-label ml-1.5 tabular-nums">{counts[s]}</span> : null}
+            </>
+          ),
+          href: { pathname: "/signals" as const, query: s === "new" ? {} : { status: s } },
+          active: active === s,
+        }))}
+      />
 
       {rows.length === 0 ? (
         <EmptyState
@@ -91,7 +92,7 @@ export default async function SignalsPage({
           hint={configured ? t("emptyHint") : t("unconfiguredHint")}
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-3 @3xl:grid-cols-2">
           {rows.map((signal) => (
             <SignalCard key={signal.id} signal={signal} today={today} />
           ))}

@@ -311,7 +311,9 @@
       "emptyColumn": "Nothing here",
       "dropHere": "Drop here",
       "moveCard": "Move {name} to another stage",
-      "moveFailed": "Could not move the customer. Please try again."
+      "moveFailed": "Could not move the customer. Please try again.",
+      "lostCount": "{count, plural, =1 {1 customer} other {# customers}}",
+      "lostShow": "Show"
     }
   },
   "time": {
@@ -567,8 +569,12 @@
       "toDate": "To date",
       "rangeSummary": "The selection covers {hours} unbilled hours.",
       "rangeLoading": "Counting hours…",
-      "createDraft": "Create draft"
-    }
+      "createDraft": "Create draft",
+      "unbilledLabel": "Ready to invoice",
+      "unbilledHint": "Unbilled hours on this customer, valued at the rates that apply."
+    },
+    "chartTitle": "The year in numbers",
+    "chartLegend": "The dark bar is realized, the light one is the target. Future months show the target only."
   },
   "projects": {
     "list": {
@@ -734,7 +740,9 @@
       "rssLabel": "RSS feeds (one per line, optionally \"url | name\")",
       "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisation&format=rss | Jobindex",
       "savedToast": "Signal settings saved."
-    }
+    },
+    "summary": "{count, plural, =0 {No new signals} =1 {One new signal} other {# new signals}} to look at",
+    "scoreTitle": "Score {score} of 100"
   },
   "knowledge": {
     "title": "Knowledge",
@@ -762,6 +770,16 @@
       "limit": "At most 15 sources. Delete one before adding more.",
       "deletedToast": "The source and its articles are removed.",
       "activeToggle": "Enable {name}"
+    },
+    "summary": "{sources} active sources · {items} articles"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Your organization, your security and the models Haij uses.",
+    "nav": {
+      "company": "Organization",
+      "security": "Security",
+      "ai": "AI"
     }
   }
 }

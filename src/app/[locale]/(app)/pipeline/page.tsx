@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { getOrgContext } from "@/core/auth/session";
 import { listCompaniesForPipeline } from "@/modules/crm/service";
 import { redirect } from "@/i18n/navigation";
@@ -27,15 +28,11 @@ export default async function PipelinePage() {
   ).length;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        {companies.length > 0 ? (
-          <p className="text-muted-foreground text-sm">
-            {t("summary", { open, total: companies.length })}
-          </p>
-        ) : null}
-      </div>
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={companies.length > 0 ? t("summary", { open, total: companies.length }) : undefined}
+      />
 
       {companies.length === 0 ? (
         <EmptyState title={t("empty")} hint={t("emptyHint")} />

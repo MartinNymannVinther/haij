@@ -2,7 +2,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   Table,
   TableBody,
@@ -19,6 +26,7 @@ import { formatOere } from "@/modules/invoicing/money";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { FrameIndicator } from "./frame-indicator";
+import { YearChart } from "./year-chart";
 import { TargetCell } from "./target-cell";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -68,39 +76,56 @@ export default async function EconomyPage({
   const currentMonth = Number(todayInCopenhagen().slice(5, 7));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <div className="flex items-center gap-1">
+    <div className="flex flex-col gap-[22px]">
+      <PageHeader
+        title={t("title")}
+        subtitle={t("yearSummary", {
+          realized: formatOere(realizedYear),
+          target: formatOere(targetYear),
+        })}
+        actions={
+          <div className="flex items-center gap-1">
           <Link
             href={{ pathname: "/economy", query: { year: year - 1 } }}
             aria-label={t("prevYear")}
-            className={cn(buttonVariants({ variant: "outline", size: "icon" }))}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
           >
             <ChevronLeft />
           </Link>
-          <span className="min-w-16 text-center font-medium tabular-nums">{year}</span>
+          <span className="w-14 text-center text-sm font-semibold tabular-nums">{year}</span>
           <Link
             href={{ pathname: "/economy", query: { year: year + 1 } }}
             aria-label={t("nextYear")}
-            className={cn(buttonVariants({ variant: "outline", size: "icon" }))}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
           >
             <ChevronRight />
           </Link>
-        </div>
-      </div>
+          </div>
+        }
+      />
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("chartTitle")}</CardTitle>
+          <CardDescription>{t("chartLegend")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <YearChart
+            bars={months.map((month) => ({
+              month: month.month,
+              label: t(`months.${MONTH_KEYS[month.month - 1]!}`).slice(0, 3),
+              realizedOere: month.realizedOere,
+              targetOere: month.targetOere,
+              isCurrent: month.month === currentMonth,
+              isFuture: month.month > currentMonth,
+            }))}
+          />
+        </CardContent>
+      </Card>
 
       <Card className="py-0">
         <CardHeader className="pt-6">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <CardTitle>{t("monthsTitle")}</CardTitle>
-            <p className="text-muted-foreground text-sm">
-              {t("yearSummary", {
-                realized: formatOere(realizedYear),
-                target: formatOere(targetYear),
-              })}
-            </p>
-          </div>
+          <CardTitle>{t("monthsTitle")}</CardTitle>
         </CardHeader>
         <div className="overflow-x-auto">
           <Table>

@@ -63,9 +63,12 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
     router.refresh();
   }
 
+  const lost = items.filter((item) => item.pipelineStage === "lost");
+
   return (
-    <div className="grid gap-3 @lg:grid-cols-2 @3xl:grid-cols-3 @4xl:grid-cols-5">
-      {STAGE_ORDER.map((stage) => {
+    <div className="flex flex-col gap-3">
+      <div className="grid gap-3 @lg:grid-cols-2 @3xl:grid-cols-4">
+      {STAGE_ORDER.filter((stage) => stage !== "lost").map((stage) => {
         const cards = items.filter((item) => item.pipelineStage === stage);
         const isTarget = dropTarget === stage;
         return (
@@ -90,17 +93,13 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
               if (company) void move(company, stage);
             }}
             className={cn(
-              "bg-muted/40 flex min-w-0 flex-col gap-2 rounded-xl p-2 transition-colors",
-              isTarget && "bg-primary/5 ring-primary/40 ring-2",
+              "flex min-w-0 flex-col gap-2 rounded-xl transition-colors",
+              isTarget && "bg-accent/50 ring-primary/30 ring-2",
             )}
           >
-            <h2 className="flex items-center gap-2 px-1.5 pt-1 text-sm font-medium">
-              <span
-                aria-hidden
-                className={cn("size-1.5 shrink-0 rounded-full", STAGE_ACCENT_CLASS[stage])}
-              />
+            <h2 className="flex items-center gap-2 px-1 text-[0.8125rem] font-semibold">
               <span className="min-w-0 flex-1 truncate">{tStages(stage)}</span>
-              <span className="text-muted-foreground text-xs tabular-nums">{cards.length}</span>
+              <span className="text-meta text-xs font-normal tabular-nums">{cards.length}</span>
             </h2>
 
             <div className="flex min-h-14 flex-col gap-2">
@@ -118,18 +117,29 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
                     setDropTarget(null);
                   }}
                   className={cn(
-                    "bg-card ring-foreground/10 group/card relative flex flex-col gap-0.5 rounded-lg p-2.5 shadow-[var(--surface-shadow)] ring-1 transition-opacity",
+                    "group/card border-border relative flex flex-col gap-1 rounded-[13px] border px-4 py-3.5 transition-opacity",
+                    stage === "won" ? "bg-accent border-[oklch(0.885_0.025_150)]" : "bg-card",
                     dragging === company.id ? "opacity-40" : "cursor-grab active:cursor-grabbing",
                   )}
                 >
                   <Link
                     href={`/companies/${company.id}`}
-                    className="pr-5 text-sm leading-snug font-medium hover:underline"
+                    className={cn(
+                      "pr-5 text-[0.8125rem] leading-snug font-semibold hover:underline",
+                      stage === "won" && "text-accent-foreground",
+                    )}
                   >
                     {company.name}
                   </Link>
                   {company.city ? (
-                    <p className="text-muted-foreground truncate text-xs">{company.city}</p>
+                    <p
+                      className={cn(
+                        "truncate text-xs",
+                        stage === "won" ? "text-accent-foreground/75" : "text-meta",
+                      )}
+                    >
+                      {company.city}
+                    </p>
                   ) : null}
                   {/* Always present for touch and keyboard; fades in on pointer devices. */}
                   <DropdownMenu>
@@ -170,8 +180,8 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
               {cards.length === 0 ? (
                 <p
                   className={cn(
-                    "text-muted-foreground/60 rounded-lg border border-dashed px-2 py-4 text-center text-xs transition-colors",
-                    isTarget ? "border-primary/40 text-primary" : "border-border/70",
+                    "rounded-[13px] border border-dashed px-3 py-5 text-center text-xs transition-colors",
+                    isTarget ? "border-primary/50 text-primary" : "border-border text-label",
                   )}
                 >
                   {dragging ? t("dropHere") : t("emptyColumn")}
@@ -181,6 +191,50 @@ export function PipelineBoard({ companies }: { companies: PipelineCompany[] }) {
           </section>
         );
       })}
+      </div>
+
+      {lost.length > 0 ? (
+        <section
+          onDragOver={(event) => {
+            if (!dragging) return;
+            event.preventDefault();
+            event.dataTransfer.dropEffect = "move";
+            setDropTarget("lost");
+          }}
+          onDragLeave={(event) => {
+            if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+            setDropTarget((current) => (current === "lost" ? null : current));
+          }}
+          onDrop={(event) => {
+            event.preventDefault();
+            const id = event.dataTransfer.getData(DRAG_TYPE) || dragging;
+            setDropTarget(null);
+            setDragging(null);
+            const company = items.find((item) => item.id === id);
+            if (company) void move(company, "lost");
+          }}
+          className={cn(
+            "bg-secondary flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[14px] px-4 py-3 text-[0.8125rem] transition-colors",
+            dropTarget === "lost" && "ring-primary/30 ring-2",
+          )}
+        >
+          <span className="font-semibold">{tStages("lost")}</span>
+          <span className="text-meta">
+            {t("lostCount", { count: lost.length })} ·{" "}
+            {lost
+              .slice(0, 3)
+              .map((company) => company.name)
+              .join(", ")}
+            {lost.length > 3 ? " …" : ""}
+          </span>
+          <Link
+            href={{ pathname: "/companies", query: { stage: "lost" } }}
+            className="text-primary ml-auto font-medium hover:underline"
+          >
+            {t("lostShow")}
+          </Link>
+        </section>
+      ) : null}
     </div>
   );
 }

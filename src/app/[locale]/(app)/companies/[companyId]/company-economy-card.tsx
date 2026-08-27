@@ -45,9 +45,15 @@ export type CompanyEconomy = {
 export function CompanyEconomyCard({
   companyId,
   economy,
+  variant = "card",
+  showInvoiceButton = true,
 }: {
   companyId: string;
   economy: CompanyEconomy;
+  /** `action` renders only the invoice button, for the 2a action card. */
+  variant?: "card" | "action";
+  /** False when the action card above already carries the invoice button. */
+  showInvoiceButton?: boolean;
 }) {
   const t = useTranslations("economy.customerCard");
   const tCommon = useTranslations("common");
@@ -137,6 +143,67 @@ export function CompanyEconomyCard({
     router.push(`/invoices/${result.data.invoiceId}`);
   }
 
+  const invoiceDialog = (
+    <Dialog open={invoiceOpen} onOpenChange={setInvoiceOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t("invoiceDialogTitle")}</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <p className="text-muted-foreground text-sm">{t("invoiceDialogHint")}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel htmlFor="invoice-from">{t("fromDate")}</FieldLabel>
+              <Input
+                id="invoice-from"
+                type="date"
+                value={range.from}
+                onChange={updateRange("from")}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="invoice-to">{t("toDate")}</FieldLabel>
+              <Input id="invoice-to" type="date" value={range.to} onChange={updateRange("to")} />
+            </Field>
+          </div>
+          <p className="text-sm font-medium tabular-nums" aria-live="polite">
+            {summary
+              ? t("rangeSummary", { hours: formatMinutes(summary.minutes) })
+              : t("rangeLoading")}
+          </p>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setInvoiceOpen(false)}>
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              onClick={handleCreateInvoice}
+              disabled={creating || !summary || summary.minutes === 0}
+            >
+              {creating ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
+              {t("createDraft")}
+            </Button>
+          </DialogFooter>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  if (variant === "action") {
+    return (
+      <>
+        <Button
+          className="bg-accent-foreground hover:bg-accent-foreground/90 text-accent"
+          onClick={openInvoiceDialog}
+          disabled={economy.unbilledMinutes === 0}
+        >
+          <FilePlus2 data-slot="icon" />
+          {t("createInvoice")}
+        </Button>
+        {invoiceDialog}
+      </>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -184,58 +251,19 @@ export function CompanyEconomyCard({
           </>
         ) : null}
 
-        <Button
-          className="mt-1"
-          onClick={openInvoiceDialog}
-          disabled={economy.unbilledMinutes === 0}
-        >
-          <FilePlus2 data-slot="icon" />
-          {t("createInvoice")}
-        </Button>
+        {showInvoiceButton ? (
+          <Button
+            className="mt-1"
+            onClick={openInvoiceDialog}
+            disabled={economy.unbilledMinutes === 0}
+          >
+            <FilePlus2 data-slot="icon" />
+            {t("createInvoice")}
+          </Button>
+        ) : null}
       </CardContent>
 
-      <Dialog open={invoiceOpen} onOpenChange={setInvoiceOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("invoiceDialogTitle")}</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <p className="text-muted-foreground text-sm">{t("invoiceDialogHint")}</p>
-            <div className="grid grid-cols-2 gap-4">
-              <Field>
-                <FieldLabel htmlFor="invoice-from">{t("fromDate")}</FieldLabel>
-                <Input
-                  id="invoice-from"
-                  type="date"
-                  value={range.from}
-                  onChange={updateRange("from")}
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="invoice-to">{t("toDate")}</FieldLabel>
-                <Input id="invoice-to" type="date" value={range.to} onChange={updateRange("to")} />
-              </Field>
-            </div>
-            <p className="text-sm font-medium tabular-nums" aria-live="polite">
-              {summary
-                ? t("rangeSummary", { hours: formatMinutes(summary.minutes) })
-                : t("rangeLoading")}
-            </p>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setInvoiceOpen(false)}>
-                {tCommon("cancel")}
-              </Button>
-              <Button
-                onClick={handleCreateInvoice}
-                disabled={creating || !summary || summary.minutes === 0}
-              >
-                {creating ? <Loader2 data-slot="icon" className="animate-spin" /> : null}
-                {t("createDraft")}
-              </Button>
-            </DialogFooter>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {invoiceDialog}
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">

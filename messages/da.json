@@ -311,7 +311,9 @@
       "emptyColumn": "Ingen her",
       "dropHere": "Slip her",
       "moveCard": "Flyt {name} til en anden fase",
-      "moveFailed": "Kunne ikke flytte kunden. Prøv igen."
+      "moveFailed": "Kunne ikke flytte kunden. Prøv igen.",
+      "lostCount": "{count, plural, =1 {1 kunde} other {# kunder}}",
+      "lostShow": "Vis"
     }
   },
   "time": {
@@ -567,8 +569,12 @@
       "toDate": "Til dato",
       "rangeSummary": "Valget dækker {hours} uafregnede timer.",
       "rangeLoading": "Tæller timer…",
-      "createDraft": "Opret udkast"
-    }
+      "createDraft": "Opret udkast",
+      "unbilledLabel": "Klar til fakturering",
+      "unbilledHint": "Uafregnede timer på denne kunde, opgjort med de timepriser der gælder."
+    },
+    "chartTitle": "Året i tal",
+    "chartLegend": "Mørk søjle er realiseret, lys er mål. Kommende måneder viser kun målet."
   },
   "projects": {
     "list": {
@@ -734,7 +740,9 @@
       "rssLabel": "RSS-feeds (ét pr. linje, evt. \"url | navn\")",
       "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisering&format=rss | Jobindex",
       "savedToast": "Signal-indstillingerne er gemt."
-    }
+    },
+    "summary": "{count, plural, =0 {Ingen nye signaler} =1 {Ét nyt signal} other {# nye signaler}} at kigge på",
+    "scoreTitle": "Score {score} af 100"
   },
   "knowledge": {
     "title": "Viden",
@@ -762,6 +770,16 @@
       "limit": "Højst 15 kilder. Slet en, før du tilføjer flere.",
       "deletedToast": "Kilden og dens artikler er fjernet.",
       "activeToggle": "Aktivér {name}"
+    },
+    "summary": "{sources} aktive kilder · {items} artikler"
+  },
+  "settings": {
+    "title": "Indstillinger",
+    "subtitle": "Din virksomhed, din sikkerhed og de modeller Haij bruger.",
+    "nav": {
+      "company": "Virksomhed",
+      "security": "Sikkerhed",
+      "ai": "AI"
     }
   }
 }

@@ -32,7 +32,7 @@ import {
   setSignalFollowUpAction,
   setSignalStatusAction,
 } from "@/modules/signals/actions";
-import { SOURCE_BADGE_CLASS, scoreBadgeClass } from "@/modules/signals/source-meta";
+import { SOURCE_BADGE_CLASS } from "@/modules/signals/source-meta";
 import { Link, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -84,7 +84,22 @@ export function SignalCard({ signal, today }: { signal: SignalRow; today: string
                 {t(`source.${signal.source}`)}
               </Badge>
               {signal.score !== null ? (
-                <Badge className={scoreBadgeClass(signal.score)}>{signal.score}</Badge>
+                <span
+                  className="flex items-center gap-[3px]"
+                  title={t("scoreTitle", { score: signal.score })}
+                  aria-label={t("scoreTitle", { score: signal.score })}
+                >
+                  {[0, 1, 2, 3, 4].map((step) => (
+                    <span
+                      key={step}
+                      aria-hidden
+                      className={cn(
+                        "size-[7px] rounded-[1.5px]",
+                        signal.score! >= (step + 1) * 20 ? "bg-primary" : "bg-chart-5",
+                      )}
+                    />
+                  ))}
+                </span>
               ) : null}
               {signal.followUpAt ? (
                 <span
@@ -98,7 +113,7 @@ export function SignalCard({ signal, today }: { signal: SignalRow; today: string
                 </span>
               ) : null}
             </div>
-            <p className="mt-1.5 font-medium">
+            <p className="mt-2 text-[0.906rem] font-semibold">
               {signal.url ? (
                 <a
                   href={signal.url}
