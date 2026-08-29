@@ -22,6 +22,7 @@ import { getInvoicingOverview, listInvoices } from "@/modules/invoicing/service"
 import { INVOICE_STATUS_BADGE_CLASS } from "@/modules/invoicing/status-meta";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { DraftDeleteButton } from "./draft-delete-button";
 import { NewInvoiceButton } from "./new-invoice-button";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -98,6 +99,7 @@ export default async function InvoicesPage({
                 <TableHead>{t("due")}</TableHead>
                 <TableHead className="text-right">{t("amount")}</TableHead>
                 <TableHead>{t("statusHead")}</TableHead>
+                <TableHead className="w-9" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -108,7 +110,7 @@ export default async function InvoicesPage({
                   Boolean(invoice.dueDate) &&
                   invoice.dueDate! < today;
                 return (
-                  <TableRow key={invoice.id} className="relative">
+                  <TableRow key={invoice.id} className="group/row relative">
                     <TableCell className="text-[0.845rem] font-semibold">
                       <Link
                         href={`/invoices/${invoice.id}`}
@@ -152,6 +154,14 @@ export default async function InvoicesPage({
                       >
                         {tStatus(invoice.status)}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="w-9 pr-2">
+                      {invoice.status === "draft" ? (
+                        <DraftDeleteButton
+                          invoiceId={invoice.id}
+                          label={invoice.buyerName ?? invoice.companyName ?? t("draftLabel")}
+                        />
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 );

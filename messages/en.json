@@ -238,7 +238,8 @@
       "throttled": "Too many lookups in a short time. Wait a moment.",
       "cvrExists": "A customer with this CVR number already exists.",
       "submit": "Create customer",
-      "createdToast": "{name} has been created"
+      "createdToast": "{name} has been created",
+      "eanInvalid": "That EAN is not valid. Check the thirteen digits, the check digit does not match."
     },
     "form": {
       "name": "Name",
@@ -248,7 +249,13 @@
       "city": "City",
       "phone": "Phone",
       "email": "Email",
-      "website": "Website"
+      "website": "Website",
+      "billingSection": "Billing",
+      "invoiceEmail": "Invoice email",
+      "invoiceEmailPlaceholder": "Uses the customer's ordinary email",
+      "invoiceEmailHint": "Where invoices are sent. Left empty, the customer's ordinary email is used.",
+      "eanGln": "EAN/GLN",
+      "eanHint": "Thirteen digits. Public-sector customers receive invoices on EAN, not by email."
     },
     "detail": {
       "back": "All customers",

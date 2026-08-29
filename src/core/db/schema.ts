@@ -228,6 +228,14 @@ export const companies = pgTable(
     country: text("country").notNull().default("DK"),
     phone: text("phone"),
     email: text("email"),
+    /** Where invoices are sent; falls back to `email` when empty. */
+    invoiceEmail: text("invoice_email"),
+    /**
+     * EAN/GLN for public-sector customers. Thirteen digits with a GS1
+     * check digit; the shape is checked here, the check digit at the
+     * boundary where a typo can still be reported to a human.
+     */
+    eanGln: text("ean_gln"),
     website: text("website"),
     industryCode: text("industry_code"),
     industryText: text("industry_text"),
@@ -250,6 +258,7 @@ export const companies = pgTable(
       .on(t.orgId, t.cvr)
       .where(sql`cvr is not null`),
     check("companies_cvr_format", sql`cvr is null or cvr ~ '^[0-9]{8}$'`),
+    check("companies_ean_format", sql`ean_gln is null or ean_gln ~ '^[0-9]{13}$'`),
     check(
       "companies_stage_valid",
       sql`pipeline_stage in ('lead', 'dialogue', 'proposal', 'won', 'lost')`,

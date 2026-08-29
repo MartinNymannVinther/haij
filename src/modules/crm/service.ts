@@ -24,6 +24,10 @@ export type CompanyInput = {
   country?: string;
   phone?: string | null;
   email?: string | null;
+  /** Where invoices go; falls back to `email` when empty. */
+  invoiceEmail?: string | null;
+  /** EAN/GLN for public-sector customers, 13 digits. */
+  eanGln?: string | null;
   website?: string | null;
   industryCode?: string | null;
   industryText?: string | null;
@@ -128,6 +132,8 @@ export async function createCompany(
         country: input.country ?? "DK",
         phone: input.phone ?? null,
         email: input.email ?? null,
+        invoiceEmail: input.invoiceEmail ?? null,
+        eanGln: input.eanGln ?? null,
         website: input.website ?? null,
         industryCode: input.industryCode ?? null,
         industryText: input.industryText ?? null,
@@ -164,6 +170,8 @@ export async function updateCompany(ctx: OrgContext, companyId: string, input: C
         city: input.city ?? null,
         phone: input.phone ?? null,
         email: input.email ?? null,
+        invoiceEmail: input.invoiceEmail ?? null,
+        eanGln: input.eanGln ?? null,
         website: input.website ?? null,
       })
       .where(eq(companies.id, companyId))

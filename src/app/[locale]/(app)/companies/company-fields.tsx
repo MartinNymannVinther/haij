@@ -12,6 +12,8 @@ export type CompanyFormValues = {
   city: string;
   phone: string;
   email: string;
+  invoiceEmail: string;
+  eanGln: string;
   website: string;
 };
 
@@ -23,6 +25,8 @@ export const EMPTY_COMPANY: CompanyFormValues = {
   city: "",
   phone: "",
   email: "",
+  invoiceEmail: "",
+  eanGln: "",
   website: "",
 };
 
@@ -110,6 +114,35 @@ export function CompanyFields({
           maxLength={300}
         />
       </Field>
+
+      <div className="border-hairline flex flex-col gap-4 border-t pt-4">
+        <p className="text-label text-xs font-medium">{t("billingSection")}</p>
+        <Field>
+          <FieldLabel htmlFor={`${idPrefix}-invoice-email`}>{t("invoiceEmail")}</FieldLabel>
+          <Input
+            id={`${idPrefix}-invoice-email`}
+            type="email"
+            placeholder={values.email || t("invoiceEmailPlaceholder")}
+            value={values.invoiceEmail}
+            onChange={set("invoiceEmail")}
+            maxLength={320}
+          />
+          <p className="text-meta text-xs">{t("invoiceEmailHint")}</p>
+        </Field>
+        <Field>
+          <FieldLabel htmlFor={`${idPrefix}-ean`}>{t("eanGln")}</FieldLabel>
+          <Input
+            id={`${idPrefix}-ean`}
+            inputMode="numeric"
+            placeholder="5798765432109"
+            value={values.eanGln}
+            onChange={set("eanGln")}
+            maxLength={20}
+            className="tabular-nums"
+          />
+          <p className="text-meta text-xs">{t("eanHint")}</p>
+        </Field>
+      </div>
     </FieldGroup>
   );
 }

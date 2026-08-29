@@ -469,12 +469,20 @@ export async function issueInvoice(ctx: OrgContext, invoiceId: string) {
 
     // Buyer snapshot: from the company — except a credit note born with a
     // copied snapshot, which keeps the document it credits.
-    let buyer = {
+    let buyer: {
+      buyerName: string | null;
+      buyerCvr: string | null;
+      buyerAddress: string | null;
+      buyerZipcode: string | null;
+      buyerCity: string | null;
+      buyerEanGln: string | null;
+    } = {
       buyerName: invoice.buyerName,
       buyerCvr: invoice.buyerCvr,
       buyerAddress: invoice.buyerAddress,
       buyerZipcode: invoice.buyerZipcode,
       buyerCity: invoice.buyerCity,
+      buyerEanGln: invoice.buyerEanGln,
     };
     if (!(invoice.type === "credit_note" && invoice.buyerName)) {
       if (!invoice.companyId) throw domainError("INVOICE_NO_COMPANY");
@@ -485,6 +493,9 @@ export async function issueInvoice(ctx: OrgContext, invoiceId: string) {
         buyerAddress: company.address,
         buyerZipcode: company.zipcode,
         buyerCity: company.city,
+        // The customer's EAN comes along with the rest of the snapshot,
+        // but never overwrites one typed on this particular invoice.
+        buyerEanGln: invoice.buyerEanGln ?? company.eanGln,
       };
     }
 

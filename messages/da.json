@@ -238,7 +238,8 @@
       "throttled": "For mange opslag på kort tid. Vent et øjeblik.",
       "cvrExists": "Der findes allerede en kunde med dette CVR-nummer.",
       "submit": "Opret kunde",
-      "createdToast": "{name} er oprettet"
+      "createdToast": "{name} er oprettet",
+      "eanInvalid": "EAN-nummeret er ikke gyldigt. Tjek de tretten cifre, kontrolcifret passer ikke."
     },
     "form": {
       "name": "Navn",
@@ -248,7 +249,13 @@
       "city": "By",
       "phone": "Telefon",
       "email": "E-mail",
-      "website": "Websted"
+      "website": "Websted",
+      "billingSection": "Fakturering",
+      "invoiceEmail": "Faktura-email",
+      "invoiceEmailPlaceholder": "Bruger kundens almindelige email",
+      "invoiceEmailHint": "Her sendes fakturaer hen. Står den tom, bruges kundens almindelige email.",
+      "eanGln": "EAN/GLN",
+      "eanHint": "Tretten cifre. Offentlige kunder skal have fakturaen på EAN, ikke på mail."
     },
     "detail": {
       "back": "Alle kunder",

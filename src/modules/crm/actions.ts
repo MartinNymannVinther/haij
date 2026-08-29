@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
+import { isValidEan, normalizeEan } from "@/core/ean";
 import { getCvrProvider, normalizeCvr, type CvrCompany } from "@/core/cvr";
 import { PIPELINE_STAGES } from "@/core/db/schema";
 import {
@@ -21,6 +22,7 @@ type ActionError =
   | "cvrExists"
   | "cvrInvalid"
   | "cvrUnavailable"
+  | "eanInvalid"
   | "throttled"
   | "generic";
 
@@ -35,6 +37,12 @@ const optionalText = (max: number) =>
     .nullish()
     .transform((value) => value ?? null);
 
+/** Tells a mistyped EAN apart from any other bad field, so the form can
+ *  point at the right one. */
+function schemaError(error: z.ZodError): ActionError {
+  return error.issues.some((issue) => issue.message === "ean") ? "eanInvalid" : "invalid";
+}
+
 const CompanySchema = z.object({
   name: z.string().trim().min(1).max(200),
   cvr: optionalText(20),
@@ -43,6 +51,20 @@ const CompanySchema = z.object({
   city: optionalText(100),
   phone: optionalText(30),
   email: optionalText(320),
+  invoiceEmail: optionalText(320),
+  /**
+   * The check digit is verified here, not just the shape: a mistyped EAN
+   * is a well-formed number that routes an invoice to nobody, and this is
+   * the last point where a human can be told about it.
+   */
+  eanGln: z
+    .string()
+    .trim()
+    .max(20)
+    .transform((value) => (value.length > 0 ? normalizeEan(value) : null))
+    .nullish()
+    .transform((value) => value ?? null)
+    .refine((value) => value === null || isValidEan(value), { message: "ean" }),
   website: optionalText(300),
   industryCode: optionalText(20),
   industryText: optionalText(300),
@@ -121,7 +143,7 @@ export async function createCompanyAction(
   const ctx = await requireOrgContext();
   if (!ctx) return { ok: false, error: "unauthorized" };
   const parsed = CompanySchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (!parsed.success) return { ok: false, error: schemaError(parsed.error) };
   if (parsed.data.cvr && !normalizeCvr(parsed.data.cvr)) {
     return { ok: false, error: "cvrInvalid" };
   }
@@ -148,7 +170,8 @@ export async function updateCompanyAction(
   if (!ctx) return { ok: false, error: "unauthorized" };
   const id = z.string().min(1).max(64).safeParse(companyId);
   const parsed = CompanySchema.safeParse(input);
-  if (!id.success || !parsed.success) return { ok: false, error: "invalid" };
+  if (!id.success) return { ok: false, error: "invalid" };
+  if (!parsed.success) return { ok: false, error: schemaError(parsed.error) };
 
   try {
     const updated = await updateCompany(ctx, id.data, {

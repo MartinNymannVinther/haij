@@ -8,7 +8,9 @@ import { createRole, setRoleRate } from "@/modules/invoicing/roles";
 import {
   createDraftFromTime,
   getInvoiceDetail,
+  issueInvoice,
   unbilledSummary,
+  updateDraft,
 } from "@/modules/invoicing/service";
 import { addTask, createProject, getProjectDetail } from "@/modules/projects/service";
 import { addEntry } from "@/modules/time/service";
@@ -250,5 +252,35 @@ describe("a project agreement overrides the customer agreement", () => {
     const detail = await getInvoiceDetail(CTX_A, draft);
     // Falls past the missing agreement to the customer's 1.000 kr/t.
     expect(detail?.lines.map((l) => l.unitPriceOere)).toEqual([100000]);
+  });
+});
+
+describe("the customer's EAN follows the invoice", () => {
+  it("is copied onto the document when it is issued", async () => {
+    await admin.query(`update companies set ean_gln = '5798765432109' where id = $1`, [companyId]);
+    await addEntry(CTX_A, {
+      entryDate: "2026-09-10",
+      durationMinutes: 60,
+      companyId,
+      note: "EAN-kunde",
+    });
+    const draft = await createDraftFromTime(CTX_A, companyId);
+    await issueInvoice(CTX_A, draft);
+    const detail = await getInvoiceDetail(CTX_A, draft);
+    expect(detail?.invoice.buyerEanGln).toBe("5798765432109");
+  });
+
+  it("does not overwrite one typed on the invoice itself", async () => {
+    await addEntry(CTX_A, {
+      entryDate: "2026-09-11",
+      durationMinutes: 60,
+      companyId,
+      note: "Egen EAN",
+    });
+    const draft = await createDraftFromTime(CTX_A, companyId);
+    await updateDraft(CTX_A, draft, { buyerEanGln: "5791234567890" });
+    await issueInvoice(CTX_A, draft);
+    const detail = await getInvoiceDetail(CTX_A, draft);
+    expect(detail?.invoice.buyerEanGln).toBe("5791234567890");
   });
 });

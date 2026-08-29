@@ -87,6 +87,8 @@ export default async function CompanyDetailPage({
                 city: company.city ?? "",
                 phone: company.phone ?? "",
                 email: company.email ?? "",
+                invoiceEmail: company.invoiceEmail ?? "",
+                eanGln: company.eanGln ?? "",
                 website: company.website ?? "",
               }}
             />
