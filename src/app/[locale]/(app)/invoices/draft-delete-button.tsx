@@ -21,7 +21,7 @@ import { useRouter } from "@/i18n/navigation";
  * document, and the way back from one of those is a credit note.
  */
 export function DraftDeleteButton({ invoiceId, label }: { invoiceId: string; label: string }) {
-  const t = useTranslations("invoicing.detail");
+  const t = useTranslations("invoicing.editor");
   const tCommon = useTranslations("common");
   const router = useRouter();
   const [open, setOpen] = useState(false);
