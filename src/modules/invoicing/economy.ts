@@ -1,4 +1,4 @@
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import {
   budgets,
   companies,
@@ -232,5 +232,55 @@ export async function getUnbilledByCompany(
       map.set(row.companyId, { minutes: Number(row.minutes), valueOere: Number(row.valueOere) });
     }
     return map;
+  });
+}
+
+export type UnbilledCustomer = {
+  companyId: string;
+  companyName: string;
+  minutes: number;
+  valueOere: number;
+};
+
+/**
+ * Customers with hours nobody has invoiced yet, biggest first. This is
+ * the shortlist the "new invoice" dialog opens on: an invoice almost
+ * always starts from tracked time, so the customers with unbilled hours
+ * are the answer to "who am I invoicing" nine times out of ten.
+ */
+export async function listUnbilledCustomers(ctx: OrgContext): Promise<UnbilledCustomer[]> {
+  return withOrgContext(ctx, async (tx) => {
+    const [profile] = await tx
+      .select({ defaultRate: orgProfiles.defaultHourlyRateOere })
+      .from(orgProfiles)
+      .where(eq(orgProfiles.orgId, ctx.orgId))
+      .limit(1);
+    const defaultRate = profile?.defaultRate ?? 0;
+
+    const rows = await tx
+      .select({
+        companyId: timeEntries.companyId,
+        companyName: companies.name,
+        minutes: sql<number>`coalesce(sum(${timeEntries.durationMinutes}), 0)::int`,
+        valueOere: entryValueSql(defaultRate),
+      })
+      .from(timeEntries)
+      .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .innerJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
+      .where(sql`${timeEntries.invoiceLineId} is null`)
+      .groupBy(timeEntries.companyId, companies.name)
+      .orderBy(desc(sql`sum(${timeEntries.durationMinutes})`));
+
+    return rows
+      .filter((row): row is typeof row & { companyId: string } => Boolean(row.companyId))
+      .map((row) => ({
+        companyId: row.companyId,
+        companyName: row.companyName,
+        minutes: Number(row.minutes),
+        valueOere: Number(row.valueOere),
+      }));
   });
 }

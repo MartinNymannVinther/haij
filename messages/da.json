@@ -419,7 +419,7 @@
       "create": "Ny faktura",
       "filterAll": "Alle",
       "empty": "Ingen fakturaer endnu.",
-      "emptyHint": "Opret et udkast fra bunden, eller lav en faktura direkte fra uafregnede timer på en kundeside.",
+      "emptyHint": "Opret en faktura fra uafregnede timer, eller start med et tomt udkast.",
       "noResults": "Ingen fakturaer med den status.",
       "number": "Nr.",
       "customer": "Kunde",
@@ -430,7 +430,13 @@
       "draftLabel": "Udkast",
       "creditNote": "Kreditnota",
       "summary": "{outstanding} udestående",
-      "summaryOverdue": "{outstanding} udestående · heraf {overdue} forfaldent"
+      "summaryOverdue": "{outstanding} udestående · heraf {overdue} forfaldent",
+      "fromTimeTitle": "Ny faktura",
+      "fromTimeHint": "Vælg kunden du vil fakturere. Timerne er dem der endnu ikke er sat på en faktura. Sæt datoer hvis kun en del af perioden skal med.",
+      "blankInvoice": "Tom faktura i stedet",
+      "fromDate": "Fra dato",
+      "toDate": "Til dato",
+      "noUnbilledTime": "Der er ingen uafregnede timer at fakturere."
     },
     "status": {
       "draft": "Udkast",

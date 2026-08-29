@@ -419,7 +419,7 @@
       "create": "New invoice",
       "filterAll": "All",
       "empty": "No invoices yet.",
-      "emptyHint": "Create a draft from scratch, or build an invoice straight from unbilled hours on a customer page.",
+      "emptyHint": "Create an invoice from unbilled hours, or start from a blank draft.",
       "noResults": "No invoices with that status.",
       "number": "No.",
       "customer": "Customer",
@@ -430,7 +430,13 @@
       "draftLabel": "Draft",
       "creditNote": "Credit note",
       "summary": "{outstanding} outstanding",
-      "summaryOverdue": "{outstanding} outstanding · {overdue} overdue"
+      "summaryOverdue": "{outstanding} outstanding · {overdue} overdue",
+      "fromTimeTitle": "New invoice",
+      "fromTimeHint": "Pick the customer to invoice. The hours are the ones not yet on an invoice. Set dates if only part of the period belongs on this one.",
+      "blankInvoice": "Blank invoice instead",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "noUnbilledTime": "There are no unbilled hours to invoice."
     },
     "status": {
       "draft": "Draft",

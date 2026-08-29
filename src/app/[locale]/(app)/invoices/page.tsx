@@ -16,6 +16,7 @@ import {
 import { getOrgContext } from "@/core/auth/session";
 import { INVOICE_STATUSES, type InvoiceStatus } from "@/core/db/schema";
 import { formatDateDa } from "@/core/dates";
+import { listUnbilledCustomers } from "@/modules/invoicing/economy";
 import { formatOere } from "@/modules/invoicing/money";
 import { getInvoicingOverview, listInvoices } from "@/modules/invoicing/service";
 import { INVOICE_STATUS_BADGE_CLASS } from "@/modules/invoicing/status-meta";
@@ -45,11 +46,12 @@ export default async function InvoicesPage({
   const { status } = await searchParams;
   const filter = isStatus(status) ? status : undefined;
   const today = new Date().toISOString().slice(0, 10);
-  const [t, tStatus, invoices, overview] = await Promise.all([
+  const [t, tStatus, invoices, overview, unbilledCustomers] = await Promise.all([
     getTranslations("invoicing.list"),
     getTranslations("invoicing.status"),
     listInvoices(context, filter),
     getInvoicingOverview(context),
+    listUnbilledCustomers(context),
   ]);
 
   return (
@@ -64,7 +66,7 @@ export default async function InvoicesPage({
               })
             : t("summary", { outstanding: formatOere(overview.outstandingOere) })
         }
-        actions={<NewInvoiceButton />}
+        actions={<NewInvoiceButton customers={unbilledCustomers} />}
       />
 
       <SegmentedFilter
