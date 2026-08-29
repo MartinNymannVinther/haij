@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -198,13 +198,11 @@ export default async function DashboardPage() {
         })}
         actions={
           <>
-            <Link href="/time">
-              <Button render={<span />}>{t("actionTrackTime")}</Button>
+            <Link href="/time" className={cn(buttonVariants())}>
+              {t("actionTrackTime")}
             </Link>
-            <Link href="/invoices">
-              <Button variant="outline" render={<span />}>
-                {t("actionNewInvoice")}
-              </Button>
+            <Link href="/invoices" className={cn(buttonVariants({ variant: "outline" }))}>
+              {t("actionNewInvoice")}
             </Link>
           </>
         }
@@ -216,8 +214,8 @@ export default async function DashboardPage() {
           title={t("emptyTitle")}
           hint={t("emptyBody")}
           action={
-            <Link href="/companies">
-              <Button render={<span />}>{t("emptyAction")}</Button>
+            <Link href="/companies" className={cn(buttonVariants())}>
+              {t("emptyAction")}
             </Link>
           }
         />
@@ -307,10 +305,11 @@ export default async function DashboardPage() {
                         })}
                         meta={`${invoice.buyerName ?? invoice.companyName ?? "—"} · ${formatOere(invoice.grossOere)}`}
                         action={
-                          <Link href={`/invoices/${invoice.id}`}>
-                            <Button variant="outline" size="sm" render={<span />}>
-                              {t("actionOpen")}
-                            </Button>
+                          <Link
+                            href={`/invoices/${invoice.id}`}
+                            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+                          >
+                            {t("actionOpen")}
                           </Link>
                         }
                       />
@@ -321,10 +320,8 @@ export default async function DashboardPage() {
                         title={t("actionUnbilled", { amount: formatOere(unbilledValueOere) })}
                         meta={t("actionUnbilledMeta", { count: unbilledCustomers })}
                         action={
-                          <Link href="/economy">
-                            <Button size="sm" render={<span />}>
-                              {t("actionInvoice")}
-                            </Button>
+                          <Link href="/economy" className={cn(buttonVariants({ size: "sm" }))}>
+                            {t("actionInvoice")}
                           </Link>
                         }
                       />
