@@ -5,9 +5,7 @@
  *
  * Run it from the project root with the app's own environment:
  *
- *     pnpm exec tsx scripts/onboard-vinther.ts <org-slug-or-id> [--dry-run]
- *
- * (tsx comes in with vitest; if that ever changes, `pnpm add -D tsx`.)
+ *     pnpm script scripts/onboard-vinther.ts <org-slug-or-id> [--dry-run]
  *
  * Idempotent: every step checks for what it would create and skips it,
  * so a second run reports "findes" rather than duplicating anything. It
@@ -135,7 +133,7 @@ const skip = (message: string) => console.log(`  – ${message} (findes, springe
 async function resolveContext(): Promise<OrgContext> {
   if (!target) {
     throw new Error(
-      "Angiv organisationens slug eller id: pnpm exec tsx scripts/onboard-vinther.ts <org>",
+      "Angiv organisationens slug eller id: pnpm script scripts/onboard-vinther.ts <org>",
     );
   }
   // The org lookup runs on the auth role: the application role only sees
@@ -218,7 +216,23 @@ async function importAka(ctx: OrgContext) {
     await addContact(ctx, companyId, data.contact);
     log(`  + ${data.customer.name} med ${data.contact.name}`);
   } else {
-    log(`  + ${data.customer.name}`);
+    // Dry run on an empty org: nothing exists yet to compare against, so
+    // report what the file would create and stop before the writes.
+    log(`  + ${data.customer.name} med ${data.contact.name}`);
+    log(`  + projekt ${data.project.name}`);
+    log(`  + rolle ${data.role.name} til ${data.role.hourlyRateOere / 100} kr./t på kunden`);
+    const minutes = data.timeEntries.reduce((sum, e) => sum + e.minutes, 0);
+    log(
+      `\nTidsregistreringer\n  + ${data.timeEntries.length} poster, ${(minutes / 60).toFixed(1)} timer`,
+    );
+    log("\nFakturaer");
+    for (const invoice of data.invoices) {
+      log(
+        `  + ${invoice.ref} ${invoice.date}${invoice.paidDate ? ` betalt ${invoice.paidDate}` : ""}`,
+      );
+    }
+    const highest = Math.max(...data.invoices.map((i) => Number(i.ref)));
+    log(`\nNæste fakturanummer ville blive: ${highest + 1}`);
     return;
   }
 
