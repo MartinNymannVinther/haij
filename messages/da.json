@@ -368,14 +368,12 @@
     "invalidRate": "Timeprisen kunne ikke læses. Skriv fx 950 eller 950,00.",
     "invalidForm": "Tjek felterne. CVR skal være 8 cifre.",
     "roles": {
-      "title": "Roller og timepriser",
-      "hint": "Priser i kr. ekskl. moms. En rolle valgt på en tidspost vinder over priser på opgave, projekt og kunde.",
-      "empty": "Ingen roller endnu. Tilføj fx Seniorrådgivning eller Projektledelse.",
+      "title": "Roller",
+      "hint": "Navne på de roller du sælger. Prisen aftales per kunde eller projekt, ikke her.",
+      "empty": "Ingen roller endnu. Tilføj fx Transformation Lead eller Agil coach.",
       "namePlaceholder": "Rollenavn…",
-      "ratePlaceholder": "Timepris ekskl. moms",
-      "rateLine": "{rate}/t ekskl. moms",
       "add": "Tilføj",
-      "invalid": "Tjek navn og pris. Skriv prisen som fx 1.400.",
+      "invalid": "Skriv et navn på rollen.",
       "nameTaken": "Der findes allerede en rolle med det navn.",
       "deletedToast": "Rollen er slettet. Tidsposter beholder deres timer."
     },
@@ -390,6 +388,29 @@
       "tooBig": "Filen er for stor. Højst 1 MB.",
       "savedToast": "Logoet er gemt og kommer på fremtidige PDF'er.",
       "deletedToast": "Logoet er fjernet."
+    },
+    "numbering": {
+      "title": "Fakturanummerering",
+      "hint": "Næste faktura får dette nummer. Sæt det til dit gamle systems næste nummer, når du flytter ind. Det kan kun sættes op, aldrig ned.",
+      "label": "Næste fakturanummer",
+      "save": "Gem nummer",
+      "savedToast": "Næste faktura får nummer {number}.",
+      "tooLow": "Nummeret skal være højere end det du står på nu. Rækkefølgen skal være ubrudt."
+    },
+    "roleRates": {
+      "companyTitle": "Aftalte timepriser",
+      "companyHint": "Priser i kr. ekskl. moms. En aftalt pris her gælder alle timer på kunden, med mindre projektet har sin egen.",
+      "projectTitle": "Timepriser på projektet",
+      "projectHint": "Priser i kr. ekskl. moms. Her overskriver du det kunden ellers er aftalt til.",
+      "empty": "Ingen aftalte priser. Timer prissættes efter kundens almindelige timepris.",
+      "emptyNoRoles": "Opret først en rolle under firmaindstillinger.",
+      "rolePlaceholder": "Vælg rolle",
+      "ratePlaceholder": "Timepris ekskl. moms",
+      "inherited": "Arver {rate}/t",
+      "rateLine": "{rate}/t",
+      "add": "Tilføj pris",
+      "invalid": "Vælg en rolle og skriv en pris, fx 1.400.",
+      "deletedToast": "Prisen er fjernet."
     }
   },
   "invoicing": {

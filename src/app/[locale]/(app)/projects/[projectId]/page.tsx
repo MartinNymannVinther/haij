@@ -3,11 +3,17 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RoleRatesCard } from "@/components/role-rates-card";
 import { Separator } from "@/components/ui/separator";
 import { getOrgContext } from "@/core/auth/session";
 import { formatDateDa } from "@/core/dates";
 import { listCompanies } from "@/modules/crm/service";
 import { formatOere } from "@/modules/invoicing/money";
+import {
+  listInheritedRoleRates,
+  listProjectRoleRates,
+  listRolesWithoutRate,
+} from "@/modules/invoicing/roles";
 import { getProjectDetail } from "@/modules/projects/service";
 import { formatMinutes } from "@/modules/time/duration";
 import { Link, redirect } from "@/i18n/navigation";
@@ -34,9 +40,12 @@ export default async function ProjectDetailPage({
   const detail = await getProjectDetail(context, projectId);
   if (!detail) notFound();
 
-  const [t, companies] = await Promise.all([
+  const [t, companies, roleRates, rolesWithoutRate, inherited] = await Promise.all([
     getTranslations("projects.detail"),
     listCompanies(context),
+    listProjectRoleRates(context, projectId),
+    listRolesWithoutRate(context, { projectId }),
+    listInheritedRoleRates(context, projectId),
   ]);
   const { project, company, tasks, recentTime, trackedMinutes, unbilledMinutes, trackedValueOere } =
     detail;
@@ -156,6 +165,14 @@ export default async function ProjectDetailPage({
               ) : null}
             </CardContent>
           </Card>
+
+          <RoleRatesCard
+            scope="project"
+            scopeId={project.id}
+            rates={roleRates}
+            availableRoles={rolesWithoutRate}
+            inherited={Object.fromEntries(inherited)}
+          />
 
           {project.description ? (
             <Card>

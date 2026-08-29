@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createRoleAction, deleteRoleAction, updateRoleAction } from "@/modules/invoicing/actions";
-import { formatOere, oereToInputValue, parseKronerToOere } from "@/modules/invoicing/money";
 import { useRouter } from "@/i18n/navigation";
 
-export type RoleRow = { id: string; name: string; hourlyRateOere: number };
+export type RoleRow = { id: string; name: string };
 
 export function RolesManager({ roles }: { roles: RoleRow[] }) {
   const t = useTranslations("orgProfile.roles");
@@ -26,15 +25,14 @@ export function RolesManager({ roles }: { roles: RoleRow[] }) {
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     const name = String(form.get("name") ?? "").trim();
-    const rate = parseKronerToOere(String(form.get("rate") ?? ""));
-    if (!name || rate === null || rate < 0) {
+    if (!name) {
       toast.error(t("invalid"));
       return;
     }
     setPending(true);
     const result = editing
-      ? await updateRoleAction(editing.id, { name, hourlyRateOere: rate })
-      : await createRoleAction({ name, hourlyRateOere: rate });
+      ? await updateRoleAction(editing.id, { name })
+      : await createRoleAction({ name });
     setPending(false);
     if (!result.ok) {
       toast.error(result.error === "invalid" ? t("nameTaken") : tCommon("error"));
@@ -74,9 +72,6 @@ export function RolesManager({ roles }: { roles: RoleRow[] }) {
                 className="group border-border flex items-center gap-3 border-b py-2 text-sm last:border-b-0"
               >
                 <span className="min-w-0 flex-1 truncate font-medium">{role.name}</span>
-                <span className="text-muted-foreground shrink-0 tabular-nums">
-                  {t("rateLine", { rate: formatOere(role.hourlyRateOere) })}
-                </span>
                 <Button
                   size="icon-sm"
                   variant="ghost"
@@ -113,15 +108,6 @@ export function RolesManager({ roles }: { roles: RoleRow[] }) {
             required
             defaultValue={editing?.name ?? ""}
             className="min-w-40 flex-1"
-          />
-          <Input
-            name="rate"
-            inputMode="decimal"
-            placeholder={t("ratePlaceholder")}
-            required
-            defaultValue={editing ? oereToInputValue(editing.hourlyRateOere) : ""}
-            className="w-44"
-            aria-label={t("ratePlaceholder")}
           />
           <Button type="submit" variant="outline" disabled={pending}>
             {pending ? (

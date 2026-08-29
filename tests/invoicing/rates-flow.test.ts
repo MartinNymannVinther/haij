@@ -4,7 +4,7 @@ import { createCompany } from "@/modules/crm/service";
 import { setCustomerFrame } from "@/modules/invoicing/economy";
 import { upsertOrgProfile } from "@/modules/invoicing/profile";
 import { resolveHourlyRateOere } from "@/modules/invoicing/rates";
-import { createRole } from "@/modules/invoicing/roles";
+import { createRole, setRoleRate } from "@/modules/invoicing/roles";
 import {
   createDraftFromTime,
   getInvoiceDetail,
@@ -16,8 +16,9 @@ import { adminPool } from "../helpers/db";
 
 /**
  * Differentiated rates end to end: the resolution hierarchy
- * role -> task -> project -> customer -> org default, plus date-bounded
- * drafts from unbilled time.
+ * role rate on the project -> role rate on the customer -> task ->
+ * project -> customer -> org default, plus date-bounded drafts from
+ * unbilled time.
  */
 
 const ORG_A = "org_rates_a";
@@ -69,9 +70,9 @@ beforeAll(async () => {
     title: "Specialopgave",
     hourlyRateOere: 150000, // 1.500 kr/t
   }))!;
-  await createRole(CTX_A, "Seniorrådgivning", 140000); // 1.400 kr/t
-  const role = await admin.query(`select id from roles where org_id = $1`, [ORG_A]);
-  roleId = role.rows[0].id;
+  roleId = (await createRole(CTX_A, "Seniorrådgivning"))!;
+  // Agreed with this customer: 1.400 kr/t, which outranks the task rate.
+  await setRoleRate(CTX_A, { companyId }, roleId, 140000);
 });
 
 afterAll(async () => {
@@ -79,21 +80,33 @@ afterAll(async () => {
 });
 
 describe("resolveHourlyRateOere", () => {
-  it("walks the hierarchy role -> task -> project -> company -> default", () => {
+  it("walks the hierarchy from the project agreement down to the org default", () => {
     const all = {
-      roleRateOere: 5,
+      projectRoleRateOere: 6,
+      companyRoleRateOere: 5,
       taskRateOere: 4,
       projectRateOere: 3,
       companyRateOere: 2,
       orgDefaultRateOere: 1,
     };
-    expect(resolveHourlyRateOere(all)).toBe(5);
-    expect(resolveHourlyRateOere({ ...all, roleRateOere: null })).toBe(4);
-    expect(resolveHourlyRateOere({ ...all, roleRateOere: null, taskRateOere: null })).toBe(3);
+    expect(resolveHourlyRateOere(all)).toBe(6);
+    expect(resolveHourlyRateOere({ ...all, projectRoleRateOere: null })).toBe(5);
+    expect(
+      resolveHourlyRateOere({ ...all, projectRoleRateOere: null, companyRoleRateOere: null }),
+    ).toBe(4);
     expect(
       resolveHourlyRateOere({
         ...all,
-        roleRateOere: null,
+        projectRoleRateOere: null,
+        companyRoleRateOere: null,
+        taskRateOere: null,
+      }),
+    ).toBe(3);
+    expect(
+      resolveHourlyRateOere({
+        ...all,
+        projectRoleRateOere: null,
+        companyRoleRateOere: null,
         taskRateOere: null,
         projectRateOere: null,
       }),
@@ -167,7 +180,9 @@ describe("draft from time with differentiated rates and date range", () => {
     expect(bounded).toEqual({ minutes: 120, entries: 2 });
 
     // Project consumption values every entry through the hierarchy:
-    // 1.200 + 1.500 + 1.400 kr. for the three project-linked hours.
+    // 1.200 (project) + 1.500 (task) + 1.400 (the customer's agreed rate
+    // for the role, which outranks the task's own 1.500) for the three
+    // project-linked hours.
     const project = await getProjectDetail(CTX_A, projectId);
     expect(project?.trackedValueOere).toBe(410000);
 
@@ -194,5 +209,46 @@ describe("draft from time with differentiated rates and date range", () => {
     await expect(
       createDraftFromTime(CTX_A, companyId, { from: "2030-01-01", to: "2030-01-31" }),
     ).rejects.toThrow("NO_UNBILLED_TIME");
+  });
+});
+
+describe("a project agreement overrides the customer agreement", () => {
+  it("prices the same role higher on the project that negotiated it", async () => {
+    await setRoleRate(CTX_A, { projectId }, roleId, 160000); // 1.600 kr/t
+    await addEntry(CTX_A, {
+      entryDate: "2026-09-02",
+      durationMinutes: 60,
+      projectId,
+      roleId,
+      note: "Projektaftale",
+    });
+    // Same role, same customer, but booked outside the project: the
+    // customer agreement applies.
+    await addEntry(CTX_A, {
+      entryDate: "2026-09-03",
+      durationMinutes: 60,
+      companyId,
+      roleId,
+      note: "Uden for projektet",
+    });
+
+    const draft = await createDraftFromTime(CTX_A, companyId);
+    const detail = await getInvoiceDetail(CTX_A, draft);
+    expect(detail?.lines.map((l) => l.unitPriceOere)).toEqual([160000, 140000]);
+  });
+
+  it("a role without any agreement falls through to the ordinary rates", async () => {
+    const plainRole = (await createRole(CTX_A, "Uden aftale"))!;
+    await addEntry(CTX_A, {
+      entryDate: "2026-09-04",
+      durationMinutes: 60,
+      companyId,
+      roleId: plainRole,
+      note: "Ingen aftale",
+    });
+    const draft = await createDraftFromTime(CTX_A, companyId);
+    const detail = await getInvoiceDetail(CTX_A, draft);
+    // Falls past the missing agreement to the customer's 1.000 kr/t.
+    expect(detail?.lines.map((l) => l.unitPriceOere)).toEqual([100000]);
   });
 });

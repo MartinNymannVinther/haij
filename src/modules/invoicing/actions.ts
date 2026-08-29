@@ -6,8 +6,9 @@ import { INVOICE_UNITS, VAT_CATEGORIES } from "@/core/db/schema";
 import { normalizeCvr } from "@/core/cvr";
 import { setCustomerFrame, setRevenueTarget } from "./economy";
 import { deleteOrgLogo, saveOrgLogo, LOGO_CONTENT_TYPES, LOGO_MAX_BYTES } from "./logo";
+import { setNextInvoiceNumber } from "./numbering";
 import { upsertOrgProfile } from "./profile";
-import { createRole, deleteRole, updateRole } from "./roles";
+import { createRole, deleteRole, deleteRoleRate, setRoleRate, updateRole } from "./roles";
 import {
   addLine,
   createCreditNote,
@@ -34,6 +35,7 @@ type ActionError =
   | "noCompany"
   | "profileMissing"
   | "noUnbilledTime"
+  | "numberTooLow"
   | "generic";
 
 export type InvoicingResult<T = undefined> =
@@ -50,9 +52,20 @@ const DOMAIN_ERRORS: Record<InvoiceError, ActionError> = {
   NO_UNBILLED_TIME: "noUnbilledTime",
 };
 
+/** Domain errors raised outside the invoice lifecycle itself. */
+const OTHER_DOMAIN_ERRORS: Record<string, ActionError> = {
+  ROLE_NOT_FOUND: "notFound",
+  PROJECT_NOT_FOUND: "notFound",
+  RATE_INVALID: "invalid",
+  NUMBER_TOO_LOW: "numberTooLow",
+};
+
 function toActionError(error: unknown): ActionError {
   if (error instanceof Error && error.message in DOMAIN_ERRORS) {
     return DOMAIN_ERRORS[error.message as InvoiceError];
+  }
+  if (error instanceof Error && error.message in OTHER_DOMAIN_ERRORS) {
+    return OTHER_DOMAIN_ERRORS[error.message]!;
   }
   console.error("invoicing: action failed", error);
   return "generic";
@@ -385,8 +398,19 @@ export async function setCustomerFrameAction(
 
 const RoleSchema = z.object({
   name: z.string().trim().min(1).max(100),
-  hourlyRateOere: z.number().int().min(0).max(100_000_000),
 });
+
+/** A rate belongs to exactly one customer or one project, never both. */
+const RoleRateSchema = z
+  .object({
+    roleId: Id,
+    companyId: Id.optional(),
+    projectId: Id.optional(),
+    hourlyRateOere: z.number().int().min(0).max(100_000_000),
+  })
+  .refine((v) => Boolean(v.companyId) !== Boolean(v.projectId), {
+    message: "exactly one scope",
+  });
 
 export async function createRoleAction(input: unknown): Promise<InvoicingResult> {
   const ctx = await requireOrgContext();
@@ -395,7 +419,7 @@ export async function createRoleAction(input: unknown): Promise<InvoicingResult>
   if (!parsed.success) return { ok: false, error: "invalid" };
 
   try {
-    await createRole(ctx, parsed.data.name, parsed.data.hourlyRateOere);
+    await createRole(ctx, parsed.data.name);
     return { ok: true, data: undefined };
   } catch (error) {
     const code =
@@ -413,7 +437,7 @@ export async function updateRoleAction(roleId: unknown, input: unknown): Promise
   if (!id.success || !parsed.success) return { ok: false, error: "invalid" };
 
   try {
-    const updated = await updateRole(ctx, id.data, parsed.data.name, parsed.data.hourlyRateOere);
+    const updated = await updateRole(ctx, id.data, parsed.data.name);
     return updated ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
   } catch (error) {
     return { ok: false, error: toActionError(error) };
@@ -428,6 +452,40 @@ export async function deleteRoleAction(roleId: unknown): Promise<InvoicingResult
 
   try {
     const deleted = await deleteRole(ctx, id.data);
+    return deleted ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function setRoleRateAction(input: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = RoleRateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { roleId, companyId, projectId, hourlyRateOere } = parsed.data;
+
+  try {
+    await setRoleRate(
+      ctx,
+      companyId ? { companyId } : { projectId: projectId! },
+      roleId,
+      hourlyRateOere,
+    );
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+export async function deleteRoleRateAction(roleRateId: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(roleRateId);
+  if (!id.success) return { ok: false, error: "invalid" };
+
+  try {
+    const deleted = await deleteRoleRate(ctx, id.data);
     return deleted ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
   } catch (error) {
     return { ok: false, error: toActionError(error) };
@@ -469,6 +527,22 @@ export async function deleteLogoAction(): Promise<InvoicingResult> {
   try {
     const deleted = await deleteOrgLogo(ctx);
     return deleted ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+/* -------------------------- Fakturanummerering ----------------------- */
+
+export async function setNextInvoiceNumberAction(next: unknown): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = z.number().int().min(1).max(100_000_000).safeParse(next);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    await setNextInvoiceNumber(ctx, parsed.data);
+    return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, error: toActionError(error) };
   }

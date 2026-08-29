@@ -3,12 +3,18 @@ import {
   companies,
   orgProfiles,
   projects,
-  roles,
   tasks,
   timeEntries,
   type ProjectStatus,
 } from "@/core/db/schema";
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
+import {
+  companyRoleRate,
+  companyRoleRateOn,
+  entryValueSql,
+  projectRoleRate,
+  projectRoleRateOn,
+} from "@/modules/invoicing/rates";
 
 /**
  * Light project management: projects with agreed frames, a task list and
@@ -25,15 +31,6 @@ export type ProjectInput = {
   /** Project hourly rate, øre excl. VAT; null falls back to the customer rate. */
   hourlyRateOere?: number | null;
 };
-
-/**
- * Value of tracked minutes with the full rate hierarchy resolved per
- * entry in SQL: role -> task -> project -> customer -> org default.
- * Mirrors resolveHourlyRateOere in the invoicing module.
- */
-function entryValueSql(defaultRateOere: number) {
-  return sql<number>`coalesce(sum(round(${timeEntries.durationMinutes} * coalesce(${roles.hourlyRateOere}, ${tasks.hourlyRateOere}, ${projects.hourlyRateOere}, ${companies.hourlyRateOere}, ${defaultRateOere}, 0) / 60.0)), 0)::bigint`;
-}
 
 async function orgDefaultRate(tx: AppTransaction, orgId: string): Promise<number> {
   const [profile] = await tx
@@ -92,10 +89,11 @@ export async function listProjects(ctx: OrgContext, status?: ProjectStatus) {
         valueOere: entryValueSql(defaultRate).as("value_oere"),
       })
       .from(timeEntries)
-      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
       .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
       .groupBy(timeEntries.projectId)
       .as("time");
 
@@ -187,10 +185,11 @@ export async function getProjectDetail(ctx: OrgContext, projectId: string) {
         valueOere: entryValueSql(defaultRate),
       })
       .from(timeEntries)
-      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
       .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
       .where(eq(timeEntries.projectId, projectId));
 
     return {

@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RoleRatesCard } from "@/components/role-rates-card";
 import { getOrgContext } from "@/core/auth/session";
 import type { PipelineStage } from "@/core/db/schema";
 import { formatMinutes } from "@/modules/time/duration";
 import { getCompanyDetail } from "@/modules/crm/service";
 import { getCustomerEconomy, getUnbilledByCompany } from "@/modules/invoicing/economy";
+import { listCompanyRoleRates, listRolesWithoutRate } from "@/modules/invoicing/roles";
 import { Link, redirect } from "@/i18n/navigation";
 import { ActivityComposer } from "./activity-composer";
 import { CompanyEconomyCard } from "./company-economy-card";
@@ -46,6 +48,10 @@ export default async function CompanyDetailPage({
   const { company, contacts, timeline, trackedMinutes } = detail;
   const economy = (await getCustomerEconomy(context)).find((row) => row.companyId === companyId);
   const unbilledValueOere = (await getUnbilledByCompany(context)).get(companyId)?.valueOere ?? 0;
+  const [roleRates, rolesWithoutRate] = await Promise.all([
+    listCompanyRoleRates(context, companyId),
+    listRolesWithoutRate(context, { companyId }),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -157,6 +163,13 @@ export default async function CompanyDetailPage({
               showInvoiceButton={economy.unbilledMinutes === 0}
             />
           ) : null}
+
+          <RoleRatesCard
+            scope="company"
+            scopeId={company.id}
+            rates={roleRates}
+            availableRoles={rolesWithoutRate}
+          />
 
           <Card>
             <CardHeader>

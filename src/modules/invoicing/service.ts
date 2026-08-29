@@ -17,7 +17,13 @@ import {
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
 import { invoiceTotals, lineNetOere, lineVatOere, minutesToQuantityHundredths } from "./money";
 import { allocateInvoiceNumber } from "./numbering";
-import { resolveHourlyRateOere } from "./rates";
+import {
+  companyRoleRate,
+  companyRoleRateOn,
+  projectRoleRate,
+  projectRoleRateOn,
+  resolveHourlyRateOere,
+} from "./rates";
 
 /**
  * Invoicing services. RLS scopes every query to the caller's organization;
@@ -258,7 +264,8 @@ export async function createDraftFromTime(
         durationMinutes: timeEntries.durationMinutes,
         note: timeEntries.note,
         roleName: roles.name,
-        roleRateOere: roles.hourlyRateOere,
+        projectRoleRateOere: projectRoleRate.hourlyRateOere,
+        companyRoleRateOere: companyRoleRate.hourlyRateOere,
         taskRateOere: tasks.hourlyRateOere,
         projectRateOere: projects.hourlyRateOere,
       })
@@ -266,6 +273,8 @@ export async function createDraftFromTime(
       .leftJoin(roles, eq(roles.id, timeEntries.roleId))
       .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
       .where(unbilledFilter(companyId, options))
       .orderBy(asc(timeEntries.entryDate), asc(timeEntries.createdAt));
     if (entries.length === 0) throw domainError("NO_UNBILLED_TIME");
@@ -283,7 +292,8 @@ export async function createDraftFromTime(
 
     for (const [index, entry] of entries.entries()) {
       const unitPriceOere = resolveHourlyRateOere({
-        roleRateOere: entry.roleRateOere,
+        projectRoleRateOere: entry.projectRoleRateOere,
+        companyRoleRateOere: entry.companyRoleRateOere,
         taskRateOere: entry.taskRateOere,
         projectRateOere: entry.projectRateOere,
         companyRateOere: company.hourlyRateOere,
