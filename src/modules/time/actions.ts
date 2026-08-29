@@ -5,7 +5,8 @@ import { requireOrgContext } from "@/core/auth/guard";
 import { parseDurationToMinutes } from "./duration";
 import { addEntry, deleteEntry } from "./service";
 
-type ActionError = "unauthorized" | "invalid" | "invalidDuration" | "notFound" | "generic";
+type ActionError =
+  "unauthorized" | "invalid" | "invalidDuration" | "notFound" | "invoiced" | "generic";
 
 export type TimeActionResult = { ok: true } | { ok: false; error: ActionError };
 
@@ -93,6 +94,9 @@ export async function deleteTimeEntryAction(entryId: unknown): Promise<TimeActio
     const deleted = await deleteEntry(ctx, id.data);
     return deleted ? { ok: true } : { ok: false, error: "notFound" };
   } catch (error) {
+    if (error instanceof Error && error.message === "ENTRY_INVOICED") {
+      return { ok: false, error: "invoiced" };
+    }
     console.error("time: delete entry failed", error);
     return { ok: false, error: "generic" };
   }

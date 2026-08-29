@@ -344,7 +344,12 @@
       "noTask": "Ingen opgave",
       "role": "Rolle",
       "noRole": "Ingen rolle"
-    }
+    },
+    "weekSplit": "{billed} faktureret · {unbilled} venter",
+    "billedNumber": "Faktura {number}",
+    "onDraft": "På udkast",
+    "billedTitle": "Timen er sat på en faktura",
+    "invoicedCannotDelete": "Timen sidder på en udstedt faktura og kan ikke slettes. Lav en kreditnota hvis fakturaen er forkert."
   },
   "orgProfile": {
     "title": "Virksomhed",

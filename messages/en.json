@@ -344,7 +344,12 @@
       "noTask": "No task",
       "role": "Role",
       "noRole": "No role"
-    }
+    },
+    "weekSplit": "{billed} invoiced · {unbilled} waiting",
+    "billedNumber": "Invoice {number}",
+    "onDraft": "On draft",
+    "billedTitle": "This hour is on an invoice",
+    "invoicedCannotDelete": "This hour is on an issued invoice and cannot be deleted. Issue a credit note if the invoice is wrong."
   },
   "orgProfile": {
     "title": "Company",
