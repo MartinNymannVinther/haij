@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedFilter } from "@/components/ui/segmented";
+import { LinkedRow } from "@/components/ui/linked-row";
 import {
   Table,
   TableBody,
@@ -110,12 +111,13 @@ export default async function InvoicesPage({
                   Boolean(invoice.dueDate) &&
                   invoice.dueDate! < today;
                 return (
-                  <TableRow key={invoice.id} className="group/row relative">
+                  <LinkedRow
+                    key={invoice.id}
+                    href={`/invoices/${invoice.id}`}
+                    className="group/row"
+                  >
                     <TableCell className="text-[0.845rem] font-semibold">
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        className="after:absolute after:inset-0"
-                      >
+                      <Link href={`/invoices/${invoice.id}`}>
                         {invoice.invoiceNumber ?? t("draftLabel")}
                         {invoice.type === "credit_note" ? (
                           <span className="text-meta ml-1.5 text-xs font-normal">
@@ -163,7 +165,7 @@ export default async function InvoicesPage({
                         />
                       ) : null}
                     </TableCell>
-                  </TableRow>
+                  </LinkedRow>
                 );
               })}
             </TableBody>

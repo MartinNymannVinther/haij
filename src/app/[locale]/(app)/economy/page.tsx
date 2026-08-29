@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { LinkedRow } from "@/components/ui/linked-row";
 import {
   Table,
   TableBody,
@@ -191,14 +192,9 @@ export default async function EconomyPage({
               </TableHeader>
               <TableBody>
                 {customers.map((row) => (
-                  <TableRow key={row.companyId} className="relative">
+                  <LinkedRow key={row.companyId} href={`/companies/${row.companyId}`}>
                     <TableCell className="font-medium">
-                      <Link
-                        href={`/companies/${row.companyId}`}
-                        className="after:absolute after:inset-0"
-                      >
-                        {row.companyName}
-                      </Link>
+                      <Link href={`/companies/${row.companyId}`}>{row.companyName}</Link>
                     </TableCell>
                     <TableCell className="text-right tabular-nums">
                       {row.trackedMinutes > 0 ? formatMinutes(row.trackedMinutes) : ""}
@@ -223,7 +219,7 @@ export default async function EconomyPage({
                         invoicedNetOere={row.invoicedNetOere}
                       />
                     </TableCell>
-                  </TableRow>
+                  </LinkedRow>
                 ))}
               </TableBody>
             </Table>
