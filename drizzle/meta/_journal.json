@@ -134,6 +134,27 @@
       "when": 1787777693437,
       "tag": "0018_api_keys_rls_audit",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1787996867969,
+      "tag": "0019_role_rates",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1787996867970,
+      "tag": "0020_role_rates_rls_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1788020303493,
+      "tag": "0021_company_invoice_fields",
+      "breakpoints": true
     }
   ]
 }

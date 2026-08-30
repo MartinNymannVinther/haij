@@ -228,6 +228,14 @@ export const companies = pgTable(
     country: text("country").notNull().default("DK"),
     phone: text("phone"),
     email: text("email"),
+    /** Where invoices are sent; falls back to `email` when empty. */
+    invoiceEmail: text("invoice_email"),
+    /**
+     * EAN/GLN for public-sector customers. Thirteen digits with a GS1
+     * check digit; the shape is checked here, the check digit at the
+     * boundary where a typo can still be reported to a human.
+     */
+    eanGln: text("ean_gln"),
     website: text("website"),
     industryCode: text("industry_code"),
     industryText: text("industry_text"),
@@ -250,6 +258,7 @@ export const companies = pgTable(
       .on(t.orgId, t.cvr)
       .where(sql`cvr is not null`),
     check("companies_cvr_format", sql`cvr is null or cvr ~ '^[0-9]{8}$'`),
+    check("companies_ean_format", sql`ean_gln is null or ean_gln ~ '^[0-9]{13}$'`),
     check(
       "companies_stage_valid",
       sql`pipeline_stage in ('lead', 'dialogue', 'proposal', 'won', 'lost')`,
@@ -341,10 +350,11 @@ export const timeEntries = pgTable(
 );
 
 /**
- * Org-wide role catalog for differentiated hourly rates (e.g. senior
- * advisory vs. project management). Rates are øre EXcl. VAT. A role on a
- * time entry wins the rate resolution: role -> task -> project ->
- * company -> org default.
+ * Org-wide role catalog: names only (e.g. "Transformation Lead",
+ * "Agil coach"). A role carries no price of its own — rates are agreed
+ * per customer or per project in `role_rates`, because the same role is
+ * sold at different prices to different customers (decided with Martin,
+ * 2026-08-29, replacing the org-wide rate from 2026-08-26).
  */
 export const roles = pgTable(
   "roles",
@@ -354,10 +364,48 @@ export const roles = pgTable(
       .notNull()
       .references(() => organizations.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }).notNull(),
     ...timestamps,
   },
   (t) => [uniqueIndex("roles_org_name_uq").on(t.orgId, t.name)],
+);
+
+/**
+ * Agreed hourly rate for a role, bound to EITHER one customer or one
+ * project — never both, never neither. Rates are øre EXcl. VAT.
+ *
+ * One table rather than two keeps a single join path and one editor
+ * component; the xor check does the work two tables would have done
+ * with their column layout. Trade-off accepted: the two foreign keys
+ * are nullable, so the constraint carries the invariant instead of the
+ * type system.
+ */
+export const roleRates = pgTable(
+  "role_rates",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    roleId: text("role_id")
+      .notNull()
+      .references(() => roles.id, { onDelete: "cascade" }),
+    companyId: text("company_id").references(() => companies.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.id, { onDelete: "cascade" }),
+    hourlyRateOere: bigint("hourly_rate_oere", { mode: "number" }).notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("role_rates_role_company_uq")
+      .on(t.roleId, t.companyId)
+      .where(sql`company_id is not null`),
+    uniqueIndex("role_rates_role_project_uq")
+      .on(t.roleId, t.projectId)
+      .where(sql`project_id is not null`),
+    index("role_rates_org_company_idx").on(t.orgId, t.companyId),
+    index("role_rates_org_project_idx").on(t.orgId, t.projectId),
+    check("role_rates_scope_valid", sql`(company_id is not null) <> (project_id is not null)`),
+    check("role_rates_rate_valid", sql`hourly_rate_oere >= 0`),
+  ],
 );
 
 /* ------------------------------------------------------------------ */
@@ -478,6 +526,13 @@ export const orgLogos = pgTable(
 );
 
 /** Gapless sequential invoice numbers, one series per organization. */
+/**
+ * The gapless invoice-number counter, one row per organization.
+ * `next_number` may be raised by hand so a business migrating from
+ * another system carries on where that one stopped; a database trigger
+ * refuses any decrease, which keeps the sequence unbroken as
+ * bogføringsloven requires.
+ */
 export const invoiceCounters = pgTable("invoice_counters", {
   orgId: text("org_id")
     .primaryKey()

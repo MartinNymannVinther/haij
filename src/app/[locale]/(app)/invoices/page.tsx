@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedFilter } from "@/components/ui/segmented";
+import { LinkedRow } from "@/components/ui/linked-row";
 import {
   Table,
   TableBody,
@@ -16,11 +17,13 @@ import {
 import { getOrgContext } from "@/core/auth/session";
 import { INVOICE_STATUSES, type InvoiceStatus } from "@/core/db/schema";
 import { formatDateDa } from "@/core/dates";
+import { listUnbilledCustomers } from "@/modules/invoicing/economy";
 import { formatOere } from "@/modules/invoicing/money";
 import { getInvoicingOverview, listInvoices } from "@/modules/invoicing/service";
 import { INVOICE_STATUS_BADGE_CLASS } from "@/modules/invoicing/status-meta";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { DraftDeleteButton } from "./draft-delete-button";
 import { NewInvoiceButton } from "./new-invoice-button";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -45,11 +48,12 @@ export default async function InvoicesPage({
   const { status } = await searchParams;
   const filter = isStatus(status) ? status : undefined;
   const today = new Date().toISOString().slice(0, 10);
-  const [t, tStatus, invoices, overview] = await Promise.all([
+  const [t, tStatus, invoices, overview, unbilledCustomers] = await Promise.all([
     getTranslations("invoicing.list"),
     getTranslations("invoicing.status"),
     listInvoices(context, filter),
     getInvoicingOverview(context),
+    listUnbilledCustomers(context),
   ]);
 
   return (
@@ -64,7 +68,7 @@ export default async function InvoicesPage({
               })
             : t("summary", { outstanding: formatOere(overview.outstandingOere) })
         }
-        actions={<NewInvoiceButton />}
+        actions={<NewInvoiceButton customers={unbilledCustomers} />}
       />
 
       <SegmentedFilter
@@ -96,6 +100,7 @@ export default async function InvoicesPage({
                 <TableHead>{t("due")}</TableHead>
                 <TableHead className="text-right">{t("amount")}</TableHead>
                 <TableHead>{t("statusHead")}</TableHead>
+                <TableHead className="w-9" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -106,12 +111,13 @@ export default async function InvoicesPage({
                   Boolean(invoice.dueDate) &&
                   invoice.dueDate! < today;
                 return (
-                  <TableRow key={invoice.id} className="relative">
+                  <LinkedRow
+                    key={invoice.id}
+                    href={`/invoices/${invoice.id}`}
+                    className="group/row"
+                  >
                     <TableCell className="text-[0.845rem] font-semibold">
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        className="after:absolute after:inset-0"
-                      >
+                      <Link href={`/invoices/${invoice.id}`}>
                         {invoice.invoiceNumber ?? t("draftLabel")}
                         {invoice.type === "credit_note" ? (
                           <span className="text-meta ml-1.5 text-xs font-normal">
@@ -151,7 +157,15 @@ export default async function InvoicesPage({
                         {tStatus(invoice.status)}
                       </Badge>
                     </TableCell>
-                  </TableRow>
+                    <TableCell className="w-9 pr-2">
+                      {invoice.status === "draft" ? (
+                        <DraftDeleteButton
+                          invoiceId={invoice.id}
+                          label={invoice.buyerName ?? invoice.companyName ?? t("draftLabel")}
+                        />
+                      ) : null}
+                    </TableCell>
+                  </LinkedRow>
                 );
               })}
             </TableBody>

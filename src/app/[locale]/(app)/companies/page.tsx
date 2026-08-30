@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedFilter } from "@/components/ui/segmented";
+import { LinkedRow } from "@/components/ui/linked-row";
 import {
   Table,
   TableBody,
@@ -123,14 +124,9 @@ export default async function CompaniesPage({
               {companies.map((company) => {
                 const open = unbilled.get(company.id);
                 return (
-                  <TableRow key={company.id} className="relative">
+                  <LinkedRow key={company.id} href={`/companies/${company.id}`}>
                     <TableCell className="text-[0.845rem] font-semibold">
-                      <Link
-                        href={`/companies/${company.id}`}
-                        className="after:absolute after:inset-0"
-                      >
-                        {company.name}
-                      </Link>
+                      <Link href={`/companies/${company.id}`}>{company.name}</Link>
                     </TableCell>
                     <TableCell className="text-meta text-[0.8125rem]">
                       {company.cvr ?? "—"}
@@ -151,7 +147,7 @@ export default async function CompaniesPage({
                         {tStages(company.pipelineStage as never)}
                       </Badge>
                     </TableCell>
-                  </TableRow>
+                  </LinkedRow>
                 );
               })}
             </TableBody>

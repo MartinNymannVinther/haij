@@ -1,5 +1,13 @@
 import { and, asc, between, desc, eq, sql } from "drizzle-orm";
-import { companies, projects, roles, tasks, timeEntries } from "@/core/db/schema";
+import {
+  companies,
+  invoiceLines,
+  invoices,
+  projects,
+  roles,
+  tasks,
+  timeEntries,
+} from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 import { weekDates } from "./duration";
 
@@ -36,11 +44,17 @@ export async function listWeek(ctx: OrgContext, mondayIso: string) {
         projectId: timeEntries.projectId,
         projectName: projects.name,
         roleName: roles.name,
+        invoiceLineId: timeEntries.invoiceLineId,
+        invoiceId: invoices.id,
+        invoiceNumber: invoices.invoiceNumber,
+        invoiceStatus: invoices.status,
       })
       .from(timeEntries)
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
       .leftJoin(roles, eq(roles.id, timeEntries.roleId))
+      .leftJoin(invoiceLines, eq(invoiceLines.id, timeEntries.invoiceLineId))
+      .leftJoin(invoices, eq(invoices.id, invoiceLines.invoiceId))
       .where(between(timeEntries.entryDate, monday, sunday))
       .orderBy(asc(timeEntries.entryDate), desc(timeEntries.createdAt)),
   );
@@ -108,8 +122,28 @@ export async function addEntry(ctx: OrgContext, input: TimeEntryInput) {
   });
 }
 
+/**
+ * Deleting an hour that already sits on an invoice would leave the
+ * invoice standing on a basis that no longer exists. The invoice itself
+ * is unaffected — its lines carry their own frozen quantities and prices
+ * — but the trail from the document back to the work would be gone, and
+ * bogføringsloven wants that trail. An hour on a draft may still go: the
+ * draft is not a document yet.
+ */
 export async function deleteEntry(ctx: OrgContext, entryId: string) {
   return withOrgContext(ctx, async (tx) => {
+    const [entry] = await tx
+      .select({ id: timeEntries.id, invoiceStatus: invoices.status })
+      .from(timeEntries)
+      .leftJoin(invoiceLines, eq(invoiceLines.id, timeEntries.invoiceLineId))
+      .leftJoin(invoices, eq(invoices.id, invoiceLines.invoiceId))
+      .where(and(eq(timeEntries.id, entryId), eq(timeEntries.userId, ctx.userId)))
+      .limit(1);
+    if (!entry) return false;
+    if (entry.invoiceStatus && entry.invoiceStatus !== "draft") {
+      throw new Error("ENTRY_INVOICED");
+    }
+
     const result = await tx
       .delete(timeEntries)
       .where(and(eq(timeEntries.id, entryId), eq(timeEntries.userId, ctx.userId)))

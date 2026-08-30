@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedFilter } from "@/components/ui/segmented";
+import { LinkedRow } from "@/components/ui/linked-row";
 import {
   Table,
   TableBody,
@@ -100,14 +101,9 @@ export default async function ProjectsPage({
               </TableHeader>
               <TableBody>
                 {projects.map((project) => (
-                  <TableRow key={project.id} className="relative">
+                  <LinkedRow key={project.id} href={`/projects/${project.id}`}>
                     <TableCell className="text-[0.845rem] font-semibold">
-                      <Link
-                        href={`/projects/${project.id}`}
-                        className="after:absolute after:inset-0"
-                      >
-                        {project.name}
-                      </Link>
+                      <Link href={`/projects/${project.id}`}>{project.name}</Link>
                     </TableCell>
                     <TableCell className="text-meta text-[0.8125rem]">
                       {project.companyName ?? ""}
@@ -139,7 +135,7 @@ export default async function ProjectsPage({
                         {tStatus(project.status)}
                       </Badge>
                     </TableCell>
-                  </TableRow>
+                  </LinkedRow>
                 ))}
               </TableBody>
             </Table>

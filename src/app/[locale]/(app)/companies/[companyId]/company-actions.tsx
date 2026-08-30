@@ -43,7 +43,13 @@ export function CompanyActions({
     const result = await updateCompanyAction(companyId, values);
     setPending(false);
     if (!result.ok) {
-      setError(result.error === "cvrExists" ? tCreate("cvrExists") : tCommon("error"));
+      setError(
+        result.error === "cvrExists"
+          ? tCreate("cvrExists")
+          : result.error === "eanInvalid"
+            ? tCreate("eanInvalid")
+            : tCommon("error"),
+      );
       return;
     }
     toast.success(t("savedToast"));

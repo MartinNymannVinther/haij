@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { Pool } from "pg";
 import { withOrgContext } from "@/core/db/tenant";
-import { allocateInvoiceNumber } from "@/modules/invoicing/numbering";
+import {
+  allocateInvoiceNumber,
+  getNextInvoiceNumber,
+  setNextInvoiceNumber,
+} from "@/modules/invoicing/numbering";
 import { adminPool } from "../helpers/db";
 
 /**
@@ -83,5 +87,61 @@ describe("allocateInvoiceNumber", () => {
     await expect(
       withOrgContext(CTX_1, (tx) => allocateInvoiceNumber(tx, ORG_2)),
     ).rejects.toMatchObject({ cause: { code: "42501" } });
+  });
+});
+
+/**
+ * Moving in from another system: the counter can be pushed forward so the
+ * sequence carries on where the old system stopped, and can never be
+ * pulled back onto numbers already used.
+ */
+describe("setNextInvoiceNumber", () => {
+  const ORG_3 = "org_numbering_3";
+  const CTX_3 = { orgId: ORG_3, userId: USER };
+
+  beforeAll(async () => {
+    await admin.query(
+      `insert into organizations (id, name, slug, created_at)
+         values ($1, 'Numbering 3', 'numbering-3', now())`,
+      [ORG_3],
+    );
+  });
+
+  it("moves the counter forward and the next invoice takes that number", async () => {
+    expect(await getNextInvoiceNumber(CTX_3)).toBe(1);
+    await setNextInvoiceNumber(CTX_3, 284);
+    expect(await getNextInvoiceNumber(CTX_3)).toBe(284);
+
+    const allocated = await withOrgContext(CTX_3, (tx) => allocateInvoiceNumber(tx, ORG_3));
+    expect(allocated).toBe(284);
+    expect(await getNextInvoiceNumber(CTX_3)).toBe(285);
+  });
+
+  it("refuses to go backwards", async () => {
+    await expect(setNextInvoiceNumber(CTX_3, 200)).rejects.toThrow("NUMBER_TOO_LOW");
+    await expect(setNextInvoiceNumber(CTX_3, 0)).rejects.toThrow("NUMBER_TOO_LOW");
+    expect(await getNextInvoiceNumber(CTX_3)).toBe(285);
+  });
+
+  it("writes a semantic audit event rather than one row per issued invoice", async () => {
+    const raised = await admin.query(
+      `select before_data, after_data from audit_log
+         where org_id = $1 and action = 'invoice_counters.raised'`,
+      [ORG_3],
+    );
+    expect(raised.rowCount).toBe(1);
+    expect(raised.rows[0].before_data).toEqual({ nextNumber: 1 });
+    expect(raised.rows[0].after_data).toEqual({ nextNumber: 284 });
+
+    const rowAudit = await admin.query(
+      `select count(*)::int as n from audit_log where entity_type = 'invoice_counters'`,
+    );
+    expect(rowAudit.rows[0].n).toBe(0);
+  });
+
+  it("the database refuses a rewind even if the service is bypassed", async () => {
+    await expect(
+      admin.query(`update invoice_counters set next_number = 5 where org_id = $1`, [ORG_3]),
+    ).rejects.toThrow(/cannot be lowered/);
   });
 });

@@ -57,6 +57,12 @@ export default async function TimePage({
 
   const days = weekDates(monday);
   const weekTotal = entries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
+  // Hours already on an invoice, draft or issued: what is on its way out
+  // versus what is still sitting here waiting to be billed.
+  const billedMinutes = entries.reduce(
+    (sum, entry) => (entry.invoiceLineId ? sum + entry.durationMinutes : sum),
+    0,
+  );
   const byDay = new Map<string, typeof entries>();
   for (const entry of entries) {
     const list = byDay.get(entry.entryDate) ?? [];
@@ -112,8 +118,18 @@ export default async function TimePage({
                 { day: "numeric", month: "short" },
               )}
             </span>
-            <span className="tabular-nums">
-              {t("weekTotal")}: {formatMinutes(weekTotal)}
+            <span className="flex items-baseline gap-2 tabular-nums">
+              {billedMinutes > 0 ? (
+                <span className="text-meta text-[0.78rem] font-normal">
+                  {t("weekSplit", {
+                    billed: formatMinutes(billedMinutes),
+                    unbilled: formatMinutes(weekTotal - billedMinutes),
+                  })}
+                </span>
+              ) : null}
+              <span>
+                {t("weekTotal")}: {formatMinutes(weekTotal)}
+              </span>
             </span>
           </CardTitle>
         </CardHeader>
@@ -168,10 +184,24 @@ export default async function TimePage({
                           <span className="text-muted-foreground"> · {entry.note}</span>
                         ) : null}
                       </div>
+                      {entry.invoiceId ? (
+                        <Link
+                          href={`/invoices/${entry.invoiceId}`}
+                          className="bg-accent text-accent-foreground shrink-0 rounded-sm px-1.5 py-0.5 text-[0.7rem] font-medium tabular-nums hover:underline"
+                          title={t("billedTitle")}
+                        >
+                          {entry.invoiceNumber
+                            ? t("billedNumber", { number: entry.invoiceNumber })
+                            : t("onDraft")}
+                        </Link>
+                      ) : null}
                       <span className="text-sm tabular-nums">
                         {formatMinutes(entry.durationMinutes)}
                       </span>
-                      {entry.userId === session.user.id ? (
+                      {entry.userId === session.user.id &&
+                      entry.invoiceStatus !== "issued" &&
+                      entry.invoiceStatus !== "sent" &&
+                      entry.invoiceStatus !== "paid" ? (
                         <EntryDeleteButton entryId={entry.id} />
                       ) : (
                         <span className="w-7" />

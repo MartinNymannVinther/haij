@@ -28,9 +28,21 @@ beforeAll(async () => {
     USER_A,
   ]);
   await admin.query(
-    `insert into roles (id, org_id, name, hourly_rate_oere) values
-       ('role_a', $1, 'Seniorrådgivning', 140000),
-       ('role_b', $2, 'Udvikling', 90000)`,
+    `insert into roles (id, org_id, name) values
+       ('role_a', $1, 'Seniorrådgivning'),
+       ('role_b', $2, 'Udvikling')`,
+    [ORG_A, ORG_B],
+  );
+  await admin.query(
+    `insert into companies (id, org_id, name, pipeline_stage) values
+       ('rr_comp_a', $1, 'Kunde A', 'lead'),
+       ('rr_comp_b', $2, 'Kunde B', 'lead')`,
+    [ORG_A, ORG_B],
+  );
+  await admin.query(
+    `insert into role_rates (id, org_id, role_id, company_id, hourly_rate_oere) values
+       ('rr_a', $1, 'role_a', 'rr_comp_a', 140000),
+       ('rr_b', $2, 'role_b', 'rr_comp_b', 90000)`,
     [ORG_A, ORG_B],
   );
   await admin.query(
@@ -46,27 +58,28 @@ afterAll(async () => {
 });
 
 describe("read isolation", () => {
-  it.each(["roles", "org_logos"] as const)("%s: org A sees only its own rows", async (table) => {
-    const rows = await asApp(app, CTX_A, (c) => c.query(`select org_id from ${table}`));
-    expect(rows.rowCount).toBe(1);
-    expect(rows.rows[0].org_id).toBe(ORG_A);
-  });
+  it.each(["roles", "org_logos", "role_rates"] as const)(
+    "%s: org A sees only its own rows",
+    async (table) => {
+      const rows = await asApp(app, CTX_A, (c) => c.query(`select org_id from ${table}`));
+      expect(rows.rowCount).toBe(1);
+      expect(rows.rows[0].org_id).toBe(ORG_A);
+    },
+  );
 });
 
 describe("write isolation", () => {
   it("cannot insert, update or delete for the foreign org", async () => {
     const insertCode = await asApp(app, CTX_A, (c) =>
-      expectSqlError(
-        c.query(`insert into roles (org_id, name, hourly_rate_oere) values ($1, 'Smuglet', 1)`, [
-          ORG_B,
-        ]),
-      ),
+      expectSqlError(c.query(`insert into roles (org_id, name) values ($1, 'Smuglet')`, [ORG_B])),
     );
     expect(insertCode).toBe("42501");
 
     for (const sql of [
-      `update roles set hourly_rate_oere = 1 where id = 'role_b'`,
+      `update roles set name = 'Kapret' where id = 'role_b'`,
       `delete from roles where id = 'role_b'`,
+      `update role_rates set hourly_rate_oere = 1 where id = 'rr_b'`,
+      `delete from role_rates where id = 'rr_b'`,
       `update org_logos set data = 'x' where org_id = '${ORG_B}'`,
       `delete from org_logos where org_id = '${ORG_B}'`,
     ]) {
@@ -87,9 +100,51 @@ describe("write isolation", () => {
 });
 
 describe("default deny without context", () => {
-  it.each(["roles", "org_logos"] as const)("%s: zero rows", async (table) => {
+  it.each(["roles", "org_logos", "role_rates"] as const)("%s: zero rows", async (table) => {
     const rows = await asApp(app, null, (c) => c.query(`select count(*)::int as n from ${table}`));
     expect(rows.rows[0].n).toBe(0);
+  });
+});
+
+describe("role rate scope", () => {
+  it("refuses a rate that borrows another org's customer", async () => {
+    const code = await asApp(app, CTX_A, (c) =>
+      expectSqlError(
+        c.query(
+          `insert into role_rates (org_id, role_id, company_id, hourly_rate_oere)
+             values ($1, 'role_a', 'rr_comp_b', 100000)`,
+          [ORG_A],
+        ),
+      ),
+    );
+    // The trigger fires before the row-level policy can reject it.
+    expect(code).toBe("23514");
+  });
+
+  it("refuses a rate bound to neither a customer nor a project", async () => {
+    const code = await asApp(app, CTX_A, (c) =>
+      expectSqlError(
+        c.query(
+          `insert into role_rates (org_id, role_id, company_id, project_id, hourly_rate_oere)
+             values ($1, 'role_a', null, null, 100000)`,
+          [ORG_A],
+        ),
+      ),
+    );
+    expect(code).toBe("23514");
+  });
+
+  it("refuses the same role twice on one customer", async () => {
+    const code = await asApp(app, CTX_A, (c) =>
+      expectSqlError(
+        c.query(
+          `insert into role_rates (org_id, role_id, company_id, hourly_rate_oere)
+             values ($1, 'role_a', 'rr_comp_a', 99000)`,
+          [ORG_A],
+        ),
+      ),
+    );
+    expect(code).toBe("23505");
   });
 });
 
@@ -100,6 +155,12 @@ describe("audit", () => {
       [ORG_A],
     );
     expect(roleAudit.rows[0].n).toBe(1);
+
+    const rateAudit = await admin.query(
+      `select count(*)::int as n from audit_log where org_id = $1 and action = 'role_rates.insert'`,
+      [ORG_A],
+    );
+    expect(rateAudit.rows[0].n).toBe(1);
 
     // No row trigger on org_logos: the base64 payload must never land in
     // the audit log via table auditing (the service writes a semantic

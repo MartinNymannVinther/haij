@@ -9,6 +9,7 @@ import { useRouter } from "@/i18n/navigation";
 
 export function EntryDeleteButton({ entryId }: { entryId: string }) {
   const t = useTranslations("time");
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   async function handleDelete() {
@@ -16,7 +17,9 @@ export function EntryDeleteButton({ entryId }: { entryId: string }) {
     if (result.ok) {
       toast.success(t("deletedToast"));
       router.refresh();
+      return;
     }
+    toast.error(result.error === "invoiced" ? t("invoicedCannotDelete") : tCommon("error"));
   }
 
   return (

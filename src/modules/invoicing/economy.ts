@@ -1,15 +1,21 @@
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import {
   budgets,
   companies,
   invoices,
   orgProfiles,
   projects,
-  roles,
   tasks,
   timeEntries,
 } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
+import {
+  companyRoleRate,
+  companyRoleRateOn,
+  entryValueSql,
+  projectRoleRate,
+  projectRoleRateOn,
+} from "./rates";
 
 /**
  * The economy views Martin asked for: monthly revenue targets against
@@ -189,7 +195,8 @@ export async function setCustomerFrame(
 
 /**
  * Unbilled time per customer, valued with the full rate hierarchy resolved
- * per entry in SQL: role -> task -> project -> customer -> org default.
+ * per entry in SQL: role rate on the project -> role rate on the customer
+ * -> task -> project -> customer -> org default.
  * The customer list and the customer page both show this number, so it is
  * computed once here rather than twice in the views.
  */
@@ -208,13 +215,14 @@ export async function getUnbilledByCompany(
       .select({
         companyId: timeEntries.companyId,
         minutes: sql<number>`coalesce(sum(${timeEntries.durationMinutes}), 0)::int`,
-        valueOere: sql<number>`coalesce(sum(round(${timeEntries.durationMinutes} * coalesce(${roles.hourlyRateOere}, ${tasks.hourlyRateOere}, ${projects.hourlyRateOere}, ${companies.hourlyRateOere}, ${defaultRate}, 0) / 60.0)), 0)::bigint`,
+        valueOere: entryValueSql(defaultRate),
       })
       .from(timeEntries)
-      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
       .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
       .leftJoin(projects, eq(projects.id, timeEntries.projectId))
       .leftJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
       .where(sql`${timeEntries.invoiceLineId} is null`)
       .groupBy(timeEntries.companyId);
 
@@ -224,5 +232,55 @@ export async function getUnbilledByCompany(
       map.set(row.companyId, { minutes: Number(row.minutes), valueOere: Number(row.valueOere) });
     }
     return map;
+  });
+}
+
+export type UnbilledCustomer = {
+  companyId: string;
+  companyName: string;
+  minutes: number;
+  valueOere: number;
+};
+
+/**
+ * Customers with hours nobody has invoiced yet, biggest first. This is
+ * the shortlist the "new invoice" dialog opens on: an invoice almost
+ * always starts from tracked time, so the customers with unbilled hours
+ * are the answer to "who am I invoicing" nine times out of ten.
+ */
+export async function listUnbilledCustomers(ctx: OrgContext): Promise<UnbilledCustomer[]> {
+  return withOrgContext(ctx, async (tx) => {
+    const [profile] = await tx
+      .select({ defaultRate: orgProfiles.defaultHourlyRateOere })
+      .from(orgProfiles)
+      .where(eq(orgProfiles.orgId, ctx.orgId))
+      .limit(1);
+    const defaultRate = profile?.defaultRate ?? 0;
+
+    const rows = await tx
+      .select({
+        companyId: timeEntries.companyId,
+        companyName: companies.name,
+        minutes: sql<number>`coalesce(sum(${timeEntries.durationMinutes}), 0)::int`,
+        valueOere: entryValueSql(defaultRate),
+      })
+      .from(timeEntries)
+      .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .innerJoin(companies, eq(companies.id, timeEntries.companyId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
+      .where(sql`${timeEntries.invoiceLineId} is null`)
+      .groupBy(timeEntries.companyId, companies.name)
+      .orderBy(desc(sql`sum(${timeEntries.durationMinutes})`));
+
+    return rows
+      .filter((row): row is typeof row & { companyId: string } => Boolean(row.companyId))
+      .map((row) => ({
+        companyId: row.companyId,
+        companyName: row.companyName,
+        minutes: Number(row.minutes),
+        valueOere: Number(row.valueOere),
+      }));
   });
 }

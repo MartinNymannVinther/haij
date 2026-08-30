@@ -1,0 +1,64 @@
+# Maintenance scripts
+
+One-off tools, run by hand against a Haij database. None of them is
+reachable from the application, and that is the point: each one does
+something the running app must refuse to do.
+
+Run them with `pnpm script <fil> [argumenter]`.
+
+## onboard-vinther.ts
+
+Sets up the signals service profile, CVR branch codes, TED keywords and
+RSS sources for Vinther Consulting, and imports the 2026 history for
+Eksempel A-kasse from the FreeAgent export in `data/aka-2026.json`.
+
+```
+pnpm script scripts/onboard-vinther.ts <org-slug> --dry-run
+pnpm script scripts/onboard-vinther.ts <org-slug>
+```
+
+Idempotent: a second run reports what already exists and creates nothing.
+Writes through the ordinary service layer, so RLS, the audit log and the
+invoice immutability rules all apply.
+
+## reset-org.ts
+
+Empties one organization's business data so it can be taken into real use
+with clean books. Keeps the organization, its members, the company
+profile and logo, API keys and the audit log — which records the reset.
+
+```
+pnpm script scripts/reset-org.ts <org-slug>            # viser hvad der ryger
+pnpm script scripts/reset-org.ts <org-slug> --confirm  # sletter
+```
+
+## delete-invoice.ts
+
+Removes one invoice completely and releases the hours it covered back to
+unbilled. Winds the counter back when the invoice held the highest
+number, so the number is handed out again.
+
+```
+pnpm script scripts/delete-invoice.ts <org-slug> <nummer>
+pnpm script scripts/delete-invoice.ts <org-slug> <nummer> --confirm
+```
+
+## Why the last two are scripts and not buttons
+
+An issued invoice is immutable and undeletable inside Haij, enforced by
+database triggers, because bogføringsloven wants the number sequence
+unbroken: a deleted invoice leaves a hole nobody can explain years later,
+and the right answer against real books is a credit note.
+
+Testing and moving in need something the rules forbid. Rather than
+softening the rules for everyone, the two destructive tools live outside
+the application: they connect as the migration role, set
+`session_replication_role = replica` for the length of one transaction so
+the guards stand down, delete children before parents by hand (that
+setting suspends foreign-key cascades too), and write a semantic audit
+event afterwards. The setting is session-local, so a crash cannot leave
+the database unguarded.
+
+Both refuse to do anything without `--confirm` and then ask you to type
+the organization's slug or the invoice number back. If you reach for
+either one against real books, stop and issue a credit note instead.

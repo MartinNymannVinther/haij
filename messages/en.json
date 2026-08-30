@@ -238,7 +238,8 @@
       "throttled": "Too many lookups in a short time. Wait a moment.",
       "cvrExists": "A customer with this CVR number already exists.",
       "submit": "Create customer",
-      "createdToast": "{name} has been created"
+      "createdToast": "{name} has been created",
+      "eanInvalid": "That EAN is not valid. Check the thirteen digits, the check digit does not match."
     },
     "form": {
       "name": "Name",
@@ -248,7 +249,13 @@
       "city": "City",
       "phone": "Phone",
       "email": "Email",
-      "website": "Website"
+      "website": "Website",
+      "billingSection": "Billing",
+      "invoiceEmail": "Invoice email",
+      "invoiceEmailPlaceholder": "Uses the customer's ordinary email",
+      "invoiceEmailHint": "Where invoices are sent. Left empty, the customer's ordinary email is used.",
+      "eanGln": "EAN/GLN",
+      "eanHint": "Thirteen digits. Public-sector customers receive invoices on EAN, not by email."
     },
     "detail": {
       "back": "All customers",
@@ -344,7 +351,12 @@
       "noTask": "No task",
       "role": "Role",
       "noRole": "No role"
-    }
+    },
+    "weekSplit": "{billed} invoiced · {unbilled} waiting",
+    "billedNumber": "Invoice {number}",
+    "onDraft": "On draft",
+    "billedTitle": "This hour is on an invoice",
+    "invoicedCannotDelete": "This hour is on an issued invoice and cannot be deleted. Issue a credit note if the invoice is wrong."
   },
   "orgProfile": {
     "title": "Company",
@@ -368,14 +380,12 @@
     "invalidRate": "Could not read the hourly rate. Try e.g. 950 or 950.00.",
     "invalidForm": "Check the fields. CVR must be 8 digits.",
     "roles": {
-      "title": "Roles and hourly rates",
-      "hint": "Rates in DKK excl. VAT. A role picked on a time entry wins over task, project and customer rates.",
-      "empty": "No roles yet. Add e.g. Senior advisory or Project management.",
+      "title": "Roles",
+      "hint": "Names of the roles you sell. The price is agreed per customer or project, not here.",
+      "empty": "No roles yet. Add e.g. Transformation Lead or Agile coach.",
       "namePlaceholder": "Role name…",
-      "ratePlaceholder": "Hourly rate excl. VAT",
-      "rateLine": "{rate}/h excl. VAT",
       "add": "Add",
-      "invalid": "Check name and rate. Write the rate like 1,400.",
+      "invalid": "Give the role a name.",
       "nameTaken": "A role with that name already exists.",
       "deletedToast": "Role deleted. Time entries keep their hours."
     },
@@ -390,6 +400,29 @@
       "tooBig": "The file is too large. At most 1 MB.",
       "savedToast": "Logo saved; future PDFs will carry it.",
       "deletedToast": "Logo removed."
+    },
+    "numbering": {
+      "title": "Invoice numbering",
+      "hint": "The next invoice gets this number. Set it to your previous system's next number when you move in. It can only be raised, never lowered.",
+      "label": "Next invoice number",
+      "save": "Save number",
+      "savedToast": "The next invoice will be number {number}.",
+      "tooLow": "The number must be higher than the current one. The sequence has to stay unbroken."
+    },
+    "roleRates": {
+      "companyTitle": "Agreed hourly rates",
+      "companyHint": "Rates in DKK excl. VAT. A rate here applies to every hour on this customer unless the project has its own.",
+      "projectTitle": "Hourly rates on this project",
+      "projectHint": "Rates in DKK excl. VAT. These override what the customer is otherwise agreed at.",
+      "empty": "No agreed rates. Hours are priced at the customer's ordinary rate.",
+      "emptyNoRoles": "Create a role under company settings first.",
+      "rolePlaceholder": "Pick a role",
+      "ratePlaceholder": "Rate excl. VAT",
+      "inherited": "Inherits {rate}/h",
+      "rateLine": "{rate}/h",
+      "add": "Add rate",
+      "invalid": "Pick a role and enter a rate, e.g. 1,400.",
+      "deletedToast": "Rate removed."
     }
   },
   "invoicing": {
@@ -398,7 +431,7 @@
       "create": "New invoice",
       "filterAll": "All",
       "empty": "No invoices yet.",
-      "emptyHint": "Create a draft from scratch, or build an invoice straight from unbilled hours on a customer page.",
+      "emptyHint": "Create an invoice from unbilled hours, or start from a blank draft.",
       "noResults": "No invoices with that status.",
       "number": "No.",
       "customer": "Customer",
@@ -409,7 +442,13 @@
       "draftLabel": "Draft",
       "creditNote": "Credit note",
       "summary": "{outstanding} outstanding",
-      "summaryOverdue": "{outstanding} outstanding · {overdue} overdue"
+      "summaryOverdue": "{outstanding} outstanding · {overdue} overdue",
+      "fromTimeTitle": "New invoice",
+      "fromTimeHint": "Pick the customer to invoice. The hours are the ones not yet on an invoice. Set dates if only part of the period belongs on this one.",
+      "blankInvoice": "Blank invoice instead",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "noUnbilledTime": "There are no unbilled hours to invoice."
     },
     "status": {
       "draft": "Draft",

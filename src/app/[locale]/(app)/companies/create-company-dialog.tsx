@@ -69,6 +69,9 @@ export function CreateCompanyDialog() {
       city: company.city ?? "",
       phone: company.phone ?? "",
       email: company.email ?? "",
+      // CVR knows neither of these; they are agreed with the customer.
+      invoiceEmail: "",
+      eanGln: "",
       website: company.website ?? "",
     });
     setIndustry({ code: company.industryCode, text: company.industryText });
@@ -93,8 +96,8 @@ export function CreateCompanyDialog() {
       setError(
         result.error === "cvrExists"
           ? t("cvrExists")
-          : result.error === "cvrInvalid"
-            ? t("invalidCvr")
+          : result.error === "eanInvalid"
+            ? t("eanInvalid")
             : t("invalidCvr"),
       );
       return;
