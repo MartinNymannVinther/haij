@@ -4,7 +4,7 @@ import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
 import { isValidEan, normalizeEan } from "@/core/ean";
 import { getCvrProvider, normalizeCvr, type CvrCompany } from "@/core/cvr";
-import { PIPELINE_STAGES } from "@/core/db/schema";
+import { CONTACT_CATEGORIES, PIPELINE_STAGES } from "@/core/db/schema";
 import {
   addActivity,
   addContact,
@@ -13,6 +13,7 @@ import {
   deleteContact,
   setPipelineStage,
   updateCompany,
+  updateContact,
 } from "./service";
 
 type ActionError =
@@ -79,6 +80,7 @@ const ContactSchema = z.object({
   email: optionalText(320),
   phone: optionalText(30),
   isPrimary: z.boolean().optional(),
+  categories: z.array(z.enum(CONTACT_CATEGORIES)).max(CONTACT_CATEGORIES.length).default([]),
 });
 
 const ActivitySchema = z.object({
@@ -234,6 +236,25 @@ export async function addContactAction(input: unknown): Promise<ActionResult> {
   } catch (error) {
     if (isCompanyNotFound(error)) return { ok: false, error: "notFound" };
     console.error("crm: add contact failed", error);
+    return { ok: false, error: "generic" };
+  }
+}
+
+export async function updateContactAction(
+  contactId: unknown,
+  input: unknown,
+): Promise<ActionResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = z.string().min(1).max(64).safeParse(contactId);
+  const parsed = ContactSchema.safeParse(input);
+  if (!id.success || !parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    const updated = await updateContact(ctx, id.data, parsed.data);
+    return updated ? { ok: true, data: undefined } : { ok: false, error: "notFound" };
+  } catch (error) {
+    console.error("crm: update contact failed", error);
     return { ok: false, error: "generic" };
   }
 }

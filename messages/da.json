@@ -109,7 +109,8 @@
       "knowledge": "Viden",
       "openMenu": "Åbn menu",
       "menuTitle": "Navigation",
-      "settings": "Indstillinger"
+      "settings": "Indstillinger",
+      "contacts": "Kontakter"
     },
     "orgSwitcher": {
       "label": "Organisation",
@@ -159,7 +160,14 @@
       "actionUnbilled": "{amount} uafregnede timer",
       "actionUnbilledMeta": "fordelt på {count, plural, =1 {én kunde} other {# kunder}}",
       "actionInvoice": "Fakturér",
-      "emptyAction": "Opret din første kunde"
+      "emptyAction": "Opret din første kunde",
+      "attention": {
+        "signalTitle": "Værd at se på",
+        "signalLink": "Alle signaler",
+        "digestTitle": "Nyt fra dine kilder",
+        "digestLink": "Til Viden",
+        "digestMeta": "{count} artikler"
+      }
     },
     "security": {
       "title": "Sikkerhed",
@@ -321,6 +329,31 @@
       "moveFailed": "Kunne ikke flytte kunden. Prøv igen.",
       "lostCount": "{count, plural, =1 {1 kunde} other {# kunder}}",
       "lostShow": "Vis"
+    },
+    "categories": {
+      "decision_maker": "Beslutningstager",
+      "practitioner": "Fagligt anker",
+      "door_opener": "Døråbner",
+      "thought_leader": "Meningsdanner",
+      "partner": "Partner",
+      "former_colleague": "Tidligere kollega",
+      "press": "Presse"
+    },
+    "contactList": {
+      "title": "Kontakter",
+      "subtitle": "{count} kontakter på tværs af kunder",
+      "empty": "Ingen kontakter endnu.",
+      "emptyHint": "Kontakter oprettes på den enkelte kunde. Kategorierne gør dem søgbare her.",
+      "noResults": "Ingen kontakter matcher.",
+      "searchPlaceholder": "Søg navn, titel, mail eller kunde…",
+      "filterAll": "Alle",
+      "categoriesLabel": "Kategorier",
+      "nameHead": "Navn",
+      "companyHead": "Kunde",
+      "categoryHead": "Kategorier",
+      "contactHead": "Kontakt",
+      "editTitle": "Redigér kontakt",
+      "savedToast": "Kontakten er gemt."
     }
   },
   "time": {
@@ -767,18 +800,40 @@
       "invalid": "Tjek felterne. CVR skal være 8 cifre, link skal være en gyldig adresse."
     },
     "settings": {
-      "trigger": "Kilder",
-      "title": "Serviceprofil og kilder",
-      "hint": "Serviceprofilen er målestokken, AI'en scorer signaler imod. Kilderne afgør, hvad der hentes.",
+      "title": "Signaler",
+      "hint": "Signalmotoren leder efter organisationer der ligner dine kunder, og scorer det den finder op imod din serviceprofil.",
+      "profileTitle": "Serviceprofil",
+      "profileHint": "Den tekst AI'en måler alt op imod. Skriv hvad du sælger, til hvem, og hvad der kendetegner et godt og et dårligt signal. Jo mere konkret, jo mindre støj.",
+      "profilePlaceholder": "Vi hjælper større danske organisationer med…\n\nTypiske kunder er…\n\nEt godt signal er…\n\nEt dårligt signal er…",
+      "profileCount": "{count} tegn",
+      "feedsTitle": "Kilder",
+      "feedsHint": "RSS- og Atom-feeds der følges. Jobopslag tæller med: de fleste jobsider kan give en gemt søgning som feed. Test hver kilde når du tilføjer den.",
+      "feedsEmpty": "Ingen kilder endnu.",
+      "feedNamePlaceholder": "Navn",
+      "feedUrlPlaceholder": "Adresse på feedet",
+      "feedAdd": "Tilføj kilde",
+      "feedRemove": "Fjern kilden",
+      "feedsMax": "Der er plads til ti kilder. Fjern en for at tilføje en ny.",
+      "checkAction": "Test",
+      "checkOk": "Virker. {count} artikler i feedet.",
+      "checkOkWithTitle": "Virker. {count} artikler, nyeste: {title}",
+      "checkEmpty": "Feedet kan læses, men indeholder ingen artikler lige nu.",
+      "checkNotFeed": "Adressen svarer med en almindelig webside, ikke et feed. Led efter et RSS-ikon eller prøv med /rss eller /feed til sidst.",
+      "checkHttp": "Serveren svarede med fejl {code}.",
+      "checkUnreachable": "Kunne ikke nå adressen. Tjek stavemåden.",
+      "sourcesTitle": "Søgning i registre",
+      "sourcesHint": "Ud over dine egne kilder søger motoren i CVR og i EU's udbudsdatabase.",
+      "cvrLabel": "Branchekoder",
+      "cvrPlaceholder": "fx 6419",
+      "cvrHelp": "De første fire cifre af DB07-koden. Nye selskaber i disse brancher bliver til signaler.",
+      "tedLabel": "Ord i udbud",
+      "tedPlaceholder": "fx kunstig intelligens",
+      "tedHelp": "Udbud der nævner et af ordene bliver hentet ind.",
+      "savedToast": "Opsætningen er gemt.",
+      "trigger": "Opsætning",
       "profileLabel": "Serviceprofil",
-      "profilePlaceholder": "Fx: Vi rådgiver kommuner og SMV'er om digital strategi, udbud og implementering af nye platforme…",
-      "tedLabel": "Udbuds-søgeord (TED, komma-adskilt)",
-      "tedPlaceholder": "digitalisering, it-rådgivning",
-      "cvrLabel": "CVR-branchekoder (præfikser, komma-adskilt)",
-      "cvrPlaceholder": "6201, 7022",
       "rssLabel": "RSS-feeds (ét pr. linje, evt. \"url | navn\")",
-      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisering&format=rss | Jobindex",
-      "savedToast": "Signal-indstillingerne er gemt."
+      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisering&format=rss | Jobindex"
     },
     "summary": "{count, plural, =0 {Ingen nye signaler} =1 {Ét nyt signal} other {# nye signaler}} at kigge på",
     "scoreTitle": "Score {score} af 100"
@@ -818,7 +873,8 @@
     "nav": {
       "company": "Virksomhed",
       "security": "Sikkerhed",
-      "ai": "AI"
+      "ai": "AI",
+      "signals": "Signaler"
     }
   }
 }

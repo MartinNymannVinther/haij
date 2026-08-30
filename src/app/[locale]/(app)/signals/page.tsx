@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { Settings2 } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedFilter } from "@/components/ui/segmented";
+import { cn } from "@/lib/utils";
 import { getOrgContext } from "@/core/auth/session";
 import { SIGNAL_STATUSES, type SignalStatus } from "@/core/db/schema";
 import { todayInCopenhagen } from "@/core/dates";
 import { getSignalSettings, listSignals } from "@/modules/signals/service";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { AddSignalDialog } from "./add-signal-dialog";
 import { RefreshButton } from "./refresh-button";
 import { SignalCard } from "./signal-card";
-import { SignalsSettingsDialog } from "./signals-settings-dialog";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("signals");
@@ -56,16 +58,10 @@ export default async function SignalsPage({
         actions={
           <>
             <AddSignalDialog />
-            <SignalsSettingsDialog
-              settings={{
-                serviceProfile: settings?.serviceProfile ?? "",
-                tedKeywords: settings?.tedKeywords ?? "",
-                cvrBranchePrefixes: settings?.cvrBranchePrefixes ?? "",
-                rssFeeds: Array.isArray(settings?.rssFeeds)
-                  ? (settings!.rssFeeds as Array<{ url: string; label?: string | null }>)
-                  : [],
-              }}
-            />
+            <Link href="/settings/signals" className={cn(buttonVariants({ variant: "outline" }))}>
+              <Settings2 data-slot="icon" />
+              {t("settings.trigger")}
+            </Link>
             <RefreshButton disabled={!configured} />
           </>
         }

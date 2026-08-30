@@ -109,7 +109,8 @@
       "knowledge": "Knowledge",
       "openMenu": "Open menu",
       "menuTitle": "Navigation",
-      "settings": "Settings"
+      "settings": "Settings",
+      "contacts": "Contacts"
     },
     "orgSwitcher": {
       "label": "Organization",
@@ -159,7 +160,14 @@
       "actionUnbilled": "{amount} in unbilled hours",
       "actionUnbilledMeta": "across {count, plural, =1 {one customer} other {# customers}}",
       "actionInvoice": "Invoice",
-      "emptyAction": "Create your first customer"
+      "emptyAction": "Create your first customer",
+      "attention": {
+        "signalTitle": "Worth a look",
+        "signalLink": "All signals",
+        "digestTitle": "New from your sources",
+        "digestLink": "To Knowledge",
+        "digestMeta": "{count} articles"
+      }
     },
     "security": {
       "title": "Security",
@@ -321,6 +329,31 @@
       "moveFailed": "Could not move the customer. Please try again.",
       "lostCount": "{count, plural, =1 {1 customer} other {# customers}}",
       "lostShow": "Show"
+    },
+    "categories": {
+      "decision_maker": "Decision maker",
+      "practitioner": "Practitioner",
+      "door_opener": "Door opener",
+      "thought_leader": "Thought leader",
+      "partner": "Partner",
+      "former_colleague": "Former colleague",
+      "press": "Press"
+    },
+    "contactList": {
+      "title": "Contacts",
+      "subtitle": "{count} contacts across customers",
+      "empty": "No contacts yet.",
+      "emptyHint": "Contacts are created on each customer. The categories make them findable here.",
+      "noResults": "No contacts match.",
+      "searchPlaceholder": "Search name, title, email or customer…",
+      "filterAll": "All",
+      "categoriesLabel": "Categories",
+      "nameHead": "Name",
+      "companyHead": "Customer",
+      "categoryHead": "Categories",
+      "contactHead": "Contact",
+      "editTitle": "Edit contact",
+      "savedToast": "Contact saved."
     }
   },
   "time": {
@@ -767,18 +800,40 @@
       "invalid": "Check the fields. CVR must be 8 digits, the link must be a valid URL."
     },
     "settings": {
-      "trigger": "Sources",
-      "title": "Service profile and sources",
-      "hint": "The service profile is the yardstick the AI scores signals against. The sources decide what gets fetched.",
+      "title": "Signals",
+      "hint": "The signals engine looks for organizations resembling your customers and scores what it finds against your service profile.",
+      "profileTitle": "Service profile",
+      "profileHint": "The text the AI measures everything against. Write what you sell, to whom, and what makes a good and a bad signal. The more concrete, the less noise.",
+      "profilePlaceholder": "We help larger Danish organizations with…\n\nTypical customers are…\n\nA good signal is…\n\nA bad signal is…",
+      "profileCount": "{count} characters",
+      "feedsTitle": "Sources",
+      "feedsHint": "RSS and Atom feeds to follow. Job postings count: most job sites expose a saved search as a feed. Test each source as you add it.",
+      "feedsEmpty": "No sources yet.",
+      "feedNamePlaceholder": "Name",
+      "feedUrlPlaceholder": "Feed address",
+      "feedAdd": "Add source",
+      "feedRemove": "Remove source",
+      "feedsMax": "There is room for ten sources. Remove one to add another.",
+      "checkAction": "Test",
+      "checkOk": "Works. {count} articles in the feed.",
+      "checkOkWithTitle": "Works. {count} articles, newest: {title}",
+      "checkEmpty": "The feed parses but holds no articles right now.",
+      "checkNotFeed": "That address answers with an ordinary web page, not a feed. Look for an RSS icon, or try /rss or /feed on the end.",
+      "checkHttp": "The server answered with error {code}.",
+      "checkUnreachable": "Could not reach that address. Check the spelling.",
+      "sourcesTitle": "Register searches",
+      "sourcesHint": "Beyond your own sources the engine searches CVR and the EU tender database.",
+      "cvrLabel": "Branch codes",
+      "cvrPlaceholder": "e.g. 6419",
+      "cvrHelp": "The first four digits of the DB07 code. New companies in these branches become signals.",
+      "tedLabel": "Tender keywords",
+      "tedPlaceholder": "e.g. artificial intelligence",
+      "tedHelp": "Tenders mentioning one of these words are pulled in.",
+      "savedToast": "Settings saved.",
+      "trigger": "Settings",
       "profileLabel": "Service profile",
-      "profilePlaceholder": "E.g.: We advise municipalities and SMEs on digital strategy, tenders and platform implementations…",
-      "tedLabel": "Tender keywords (TED, comma separated)",
-      "tedPlaceholder": "digitalisation, it consulting",
-      "cvrLabel": "CVR branch codes (prefixes, comma separated)",
-      "cvrPlaceholder": "6201, 7022",
       "rssLabel": "RSS feeds (one per line, optionally \"url | name\")",
-      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisation&format=rss | Jobindex",
-      "savedToast": "Signal settings saved."
+      "rssPlaceholder": "https://www.jobindex.dk/jobsoegning?q=digitalisation&format=rss | Jobindex"
     },
     "summary": "{count, plural, =0 {No new signals} =1 {One new signal} other {# new signals}} to look at",
     "scoreTitle": "Score {score} of 100"
@@ -818,7 +873,8 @@
     "nav": {
       "company": "Organization",
       "security": "Security",
-      "ai": "AI"
+      "ai": "AI",
+      "signals": "Signals"
     }
   }
 }

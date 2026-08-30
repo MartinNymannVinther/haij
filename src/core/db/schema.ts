@@ -266,6 +266,24 @@ export const companies = pgTable(
   ],
 );
 
+/**
+ * What a contact is to the business, beyond their job title. A fixed
+ * vocabulary rather than free tags: these are meant to be filtered and
+ * counted across every customer, and free tags decay into three spellings
+ * of the same idea (decided with Martin, 2026-08-30). A person can be
+ * several of them at once.
+ */
+export const CONTACT_CATEGORIES = [
+  "decision_maker",
+  "practitioner",
+  "door_opener",
+  "thought_leader",
+  "partner",
+  "former_colleague",
+  "press",
+] as const;
+export type ContactCategory = (typeof CONTACT_CATEGORIES)[number];
+
 export const contacts = pgTable(
   "contacts",
   {
@@ -281,10 +299,19 @@ export const contacts = pgTable(
     email: text("email"),
     phone: text("phone"),
     isPrimary: boolean("is_primary").notNull().default(false),
+    /** Zero or more of CONTACT_CATEGORIES; the check keeps the set closed. */
+    categories: text("categories").array().notNull().default([]),
     createdBy: text("created_by").references(() => users.id, { onDelete: "set null" }),
     ...timestamps,
   },
-  (t) => [index("contacts_org_company_idx").on(t.orgId, t.companyId)],
+  (t) => [
+    index("contacts_org_company_idx").on(t.orgId, t.companyId),
+    index("contacts_org_name_idx").on(t.orgId, t.name),
+    check(
+      "contacts_categories_valid",
+      sql`categories <@ ARRAY['decision_maker','practitioner','door_opener','thought_leader','partner','former_colleague','press']::text[]`,
+    ),
+  ],
 );
 
 export const activities = pgTable(

@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
 import { normalizeCvr } from "@/core/cvr";
+import { checkFeed, type FeedCheck } from "./feed-check";
 import { SIGNAL_STATUSES } from "@/core/db/schema";
 import {
   addManualSignal,
@@ -190,6 +191,26 @@ export async function convertSignalAction(
   try {
     const companyId = await convertSignalToCompany(ctx, id.data);
     return { ok: true, data: { companyId } };
+  } catch (error) {
+    return { ok: false, error: toError(error) };
+  }
+}
+
+/**
+ * Tries one feed and reports what came back, so a source can be verified
+ * when it is added rather than days later when nothing has arrived.
+ * Reaching an arbitrary URL is the whole point, so it is gated on an
+ * org context like every other action, and the reply carries only counts
+ * and one sanitized title.
+ */
+export async function checkFeedAction(url: unknown): Promise<SignalActionResult<FeedCheck>> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = z.string().trim().min(1).max(1000).safeParse(url);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    return { ok: true, data: await checkFeed(parsed.data) };
   } catch (error) {
     return { ok: false, error: toError(error) };
   }

@@ -215,3 +215,32 @@ export async function generateDigest(
     return { error: "FAILED" };
   }
 }
+
+export type LatestDigest = {
+  id: string;
+  content: string;
+  itemCount: number;
+  createdAt: Date;
+};
+
+/**
+ * The newest stored digest, for the dashboard. Read from what has already
+ * been generated rather than asking a model on page load: the overview is
+ * opened many times a day and must stay instant, and a summary that
+ * changes every refresh is not a summary.
+ */
+export async function getLatestDigest(ctx: OrgContext): Promise<LatestDigest | null> {
+  return withOrgContext(ctx, async (tx) => {
+    const [row] = await tx
+      .select({
+        id: knowledgeDigests.id,
+        content: knowledgeDigests.content,
+        itemCount: knowledgeDigests.itemCount,
+        createdAt: knowledgeDigests.createdAt,
+      })
+      .from(knowledgeDigests)
+      .orderBy(desc(knowledgeDigests.createdAt))
+      .limit(1);
+    return row ?? null;
+  });
+}

@@ -341,3 +341,40 @@ export async function convertSignalToCompany(ctx: OrgContext, signalId: string) 
     return companyId;
   });
 }
+
+export type TopSignal = {
+  id: string;
+  title: string;
+  summary: string | null;
+  url: string | null;
+  score: number | null;
+  scoreReason: string | null;
+  suggestion: string | null;
+  source: string;
+};
+
+/**
+ * The one new signal most worth acting on: highest AI score, newest
+ * first when scores tie. Unscored signals are excluded — without a score
+ * there is no reason to claim it is the most important thing waiting.
+ */
+export async function getTopSignal(ctx: OrgContext): Promise<TopSignal | null> {
+  return withOrgContext(ctx, async (tx) => {
+    const [row] = await tx
+      .select({
+        id: signals.id,
+        title: signals.title,
+        summary: signals.summary,
+        url: signals.url,
+        score: signals.score,
+        scoreReason: signals.scoreReason,
+        suggestion: signals.suggestion,
+        source: signals.source,
+      })
+      .from(signals)
+      .where(and(eq(signals.status, "new"), sql`${signals.score} is not null`))
+      .orderBy(desc(signals.score), desc(signals.fetchedAt))
+      .limit(1);
+    return row ?? null;
+  });
+}

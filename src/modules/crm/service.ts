@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 import {
   activities,
   companies,
@@ -6,6 +6,7 @@ import {
   timeEntries,
   users,
   type ActivityType,
+  type ContactCategory,
   type PipelineStage,
 } from "@/core/db/schema";
 import { withOrgContext, type OrgContext } from "@/core/db/tenant";
@@ -79,11 +80,16 @@ export async function getCompanyDetail(ctx: OrgContext, companyId: string) {
     const [company] = await tx.select().from(companies).where(eq(companies.id, companyId)).limit(1);
     if (!company) return null;
 
-    const companyContacts = await tx
-      .select()
-      .from(contacts)
-      .where(eq(contacts.companyId, companyId))
-      .orderBy(desc(contacts.isPrimary), contacts.name);
+    // The column is a plain text[] in the database; the check constraint
+    // keeps it inside CONTACT_CATEGORIES, so narrowing here is safe and
+    // saves every view from doing it.
+    const companyContacts = (
+      await tx
+        .select()
+        .from(contacts)
+        .where(eq(contacts.companyId, companyId))
+        .orderBy(desc(contacts.isPrimary), contacts.name)
+    ).map((contact) => ({ ...contact, categories: contact.categories as ContactCategory[] }));
 
     const timeline = await tx
       .select({
@@ -217,6 +223,8 @@ export type ContactInput = {
   email?: string | null;
   phone?: string | null;
   isPrimary?: boolean;
+  /** What this person is to the business; see CONTACT_CATEGORIES. */
+  categories?: ContactCategory[];
 };
 
 /**
@@ -252,10 +260,116 @@ export async function addContact(ctx: OrgContext, companyId: string, input: Cont
         email: input.email ?? null,
         phone: input.phone ?? null,
         isPrimary: input.isPrimary ?? false,
+        categories: input.categories ?? [],
         createdBy: ctx.userId,
       })
       .returning({ id: contacts.id });
     return created?.id ?? null;
+  });
+}
+
+export async function updateContact(ctx: OrgContext, contactId: string, input: ContactInput) {
+  return withOrgContext(ctx, async (tx) => {
+    const [existing] = await tx
+      .select({ companyId: contacts.companyId })
+      .from(contacts)
+      .where(eq(contacts.id, contactId))
+      .limit(1);
+    if (!existing) return false;
+    if (input.isPrimary) {
+      await tx
+        .update(contacts)
+        .set({ isPrimary: false })
+        .where(eq(contacts.companyId, existing.companyId));
+    }
+    const result = await tx
+      .update(contacts)
+      .set({
+        name: input.name,
+        title: input.title ?? null,
+        email: input.email ?? null,
+        phone: input.phone ?? null,
+        isPrimary: input.isPrimary ?? false,
+        categories: input.categories ?? [],
+        updatedAt: new Date(),
+      })
+      .where(eq(contacts.id, contactId))
+      .returning({ id: contacts.id });
+    return result.length > 0;
+  });
+}
+
+export type ContactRow = {
+  id: string;
+  name: string;
+  title: string | null;
+  email: string | null;
+  phone: string | null;
+  isPrimary: boolean;
+  categories: ContactCategory[];
+  companyId: string;
+  companyName: string;
+};
+
+/**
+ * Every contact across every customer. The categories only earn their
+ * keep once you can look at them together, so this is the list behind
+ * the Kontakter page: a free-text match on name, title, email or company,
+ * and a filter on one category.
+ */
+export async function listAllContacts(
+  ctx: OrgContext,
+  query?: string,
+  category?: ContactCategory,
+): Promise<ContactRow[]> {
+  return withOrgContext(ctx, async (tx) => {
+    const filters = [];
+    const trimmed = query?.trim();
+    if (trimmed) {
+      const like = `%${trimmed}%`;
+      filters.push(
+        sql`(${contacts.name} ilike ${like} or ${contacts.title} ilike ${like} or ${contacts.email} ilike ${like} or ${companies.name} ilike ${like})`,
+      );
+    }
+    if (category) filters.push(sql`${contacts.categories} @> ARRAY[${category}]::text[]`);
+
+    const rows = await tx
+      .select({
+        id: contacts.id,
+        name: contacts.name,
+        title: contacts.title,
+        email: contacts.email,
+        phone: contacts.phone,
+        isPrimary: contacts.isPrimary,
+        categories: contacts.categories,
+        companyId: contacts.companyId,
+        companyName: companies.name,
+      })
+      .from(contacts)
+      .innerJoin(companies, eq(companies.id, contacts.companyId))
+      .where(filters.length > 0 ? and(...filters) : undefined)
+      .orderBy(asc(contacts.name));
+
+    return rows.map((row) => ({ ...row, categories: row.categories as ContactCategory[] }));
+  });
+}
+
+/** How many contacts carry each category, for the filter row. */
+export async function countContactsByCategory(
+  ctx: OrgContext,
+): Promise<Record<string, number> & { all: number }> {
+  return withOrgContext(ctx, async (tx) => {
+    const rows = await tx
+      .select({
+        category: sql<string>`unnest(${contacts.categories})`.as("category"),
+        count: sql<number>`count(*)::int`,
+      })
+      .from(contacts)
+      .groupBy(sql`1`);
+    const [total] = await tx.select({ count: sql<number>`count(*)::int` }).from(contacts);
+    const counts: Record<string, number> & { all: number } = { all: Number(total?.count ?? 0) };
+    for (const row of rows) counts[row.category] = Number(row.count);
+    return counts;
   });
 }
 

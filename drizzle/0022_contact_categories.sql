@@ -1,0 +1,3 @@
+ALTER TABLE "contacts" ADD COLUMN "categories" text[] DEFAULT '{}' NOT NULL;--> statement-breakpoint
+CREATE INDEX "contacts_org_name_idx" ON "contacts" USING btree ("org_id","name");--> statement-breakpoint
+ALTER TABLE "contacts" ADD CONSTRAINT "contacts_categories_valid" CHECK (categories <@ ARRAY['decision_maker','practitioner','door_opener','thought_leader','partner','former_colleague','press']::text[]);

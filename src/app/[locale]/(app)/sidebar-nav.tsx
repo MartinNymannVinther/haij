@@ -19,6 +19,7 @@ const SECTIONS: Array<{
     labelKey: "sales",
     items: [
       { href: "/companies", key: "companies" },
+      { href: "/contacts", key: "contacts" },
       { href: "/pipeline", key: "pipeline" },
     ],
   },

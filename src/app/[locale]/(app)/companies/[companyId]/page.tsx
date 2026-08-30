@@ -1,20 +1,23 @@
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Pencil } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContactDialog } from "@/components/contact-dialog";
 import { RoleRatesCard } from "@/components/role-rates-card";
 import { getOrgContext } from "@/core/auth/session";
 import type { PipelineStage } from "@/core/db/schema";
 import { formatMinutes } from "@/modules/time/duration";
 import { getCompanyDetail } from "@/modules/crm/service";
+import { CONTACT_CATEGORY_CLASS } from "@/modules/crm/contact-meta";
 import { getCustomerEconomy, getUnbilledByCompany } from "@/modules/invoicing/economy";
 import { listCompanyRoleRates, listRolesWithoutRate } from "@/modules/invoicing/roles";
 import { Link, redirect } from "@/i18n/navigation";
+import { cn } from "@/lib/utils";
 import { ActivityComposer } from "./activity-composer";
 import { CompanyEconomyCard } from "./company-economy-card";
 import { UnbilledCard } from "./unbilled-card";
-import { AddContactDialog } from "./add-contact-dialog";
 import { CompanyActions } from "./company-actions";
 import { ContactDeleteButton } from "./contact-delete-button";
 import { StageSelect } from "./stage-select";
@@ -39,10 +42,12 @@ export default async function CompanyDetailPage({
   const detail = await getCompanyDetail(context, companyId);
   if (!detail) notFound();
 
-  const [t, tContacts, tTimeline] = await Promise.all([
+  const [t, tContacts, tTimeline, tCategories, tCommon] = await Promise.all([
     getTranslations("crm.detail"),
     getTranslations("crm.contacts"),
     getTranslations("crm.timeline"),
+    getTranslations("crm.categories"),
+    getTranslations("common"),
   ]);
   const format = await getFormatter();
   const { company, contacts, timeline, trackedMinutes } = detail;
@@ -177,7 +182,7 @@ export default async function CompanyDetailPage({
             <CardHeader>
               <CardTitle>{tContacts("title")}</CardTitle>
               <CardAction>
-                <AddContactDialog companyId={company.id} />
+                <ContactDialog companyId={company.id} />
               </CardAction>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
@@ -195,6 +200,21 @@ export default async function CompanyDetailPage({
                           </span>
                         ) : null}
                       </p>
+                      {contact.categories.length > 0 ? (
+                        <p className="mt-1 flex flex-wrap gap-1">
+                          {contact.categories.map((category) => (
+                            <span
+                              key={category}
+                              className={cn(
+                                "rounded-sm border px-1.5 py-0.5 text-[0.7rem] font-medium",
+                                CONTACT_CATEGORY_CLASS[category],
+                              )}
+                            >
+                              {tCategories(category)}
+                            </span>
+                          ))}
+                        </p>
+                      ) : null}
                       {contact.title ? (
                         <p className="text-muted-foreground">{contact.title}</p>
                       ) : null}
@@ -205,7 +225,23 @@ export default async function CompanyDetailPage({
                         <p className="text-muted-foreground">{contact.phone}</p>
                       ) : null}
                     </div>
-                    <ContactDeleteButton contactId={contact.id} />
+                    <div className="flex shrink-0 items-center">
+                      <ContactDialog
+                        companyId={company.id}
+                        contact={contact}
+                        trigger={
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            aria-label={tCommon("edit")}
+                            className="opacity-0 transition-opacity group-hover:opacity-100"
+                          >
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+                      <ContactDeleteButton contactId={contact.id} />
+                    </div>
                   </div>
                 ))
               )}

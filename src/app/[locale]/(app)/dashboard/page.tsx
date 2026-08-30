@@ -10,6 +10,8 @@ import { todayInCopenhagen } from "@/core/dates";
 import { organizations } from "@/core/db/schema";
 import { withOrgContext } from "@/core/db/tenant";
 import { getCrmOverview } from "@/modules/crm/service";
+import { getLatestDigest } from "@/modules/knowledge/service";
+import { getTopSignal } from "@/modules/signals/service";
 import { getUnbilledByCompany } from "@/modules/invoicing/economy";
 import { formatOere } from "@/modules/invoicing/money";
 import { getInvoicingOverview, listOverdueInvoices } from "@/modules/invoicing/service";
@@ -17,6 +19,7 @@ import { formatMinutes, isoWeekMonday, isoWeekNumber, weekDates } from "@/module
 import { listWeek } from "@/modules/time/service";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { AttentionCard } from "./attention-card";
 import { PasskeyPrompt } from "./passkey-prompt";
 import { WeekChart, type WeekDay } from "./week-chart";
 
@@ -115,12 +118,14 @@ export default async function DashboardPage() {
 
   const today = todayInCopenhagen();
   const monday = isoWeekMonday(new Date());
-  const [overview, invoicing, overdue, unbilled, week] = await Promise.all([
+  const [overview, invoicing, overdue, unbilled, week, topSignal, digest] = await Promise.all([
     getCrmOverview(context),
     getInvoicingOverview(context),
     listOverdueInvoices(context, 3),
     getUnbilledByCompany(context),
     listWeek(context, monday),
+    getTopSignal(context),
+    getLatestDigest(context),
   ]);
 
   const totalCompanies = overview.stages.reduce((sum, row) => sum + row.count, 0);
@@ -208,6 +213,7 @@ export default async function DashboardPage() {
         }
       />
       <PasskeyPrompt />
+      <AttentionCard signal={topSignal} digest={digest} />
 
       {totalCompanies === 0 ? (
         <EmptyState
