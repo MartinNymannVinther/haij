@@ -766,3 +766,48 @@ export async function draftHasTimeEntries(ctx: OrgContext, invoiceId: string): P
     return Boolean(row);
   });
 }
+
+/**
+ * Fills a draft's party fields for a preview.
+ *
+ * The buyer and seller are snapshotted onto the invoice when it is
+ * issued, and deliberately so: an issued invoice must keep the addresses
+ * it was sent with, whatever changes later. A draft therefore carries
+ * none of them, and a preview built straight from the row shows an
+ * invoice with no parties on it — which is not what the customer will
+ * receive, and the preview's only job is to show exactly that.
+ *
+ * So the same values the issue step would copy are filled in here, for
+ * display only. Nothing is written; the snapshot still happens at issue.
+ */
+export function withPreviewParties(
+  invoice: typeof invoices.$inferSelect,
+  company: typeof companies.$inferSelect | null,
+  profile: typeof orgProfiles.$inferSelect | null,
+): typeof invoices.$inferSelect {
+  if (invoice.status !== "draft") return invoice;
+  const today = todayInCopenhagen();
+  return {
+    ...invoice,
+    buyerName: invoice.buyerName ?? company?.name ?? null,
+    buyerCvr: invoice.buyerCvr ?? company?.cvr ?? null,
+    buyerAddress: invoice.buyerAddress ?? company?.address ?? null,
+    buyerZipcode: invoice.buyerZipcode ?? company?.zipcode ?? null,
+    buyerCity: invoice.buyerCity ?? company?.city ?? null,
+    buyerEanGln: invoice.buyerEanGln ?? company?.eanGln ?? null,
+    sellerName: invoice.sellerName ?? profile?.legalName ?? null,
+    sellerCvr: invoice.sellerCvr ?? profile?.cvr ?? null,
+    sellerAddress: invoice.sellerAddress ?? profile?.address ?? null,
+    sellerZipcode: invoice.sellerZipcode ?? profile?.zipcode ?? null,
+    sellerCity: invoice.sellerCity ?? profile?.city ?? null,
+    sellerEmail: invoice.sellerEmail ?? profile?.email ?? null,
+    sellerPhone: invoice.sellerPhone ?? profile?.phone ?? null,
+    sellerBankReg: invoice.sellerBankReg ?? profile?.bankReg ?? null,
+    sellerBankKonto: invoice.sellerBankKonto ?? profile?.bankKonto ?? null,
+    // The dates the issue step would stamp, so the preview shows the terms
+    // the customer will actually be given.
+    invoiceDate: invoice.invoiceDate ?? today,
+    deliveryDate: invoice.deliveryDate ?? today,
+    dueDate: invoice.dueDate ?? addDaysIso(today, invoice.paymentTermsDays),
+  };
+}

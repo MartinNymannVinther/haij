@@ -193,4 +193,13 @@ describe("draft", () => {
     expect(text).toContain("Tildeles ved udstedelse");
     expect(text).not.toContain("1042");
   });
+
+  it("still shows both parties, because that is what the preview is for", async () => {
+    const pdf = await renderInvoicePdf(fakeInvoice({ status: "draft", invoiceNumber: null }), [
+      fakeLine({ position: 0 }),
+    ]);
+    const text = extractText(pdf);
+    expect(text).toContain("Vinther Consulting ApS");
+    expect(text).toContain("Kunde Alfa ApS");
+  });
 });

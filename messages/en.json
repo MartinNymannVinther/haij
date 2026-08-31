@@ -592,9 +592,9 @@
       "groupingLabel": "Line grouping",
       "regroupNoTime": "There are no time entries on this draft to group.",
       "showPreview": "Show preview",
-      "hidePreview": "Hide preview",
       "previewTitle": "Invoice draft preview",
-      "previewHint": "This is how the invoice looks. The number is assigned when you issue it."
+      "previewHint": "This is how the invoice looks. The parties and dates are the ones stamped on at issue; the number is assigned then too.",
+      "openInTab": "Open in a new tab"
     },
     "detail": {
       "title": "Invoice",

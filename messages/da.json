@@ -592,9 +592,9 @@
       "groupingLabel": "Gruppering af linjer",
       "regroupNoTime": "Der er ingen tidsposter på udkastet at gruppere.",
       "showPreview": "Vis udkast",
-      "hidePreview": "Skjul udkast",
       "previewTitle": "Forhåndsvisning af fakturaudkast",
-      "previewHint": "Sådan ser fakturaen ud. Nummeret tildeles først når du udsteder."
+      "previewHint": "Sådan ser fakturaen ud. Parterne og datoerne er dem der bliver skrevet på når du udsteder; nummeret tildeles samtidig.",
+      "openInTab": "Åbn i nyt faneblad"
     },
     "detail": {
       "title": "Faktura",

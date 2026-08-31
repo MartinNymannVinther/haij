@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { requireOrgContext } from "@/core/auth/guard";
 import { getOrgLogo } from "@/modules/invoicing/logo";
-import { getInvoiceDetail } from "@/modules/invoicing/service";
+import { getInvoiceDetail, withPreviewParties } from "@/modules/invoicing/service";
 import { renderInvoicePdf } from "@/modules/invoicing/pdf";
 
 export const runtime = "nodejs";
@@ -29,7 +29,10 @@ export async function GET(
   if (!detail) return new Response("Not found", { status: 404 });
 
   const logo = await getOrgLogo(ctx);
-  const pdf = await renderInvoicePdf(detail.invoice, detail.lines, logo?.dataUrl ?? null);
+  // A draft has no party snapshot yet; fill in what issuing would stamp,
+  // so the preview shows the document the customer will receive.
+  const invoice = withPreviewParties(detail.invoice, detail.company, detail.profile);
+  const pdf = await renderInvoicePdf(invoice, detail.lines, logo?.dataUrl ?? null);
   const kind = detail.invoice.type === "credit_note" ? "kreditnota" : "faktura";
   const filename =
     detail.invoice.status === "draft"
