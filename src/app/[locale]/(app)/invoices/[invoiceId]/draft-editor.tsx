@@ -492,7 +492,13 @@ function LinesCard({
           <DialogHeader>
             <DialogTitle>{editing ? t("editLineTitle") : t("addLineTitle")}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/*
+            Remounted per line: defaultValue is read once, when a field is
+            created. Without this, opening a second line for editing would
+            leave the first one's numbers standing in the form — and the
+            values you saw would not be the values you saved.
+          */}
+          <form key={editing?.id ?? "new"} onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field>
               <FieldLabel htmlFor="description">{t("lineDescription")}</FieldLabel>
               <Input
