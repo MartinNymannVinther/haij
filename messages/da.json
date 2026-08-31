@@ -389,7 +389,46 @@
     "billedNumber": "Faktura {number}",
     "onDraft": "På udkast",
     "billedTitle": "Timen er sat på en faktura",
-    "invoicedCannotDelete": "Timen sidder på en udstedt faktura og kan ikke slettes. Lav en kreditnota hvis fakturaen er forkert."
+    "invoicedCannotDelete": "Timen sidder på en udstedt faktura og kan ikke slettes. Lav en kreditnota hvis fakturaen er forkert.",
+    "report": {
+      "title": "Timerapport",
+      "summary": "{hours} i alt · {amount} ekskl. moms · {open} endnu ikke faktureret",
+      "empty": "Ingen timer matcher.",
+      "emptyHint": "Prøv en bredere periode, eller ryd filtrene.",
+      "from": "Fra",
+      "to": "Til",
+      "customer": "Kunde",
+      "project": "Projekt",
+      "role": "Rolle",
+      "status": "Status",
+      "grouping": "Gruppering",
+      "any": "Alle",
+      "apply": "Vis",
+      "reset": "Nulstil",
+      "statuses": {
+        "all": "Alle timer",
+        "unbilled": "Ikke faktureret",
+        "billed": "Faktureret"
+      },
+      "groupings": {
+        "none": "Ingen",
+        "company": "Per kunde",
+        "project": "Per projekt",
+        "task": "Per opgave",
+        "role": "Per rolle",
+        "month": "Per måned"
+      },
+      "dateHead": "Dato",
+      "customerHead": "Kunde",
+      "workHead": "Arbejde",
+      "hoursHead": "Timer",
+      "amountHead": "Beløb",
+      "invoiceHead": "Faktura",
+      "onDraft": "Udkast",
+      "exportExcel": "Hent som Excel",
+      "exportPdf": "Hent som PDF",
+      "link": "Timerapport"
+    }
   },
   "orgProfile": {
     "title": "Virksomhed",
@@ -542,7 +581,20 @@
       "lineInvalid": "Tjek antal og pris. Skriv fx 1,5 og 950,00.",
       "subtotal": "Subtotal ekskl. moms",
       "vatTotal": "Moms",
-      "grandTotal": "Total inkl. moms"
+      "grandTotal": "Total inkl. moms",
+      "grouping": {
+        "entry": "Én linje per tidspost",
+        "project": "Saml per projekt",
+        "task": "Saml per opgave",
+        "role": "Saml per rolle",
+        "month": "Saml per måned"
+      },
+      "groupingLabel": "Gruppering af linjer",
+      "regroupNoTime": "Der er ingen tidsposter på udkastet at gruppere.",
+      "showPreview": "Vis udkast",
+      "hidePreview": "Skjul udkast",
+      "previewTitle": "Forhåndsvisning af fakturaudkast",
+      "previewHint": "Sådan ser fakturaen ud. Nummeret tildeles først når du udsteder."
     },
     "detail": {
       "title": "Faktura",

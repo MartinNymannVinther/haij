@@ -389,7 +389,46 @@
     "billedNumber": "Invoice {number}",
     "onDraft": "On draft",
     "billedTitle": "This hour is on an invoice",
-    "invoicedCannotDelete": "This hour is on an issued invoice and cannot be deleted. Issue a credit note if the invoice is wrong."
+    "invoicedCannotDelete": "This hour is on an issued invoice and cannot be deleted. Issue a credit note if the invoice is wrong.",
+    "report": {
+      "title": "Time report",
+      "summary": "{hours} in total · {amount} excl. VAT · {open} not yet invoiced",
+      "empty": "No hours match.",
+      "emptyHint": "Try a wider period, or clear the filters.",
+      "from": "From",
+      "to": "To",
+      "customer": "Customer",
+      "project": "Project",
+      "role": "Role",
+      "status": "Status",
+      "grouping": "Grouping",
+      "any": "All",
+      "apply": "Show",
+      "reset": "Reset",
+      "statuses": {
+        "all": "All hours",
+        "unbilled": "Not invoiced",
+        "billed": "Invoiced"
+      },
+      "groupings": {
+        "none": "None",
+        "company": "By customer",
+        "project": "By project",
+        "task": "By task",
+        "role": "By role",
+        "month": "By month"
+      },
+      "dateHead": "Date",
+      "customerHead": "Customer",
+      "workHead": "Work",
+      "hoursHead": "Hours",
+      "amountHead": "Amount",
+      "invoiceHead": "Invoice",
+      "onDraft": "Draft",
+      "exportExcel": "Download as Excel",
+      "exportPdf": "Download as PDF",
+      "link": "Time report"
+    }
   },
   "orgProfile": {
     "title": "Company",
@@ -542,7 +581,20 @@
       "lineInvalid": "Check quantity and price. Use e.g. 1.5 and 950.00.",
       "subtotal": "Subtotal ex VAT",
       "vatTotal": "VAT",
-      "grandTotal": "Total incl. VAT"
+      "grandTotal": "Total incl. VAT",
+      "grouping": {
+        "entry": "One line per entry",
+        "project": "Group by project",
+        "task": "Group by task",
+        "role": "Group by role",
+        "month": "Group by month"
+      },
+      "groupingLabel": "Line grouping",
+      "regroupNoTime": "There are no time entries on this draft to group.",
+      "showPreview": "Show preview",
+      "hidePreview": "Hide preview",
+      "previewTitle": "Invoice draft preview",
+      "previewHint": "This is how the invoice looks. The number is assigned when you issue it."
     },
     "detail": {
       "title": "Invoice",

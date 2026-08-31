@@ -6,6 +6,7 @@ import { INVOICE_UNITS, VAT_CATEGORIES } from "@/core/db/schema";
 import { normalizeCvr } from "@/core/cvr";
 import { setCustomerFrame, setRevenueTarget } from "./economy";
 import { deleteOrgLogo, saveOrgLogo, LOGO_CONTENT_TYPES, LOGO_MAX_BYTES } from "./logo";
+import { LINE_GROUPINGS } from "./grouping";
 import { setNextInvoiceNumber } from "./numbering";
 import { upsertOrgProfile } from "./profile";
 import { createRole, deleteRole, deleteRoleRate, setRoleRate, updateRole } from "./roles";
@@ -18,6 +19,7 @@ import {
   issueInvoice,
   markPaid,
   markSent,
+  regroupDraft,
   removeLine,
   unbilledSummary,
   updateDraft,
@@ -143,6 +145,7 @@ const DateRangeSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .nullish()
     .transform((v) => v ?? null),
+  grouping: z.enum(LINE_GROUPINGS).optional(),
 });
 
 export async function createDraftFromTimeAction(
@@ -542,6 +545,29 @@ export async function setNextInvoiceNumberAction(next: unknown): Promise<Invoici
 
   try {
     await setNextInvoiceNumber(ctx, parsed.data);
+    return { ok: true, data: undefined };
+  } catch (error) {
+    return { ok: false, error: toActionError(error) };
+  }
+}
+
+/**
+ * Changes how a draft's hours are presented on the invoice. Only the
+ * presentation: the same entries stay attached and the total does not
+ * move.
+ */
+export async function regroupDraftAction(
+  invoiceId: unknown,
+  grouping: unknown,
+): Promise<InvoicingResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const id = Id.safeParse(invoiceId);
+  const parsed = z.enum(LINE_GROUPINGS).safeParse(grouping);
+  if (!id.success || !parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    await regroupDraft(ctx, id.data, parsed.data);
     return { ok: true, data: undefined };
   } catch (error) {
     return { ok: false, error: toActionError(error) };

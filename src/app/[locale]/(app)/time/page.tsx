@@ -91,6 +91,12 @@ export default async function TimePage({
             {t("thisWeek")}
           </Link>
           <Link
+            href="/time/report"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }), "ml-2")}
+          >
+            {t("report.link")}
+          </Link>
+          <Link
             href={`/time?week=${shiftWeek(monday, 1)}`}
             aria-label={t("nextWeek")}
             className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}

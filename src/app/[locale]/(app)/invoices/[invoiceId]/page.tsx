@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getOrgContext } from "@/core/auth/session";
 import { listCompanies } from "@/modules/crm/service";
-import { getInvoiceDetail } from "@/modules/invoicing/service";
+import { draftHasTimeEntries, getInvoiceDetail } from "@/modules/invoicing/service";
 import { redirect } from "@/i18n/navigation";
 import { DraftEditor } from "./draft-editor";
 import { IssuedView } from "./issued-view";
@@ -31,6 +31,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ invoic
         lines={detail.lines}
         companies={companies.map((c) => ({ id: c.id, name: c.name }))}
         hasProfile={Boolean(detail.profile)}
+        hasTimeEntries={await draftHasTimeEntries(context, invoiceId)}
       />
     );
   }

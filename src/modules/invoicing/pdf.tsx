@@ -39,6 +39,23 @@ const muted = "#6b7280";
 const rule = "#d7dadd";
 
 const styles = StyleSheet.create({
+  /**
+   * The draft stamp. Big, diagonal and behind the content, because a
+   * draft PDF that reads as an invoice is a draft that gets emailed by
+   * mistake — and a draft carries no number, so it satisfies none of the
+   * fakturakrav.
+   */
+  draftStamp: {
+    position: "absolute",
+    top: 320,
+    left: -40,
+    width: 640,
+    textAlign: "center",
+    fontSize: 96,
+    color: "#e6ded2",
+    letterSpacing: 14,
+    transform: "rotate(-28deg)",
+  },
   page: {
     fontFamily: "Helvetica",
     fontSize: 9,
@@ -132,6 +149,7 @@ export function InvoicePdf({
   logoDataUrl?: string | null;
 }) {
   const isCredit = invoice.type === "credit_note";
+  const isDraft = invoice.status === "draft";
   const title = isCredit ? "KREDITNOTA" : "FAKTURA";
 
   // Fakturakrav: the VAT base and rate must be specified. One summary row
@@ -146,10 +164,15 @@ export function InvoicePdf({
 
   return (
     <Document
-      title={`${isCredit ? "Kreditnota" : "Faktura"} ${invoice.invoiceNumber}`}
+      title={isDraft ? `${title} (udkast)` : `${title} ${invoice.invoiceNumber}`}
       author={invoice.sellerName ?? "Haij"}
     >
       <Page size="A4" style={styles.page}>
+        {isDraft ? (
+          <Text style={styles.draftStamp} fixed>
+            UDKAST
+          </Text>
+        ) : null}
         <View style={styles.headerRow}>
           <Text style={styles.docTitle}>{title}</Text>
           {logoDataUrl ? (
@@ -202,7 +225,9 @@ export function InvoicePdf({
         <View style={styles.metaBox}>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>{isCredit ? "Kreditnotanr." : "Fakturanr."}</Text>
-            <Text style={styles.metaValue}>{invoice.invoiceNumber}</Text>
+            <Text style={styles.metaValue}>
+              {isDraft ? "Tildeles ved udstedelse" : invoice.invoiceNumber}
+            </Text>
           </View>
           <View style={styles.metaItem}>
             <Text style={styles.metaLabel}>Dato</Text>

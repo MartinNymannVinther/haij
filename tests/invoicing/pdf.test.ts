@@ -1,4 +1,5 @@
 import { writeFile } from "node:fs/promises";
+import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import type { invoiceLines, invoices } from "@/core/db/schema";
 import { renderInvoicePdf } from "@/modules/invoicing/pdf";
@@ -13,6 +14,45 @@ type Invoice = typeof invoices.$inferSelect;
 type Line = typeof invoiceLines.$inferSelect;
 
 const now = new Date();
+
+/**
+ * Pulls the visible text out of a rendered PDF. Content streams are
+ * deflated and react-pdf writes text as TJ arrays of hex-encoded glyph
+ * codes, which for these fonts are the character codes themselves. Enough
+ * to assert what a reader would see; if the encoding ever changes this
+ * fails loudly rather than passing on an empty string.
+ */
+function extractText(pdf: Buffer): string {
+  const out: string[] = [];
+  let index = 0;
+  for (;;) {
+    const start = pdf.indexOf("stream", index);
+    if (start === -1) break;
+    let from = start + 6;
+    while (pdf[from] === 0x0d || pdf[from] === 0x0a) from += 1;
+    const end = pdf.indexOf("endstream", from);
+    if (end === -1) break;
+    index = end + 9;
+
+    let inflated: string;
+    try {
+      inflated = inflateSync(pdf.subarray(from, end)).toString("latin1");
+    } catch {
+      continue; // fonts and images are not deflated text
+    }
+
+    for (const show of inflated.matchAll(/\[([^\]]*)\]\s*TJ/g)) {
+      for (const part of show[1]!.matchAll(/<([0-9a-fA-F]+)>/g)) {
+        const hex = part[1]!;
+        for (let i = 0; i + 1 < hex.length; i += 2) {
+          out.push(String.fromCharCode(parseInt(hex.slice(i, i + 2), 16)));
+        }
+      }
+      out.push(" ");
+    }
+  }
+  return out.join("");
+}
 
 function fakeInvoice(overrides: Partial<Invoice>): Invoice {
   return {
@@ -134,5 +174,23 @@ describe("renderInvoicePdf", () => {
     if (process.env.PDF_SNAPSHOT_DIR) {
       await writeFile(`${process.env.PDF_SNAPSHOT_DIR}/kreditnota.pdf`, pdf);
     }
+  });
+});
+
+/**
+ * A draft must be unmistakable. If this ever passes without the stamp,
+ * somebody can email a document that looks like an invoice but carries no
+ * number and satisfies none of the fakturakrav.
+ */
+describe("draft", () => {
+  it("stamps UDKAST across the page and shows no invoice number", async () => {
+    const pdf = await renderInvoicePdf(
+      fakeInvoice({ status: "draft", invoiceNumber: null, dueDate: null }),
+      [fakeLine({ position: 0 })],
+    );
+    const text = extractText(pdf);
+    expect(text).toContain("UDKAST");
+    expect(text).toContain("Tildeles ved udstedelse");
+    expect(text).not.toContain("1042");
   });
 });

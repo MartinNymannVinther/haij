@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DraftPreview } from "./draft-preview";
 import {
   Dialog,
   DialogContent,
@@ -64,11 +65,14 @@ export function DraftEditor({
   lines,
   companies,
   hasProfile,
+  hasTimeEntries,
 }: {
   invoice: Invoice;
   lines: Line[];
   companies: Array<{ id: string; name: string }>;
   hasProfile: boolean;
+  /** Grouping only makes sense when the lines came from tracked hours. */
+  hasTimeEntries: boolean;
 }) {
   const t = useTranslations("invoicing.editor");
   const tCommon = useTranslations("common");
@@ -181,7 +185,7 @@ export function DraftEditor({
 
       <div className="grid gap-6 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-6">
-          <LinesCard invoiceId={invoice.id} lines={lines} />
+          <LinesCard invoiceId={invoice.id} lines={lines} hasTimeEntries={hasTimeEntries} />
         </div>
 
         {/* Keyed by updatedAt: a save refreshes the invoice props, and
@@ -317,7 +321,15 @@ export function DraftEditor({
 
 /* --------------------------- Lines editing --------------------------- */
 
-function LinesCard({ invoiceId, lines }: { invoiceId: string; lines: Line[] }) {
+function LinesCard({
+  invoiceId,
+  lines,
+  hasTimeEntries,
+}: {
+  invoiceId: string;
+  lines: Line[];
+  hasTimeEntries: boolean;
+}) {
   const t = useTranslations("invoicing.editor");
   const tUnits = useTranslations("invoicing.units");
   const tVat = useTranslations("invoicing.vat");
@@ -390,6 +402,9 @@ function LinesCard({ invoiceId, lines }: { invoiceId: string; lines: Line[] }) {
           {t("addLine")}
         </Button>
       </CardHeader>
+      <CardContent className="pb-0">
+        <DraftPreview invoiceId={invoiceId} hasTimeEntries={hasTimeEntries} />
+      </CardContent>
       <CardContent className="flex flex-col gap-4">
         {lines.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-sm">{t("noLines")}</p>

@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
-import { todayInCopenhagen, addDaysIso, formatDateDa } from "@/core/dates";
+import { todayInCopenhagen, addDaysIso } from "@/core/dates";
 import {
   activities,
   companies,
@@ -15,7 +15,8 @@ import {
   type VatCategory,
 } from "@/core/db/schema";
 import { withOrgContext, type AppTransaction, type OrgContext } from "@/core/db/tenant";
-import { invoiceTotals, lineNetOere, lineVatOere, minutesToQuantityHundredths } from "./money";
+import { invoiceTotals, lineNetOere, lineVatOere } from "./money";
+import { groupEntriesIntoLines, type GroupableEntry, type LineGrouping } from "./grouping";
 import { allocateInvoiceNumber } from "./numbering";
 import {
   companyRoleRate,
@@ -207,7 +208,137 @@ export type DraftFromTimeOptions = {
   /** Inclusive yyyy-mm-dd bounds; omitted side means unbounded. */
   from?: string | null;
   to?: string | null;
+  /** How the hours are collapsed into lines; defaults to one per entry. */
+  grouping?: LineGrouping;
 };
+
+/**
+ * Replaces a draft's lines with the given entries, grouped. Used both
+ * when a draft is created from time and when the grouping is changed
+ * afterwards, so the two paths cannot produce different invoices.
+ */
+async function writeGroupedLines(
+  tx: AppTransaction,
+  ctx: OrgContext,
+  invoiceId: string,
+  entries: GroupableEntry[],
+  grouping: LineGrouping,
+): Promise<void> {
+  const grouped = groupEntriesIntoLines(entries, grouping);
+
+  for (const [position, line] of grouped.entries()) {
+    const net = lineNetOere(line.quantityHundredths, line.unitPriceOere);
+    const [created] = await tx
+      .insert(invoiceLines)
+      .values({
+        orgId: ctx.orgId,
+        invoiceId,
+        position,
+        description: line.description,
+        quantityHundredths: line.quantityHundredths,
+        unit: "hour",
+        unitPriceOere: line.unitPriceOere,
+        vatCategory: "standard",
+        vatRateBp: 2500,
+        lineNetOere: net,
+        lineVatOere: lineVatOere(net, 2500),
+      })
+      .returning({ id: invoiceLines.id });
+    if (!created) throw new Error("invoice line insert returned no row");
+
+    await tx
+      .update(timeEntries)
+      .set({ invoiceLineId: created.id, updatedAt: new Date() })
+      .where(inArray(timeEntries.id, line.entryIds));
+  }
+}
+
+/**
+ * Changes how a draft's hours are presented. Rebuilds the lines from the
+ * entries already attached to the draft, so nothing is added or lost —
+ * only regrouped. Refuses on anything but a draft: an issued invoice is a
+ * document, and its lines are frozen.
+ */
+export async function regroupDraft(
+  ctx: OrgContext,
+  invoiceId: string,
+  grouping: LineGrouping,
+): Promise<void> {
+  return withOrgContext(ctx, async (tx) => {
+    const invoice = await getDraftOrThrow(tx, invoiceId);
+    const company = invoice.companyId ? await getCompanyOrThrow(tx, invoice.companyId) : null;
+    const [profile] = await tx
+      .select()
+      .from(orgProfiles)
+      .where(eq(orgProfiles.orgId, ctx.orgId))
+      .limit(1);
+
+    const attached = await tx
+      .select({
+        id: timeEntries.id,
+        entryDate: timeEntries.entryDate,
+        durationMinutes: timeEntries.durationMinutes,
+        note: timeEntries.note,
+        roleName: roles.name,
+        projectName: projects.name,
+        taskTitle: tasks.title,
+        projectRoleRateOere: projectRoleRate.hourlyRateOere,
+        companyRoleRateOere: companyRoleRate.hourlyRateOere,
+        taskRateOere: tasks.hourlyRateOere,
+        projectRateOere: projects.hourlyRateOere,
+      })
+      .from(timeEntries)
+      .innerJoin(invoiceLines, eq(invoiceLines.id, timeEntries.invoiceLineId))
+      .leftJoin(roles, eq(roles.id, timeEntries.roleId))
+      .leftJoin(tasks, eq(tasks.id, timeEntries.taskId))
+      .leftJoin(projects, eq(projects.id, timeEntries.projectId))
+      .leftJoin(projectRoleRate, projectRoleRateOn)
+      .leftJoin(companyRoleRate, companyRoleRateOn)
+      .where(eq(invoiceLines.invoiceId, invoiceId))
+      .orderBy(asc(timeEntries.entryDate), asc(timeEntries.createdAt));
+
+    if (attached.length === 0) throw domainError("NO_UNBILLED_TIME");
+
+    // Unlink first: the lines are about to go, and a dangling reference
+    // would take the hours with them.
+    await tx
+      .update(timeEntries)
+      .set({ invoiceLineId: null, updatedAt: new Date() })
+      .where(
+        inArray(
+          timeEntries.id,
+          attached.map((entry) => entry.id),
+        ),
+      );
+    await tx.delete(invoiceLines).where(eq(invoiceLines.invoiceId, invoiceId));
+
+    await writeGroupedLines(
+      tx,
+      ctx,
+      invoiceId,
+      attached.map((entry) => ({
+        id: entry.id,
+        entryDate: entry.entryDate,
+        durationMinutes: entry.durationMinutes,
+        note: entry.note,
+        projectName: entry.projectName,
+        taskTitle: entry.taskTitle,
+        roleName: entry.roleName,
+        unitPriceOere: resolveHourlyRateOere({
+          projectRoleRateOere: entry.projectRoleRateOere,
+          companyRoleRateOere: entry.companyRoleRateOere,
+          taskRateOere: entry.taskRateOere,
+          projectRateOere: entry.projectRateOere,
+          companyRateOere: company?.hourlyRateOere,
+          orgDefaultRateOere: profile?.defaultHourlyRateOere,
+        }),
+      })),
+      grouping,
+    );
+
+    await recomputeTotals(tx, invoiceId);
+  });
+}
 
 function unbilledFilter(companyId: string, options?: DraftFromTimeOptions) {
   return and(
@@ -264,6 +395,8 @@ export async function createDraftFromTime(
         durationMinutes: timeEntries.durationMinutes,
         note: timeEntries.note,
         roleName: roles.name,
+        projectName: projects.name,
+        taskTitle: tasks.title,
         projectRoleRateOere: projectRoleRate.hourlyRateOere,
         companyRoleRateOere: companyRoleRate.hourlyRateOere,
         taskRateOere: tasks.hourlyRateOere,
@@ -290,42 +423,29 @@ export async function createDraftFromTime(
       .returning({ id: invoices.id });
     if (!created) throw new Error("invoice insert returned no row");
 
-    for (const [index, entry] of entries.entries()) {
-      const unitPriceOere = resolveHourlyRateOere({
-        projectRoleRateOere: entry.projectRoleRateOere,
-        companyRoleRateOere: entry.companyRoleRateOere,
-        taskRateOere: entry.taskRateOere,
-        projectRateOere: entry.projectRateOere,
-        companyRateOere: company.hourlyRateOere,
-        orgDefaultRateOere: profile?.defaultHourlyRateOere,
-      });
-      const quantityHundredths = minutesToQuantityHundredths(entry.durationMinutes);
-      const net = lineNetOere(quantityHundredths, unitPriceOere);
-      const label = entry.note ?? "Konsulentarbejde";
-      const [line] = await tx
-        .insert(invoiceLines)
-        .values({
-          orgId: ctx.orgId,
-          invoiceId: created.id,
-          position: index,
-          description: `${formatDateDa(entry.entryDate)} · ${label}${
-            entry.roleName ? ` (${entry.roleName})` : ""
-          }`,
-          quantityHundredths,
-          unit: "hour",
-          unitPriceOere,
-          vatCategory: "standard",
-          vatRateBp: 2500,
-          lineNetOere: net,
-          lineVatOere: lineVatOere(net, 2500),
-        })
-        .returning({ id: invoiceLines.id });
-      if (!line) throw new Error("invoice line insert returned no row");
-      await tx
-        .update(timeEntries)
-        .set({ invoiceLineId: line.id, updatedAt: new Date() })
-        .where(eq(timeEntries.id, entry.id));
-    }
+    await writeGroupedLines(
+      tx,
+      ctx,
+      created.id,
+      entries.map((entry) => ({
+        id: entry.id,
+        entryDate: entry.entryDate,
+        durationMinutes: entry.durationMinutes,
+        note: entry.note,
+        projectName: entry.projectName,
+        taskTitle: entry.taskTitle,
+        roleName: entry.roleName,
+        unitPriceOere: resolveHourlyRateOere({
+          projectRoleRateOere: entry.projectRoleRateOere,
+          companyRoleRateOere: entry.companyRoleRateOere,
+          taskRateOere: entry.taskRateOere,
+          projectRateOere: entry.projectRateOere,
+          companyRateOere: company.hourlyRateOere,
+          orgDefaultRateOere: profile?.defaultHourlyRateOere,
+        }),
+      })),
+      options?.grouping ?? "entry",
+    );
 
     await recomputeTotals(tx, created.id);
     return created.id;
@@ -627,5 +747,22 @@ export async function markPaid(ctx: OrgContext, invoiceId: string) {
       .where(and(eq(invoices.id, invoiceId), inArray(invoices.status, ["issued", "sent"])))
       .returning({ id: invoices.id });
     if (result.length === 0) throw domainError("INVOICE_NOT_ISSUED");
+  });
+}
+
+/**
+ * Whether any tracked hours hang off this invoice's lines. Grouping is
+ * only offered when there is something to group; a hand-written invoice
+ * has nothing behind its lines to rearrange.
+ */
+export async function draftHasTimeEntries(ctx: OrgContext, invoiceId: string): Promise<boolean> {
+  return withOrgContext(ctx, async (tx) => {
+    const [row] = await tx
+      .select({ id: timeEntries.id })
+      .from(timeEntries)
+      .innerJoin(invoiceLines, eq(invoiceLines.id, timeEntries.invoiceLineId))
+      .where(eq(invoiceLines.invoiceId, invoiceId))
+      .limit(1);
+    return Boolean(row);
   });
 }

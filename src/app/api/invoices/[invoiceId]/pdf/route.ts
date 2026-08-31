@@ -7,10 +7,13 @@ import { renderInvoicePdf } from "@/modules/invoicing/pdf";
 export const runtime = "nodejs";
 
 /**
- * On-demand PDF for an issued invoice or credit note, behind the session.
- * Drafts have no number and would not satisfy the fakturakrav, so they
- * get 404 like anything else the caller must not see — the response never
- * distinguishes "not yours" from "not there" or "not ready".
+ * On-demand PDF for an invoice or credit note, behind the session.
+ *
+ * Drafts render too, so what the customer will receive can be read before
+ * it is issued. A draft is marked as one in the document itself: a large
+ * UDKAST stamp across every page and no invoice number, since a number is
+ * only assigned at issue. It cannot be mistaken for an invoice, and it
+ * satisfies none of the fakturakrav on purpose.
  */
 export async function GET(
   _request: NextRequest,
@@ -23,14 +26,15 @@ export async function GET(
   if (!/^[\w-]{1,64}$/.test(invoiceId)) return new Response("Not found", { status: 404 });
 
   const detail = await getInvoiceDetail(ctx, invoiceId);
-  if (!detail || detail.invoice.status === "draft") {
-    return new Response("Not found", { status: 404 });
-  }
+  if (!detail) return new Response("Not found", { status: 404 });
 
   const logo = await getOrgLogo(ctx);
   const pdf = await renderInvoicePdf(detail.invoice, detail.lines, logo?.dataUrl ?? null);
   const kind = detail.invoice.type === "credit_note" ? "kreditnota" : "faktura";
-  const filename = `${kind}-${detail.invoice.invoiceNumber}.pdf`;
+  const filename =
+    detail.invoice.status === "draft"
+      ? `${kind}-udkast.pdf`
+      : `${kind}-${detail.invoice.invoiceNumber}.pdf`;
 
   return new Response(new Uint8Array(pdf), {
     headers: {
