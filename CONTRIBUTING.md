@@ -21,6 +21,14 @@ a new ADR that names the trade-off.
   never hardcode UI strings.
 - `pnpm lint`, `pnpm typecheck`, `pnpm format:check` and `pnpm test` must
   all pass; CI enforces them plus a dependency audit and secrets scan.
+- `pnpm test` drops and rebuilds the whole schema, which is how a fresh
+  checkout is proven to migrate from zero. It never touches the database
+  in your `.env`: every connection URL is rewritten to a `_test` sibling
+  (`haij` becomes `haij_test`), created on first run, and the suite
+  refuses to start if the target is not clearly a test database. Point it
+  somewhere else with `TEST_MIGRATION_DATABASE_URL`,
+  `TEST_APP_DATABASE_URL` and `TEST_AUTH_DATABASE_URL` — the same guard
+  applies to those.
 
 ## The tenancy checklist (every new table)
 
