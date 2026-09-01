@@ -69,7 +69,9 @@
       "loginLink": "Log ind",
       "errorInvalid": "Tjek felterne og prøv igen.",
       "errorEmailExists": "Der findes allerede en konto med denne e-mail.",
-      "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen."
+      "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen.",
+      "closedTitle": "Oprettelse er lukket",
+      "closedBody": "Denne installation af Haij tager ikke imod nye brugere. Kontakt ejeren hvis du skal have adgang."
     },
     "twoFactor": {
       "title": "Totrinsbekræftelse",

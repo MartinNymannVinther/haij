@@ -24,7 +24,10 @@ export default defineConfig({
     },
   },
   test: {
-    env: testDatabaseUrls,
+    // The suite registers users as it goes, which a closed installation
+    // refuses by design. Opening it here keeps the fixtures honest; that
+    // the shipped default is "closed" is proven in tests/auth/signup-gate.
+    env: { ...testDatabaseUrls, SIGNUP: "open" },
     environment: "node",
     include: ["tests/**/*.test.ts"],
     globalSetup: ["tests/global-setup.ts"],

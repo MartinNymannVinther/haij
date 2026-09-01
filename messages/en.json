@@ -69,7 +69,9 @@
       "loginLink": "Sign in",
       "errorInvalid": "Check the fields and try again.",
       "errorEmailExists": "An account with this email already exists.",
-      "errorGeneric": "The account could not be created. Please try again."
+      "errorGeneric": "The account could not be created. Please try again.",
+      "closedTitle": "Registration is closed",
+      "closedBody": "This Haij installation is not accepting new users. Contact the owner if you need access."
     },
     "twoFactor": {
       "title": "Two-factor authentication",

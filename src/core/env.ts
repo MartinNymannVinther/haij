@@ -4,7 +4,7 @@ import { z } from "zod";
  * Server-side environment variables, validated at the boundary.
  * Import this instead of reading process.env directly.
  */
-const EnvSchema = z
+export const EnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
     APP_DATABASE_URL: z.url(),
@@ -28,6 +28,10 @@ const EnvSchema = z
     // Model override; sensible per-provider defaults apply when unset.
     LLM_MODEL: z.string().min(1).optional(),
     OLLAMA_BASE_URL: z.url().default("http://localhost:11434"),
+    // Who may create an account: "closed" (the default) admits nobody once
+    // the first user exists, "open" lets anyone register. See
+    // src/core/auth/signup.ts.
+    SIGNUP: z.enum(["closed", "open"]).default("closed"),
     // Bearer secret for the unattended signal-refresh endpoint; the
     // endpoint answers 404 until this is set. pg-boss takes over when
     // Haij is deployed (ADR 0005).

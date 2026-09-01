@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/core/auth/client";
 import { Link, useRouter } from "@/i18n/navigation";
 
-export function LoginForm() {
+export function LoginForm({ signupOpen }: { signupOpen: boolean }) {
   const t = useTranslations("auth.login");
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -115,12 +115,14 @@ export function LoginForm() {
           {t("withPasskey")}
         </Button>
       </CardContent>
-      <CardFooter className="justify-center text-sm">
-        <span className="text-muted-foreground">{t("noAccount")}&nbsp;</span>
-        <Link href="/register" className="font-medium underline-offset-4 hover:underline">
-          {t("registerLink")}
-        </Link>
-      </CardFooter>
+      {signupOpen ? (
+        <CardFooter className="justify-center text-sm">
+          <span className="text-muted-foreground">{t("noAccount")}&nbsp;</span>
+          <Link href="/register" className="font-medium underline-offset-4 hover:underline">
+            {t("registerLink")}
+          </Link>
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }

@@ -2,6 +2,7 @@ import { APIError } from "better-auth";
 import { z } from "zod";
 import { organizationSlug } from "@/lib/slug";
 import { auth } from "./auth";
+import { signupAllowed } from "./signup";
 
 export const RegisterSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -13,7 +14,7 @@ export const RegisterSchema = z.object({
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 
 export type RegisterResult =
-  { ok: true } | { ok: false; error: "invalid" | "emailExists" | "generic" };
+  { ok: true } | { ok: false; error: "invalid" | "emailExists" | "closed" | "generic" };
 
 /** Turns the set-cookie headers of an API response into a cookie header. */
 function cookieHeaderFrom(responseHeaders: Headers): Headers {
@@ -38,6 +39,11 @@ export async function registerUserWithOrganization(
   const parsed = RegisterSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: "invalid" };
+  }
+  // Checked here as well as in the Better Auth hook, so the form can say
+  // something useful instead of showing a generic failure.
+  if (!(await signupAllowed())) {
+    return { ok: false, error: "closed" };
   }
   const { name, email, password, organizationName } = parsed.data;
 

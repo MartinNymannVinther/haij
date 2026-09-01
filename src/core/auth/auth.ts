@@ -2,13 +2,14 @@ import { passkey } from "@better-auth/passkey";
 import { eq } from "drizzle-orm";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createAuthMiddleware } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { organization, twoFactor } from "better-auth/plugins";
 import { recordAuthEvent } from "@/core/audit/events";
 import { authDb } from "@/core/db/client";
 import * as schema from "@/core/db/schema";
 import { env } from "@/core/env";
+import { signupAllowed } from "./signup";
 
 const baseUrl = new URL(env.BETTER_AUTH_URL);
 
@@ -85,6 +86,13 @@ export const auth = betterAuth({
     },
   },
   hooks: {
+    // The endpoint is the door, not the page. Hiding the registration form
+    // closes the front door only; this closes the one that matters.
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-up/email" && !(await signupAllowed())) {
+        throw new APIError("FORBIDDEN", { code: "SIGNUP_CLOSED", message: "Sign-up is closed" });
+      }
+    }),
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-out") {
         const session = ctx.context.session;

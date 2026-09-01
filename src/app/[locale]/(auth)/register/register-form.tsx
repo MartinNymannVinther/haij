@@ -36,13 +36,13 @@ export function RegisterForm() {
     });
     if (!result.ok) {
       setPending(false);
-      setError(
-        result.error === "emailExists"
-          ? t("errorEmailExists")
-          : result.error === "invalid"
-            ? t("errorInvalid")
-            : t("errorGeneric"),
-      );
+      const messages = {
+        emailExists: t("errorEmailExists"),
+        invalid: t("errorInvalid"),
+        closed: t("closedBody"),
+        generic: t("errorGeneric"),
+      };
+      setError(messages[result.error]);
       return;
     }
     router.push("/dashboard");
