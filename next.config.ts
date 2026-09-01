@@ -33,9 +33,11 @@ const journal = JSON.parse(readFileSync("./drizzle/meta/_journal.json", "utf8"))
 
 const passedCommit = process.env.HAIJ_COMMIT?.trim() ?? "";
 const commit = passedCommit || git("rev-parse", "--short=7", "HEAD") || "unknown";
-// Only meaningful when we read the working tree ourselves. A commit handed
-// to us by the build has no working tree to be dirty.
-const dirty = !passedCommit && git("status", "--porcelain") !== "" ? "1" : "";
+// Only meaningful when we read the working tree ourselves; a commit handed
+// to us by the build has no working tree to be dirty. Tracked files only
+// (-uno): an untracked patch file or scratch note lying in the repo is not
+// code that runs, and warning about it trains you to ignore the warning.
+const dirty = !passedCommit && git("status", "--porcelain", "-uno") !== "" ? "1" : "";
 const builtAt = process.env.HAIJ_BUILT_AT?.trim() || new Date().toISOString();
 const migration = journal.entries.at(-1)?.tag ?? "unknown";
 
