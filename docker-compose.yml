@@ -28,6 +28,12 @@ services:
     restart: "no"
     environment:
       MIGRATION_DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:?}@db:5432/haij
+      # The migration step is what gives the runtime roles their login
+      # rights: the Postgres init directory is bind-mounted from the
+      # repository and is empty on a build system that cleans up after
+      # itself. Learned the hard way on the first deploy.
+      HAIJ_APP_PASSWORD: ${HAIJ_APP_PASSWORD:?}
+      HAIJ_AUTH_PASSWORD: ${HAIJ_AUTH_PASSWORD:?}
     depends_on:
       db:
         condition: service_healthy

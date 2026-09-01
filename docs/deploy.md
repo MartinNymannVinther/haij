@@ -41,8 +41,19 @@ to another EU provider means restoring one Postgres dump on another box.
    Health check path: `/api/health`.
 5. Deploy. The compose order is enforced: `db` becomes healthy → `migrate`
    runs all Drizzle migrations (as the Postgres superuser, which the
-   SECURITY DEFINER audit trigger relies on) → `app` starts. The
-   `docker/postgres-init` script creates the two runtime roles on first boot.
+   SECURITY DEFINER audit trigger relies on) and then gives the two runtime
+   roles their login rights and passwords → `app` starts.
+
+   Role provisioning belongs to the migration step, not to
+   `docker/postgres-init`. That init directory is bind-mounted from the
+   repository, and a build system that removes its working copy after
+   building mounts an empty directory instead: the script never runs, the
+   migrations create the roles as NOLOGIN, and the application is refused by
+   its own database with nothing in any log to explain it. `/api/health`
+   answers 503, the container is marked unhealthy, and the proxy never
+   requests a certificate — which looks like a TLS problem and is not.
+   `scripts/ensure-roles.ts` closes that hole and is idempotent, so it also
+   repairs an installation that already went wrong.
 
 ## 3. Verify
 
@@ -72,7 +83,7 @@ On the server:
 ```bash
 DB=$(docker ps -qf name=db | head -1)
 docker cp /root/haij.dump "$DB":/tmp/haij.dump
-# The roles are created by postgres-init; the dump carries the data.
+# The roles are provisioned by the migration step; the dump carries the data.
 docker exec "$DB" pg_restore -U postgres -d haij --clean --if-exists /tmp/haij.dump
 docker exec "$DB" rm /tmp/haij.dump
 ```

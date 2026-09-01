@@ -35,6 +35,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json drizzle.config.ts ./
 COPY drizzle ./drizzle
 COPY src/core/db/schema.ts ./src/core/db/schema.ts
+# Role provisioning runs with the migrations; see scripts/ensure-roles.ts.
+COPY scripts/ensure-roles.ts ./scripts/ensure-roles.ts
 USER node
 CMD ["pnpm", "db:migrate"]
 
