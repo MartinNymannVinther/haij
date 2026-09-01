@@ -20,7 +20,10 @@ import { adminPool } from "../helpers/db";
 const REQUIRED = {
   APP_DATABASE_URL: "postgres://app:app@localhost:5432/haij",
   AUTH_DATABASE_URL: "postgres://auth:auth@localhost:5432/haij",
-  BETTER_AUTH_SECRET: "0123456789abcdef0123456789abcdef",
+  // Deliberately low-entropy and self-describing: a random-looking string
+  // here is indistinguishable from a real key to a secrets scanner, and a
+  // test fixture is not worth teaching anyone to ignore that alarm.
+  BETTER_AUTH_SECRET: "not-a-real-secret-for-tests-only",
 };
 
 let admin: Pool;
