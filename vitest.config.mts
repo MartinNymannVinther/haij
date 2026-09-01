@@ -24,10 +24,19 @@ export default defineConfig({
     },
   },
   test: {
-    // The suite registers users as it goes, which a closed installation
-    // refuses by design. Opening it here keeps the fixtures honest; that
-    // the shipped default is "closed" is proven in tests/auth/signup-gate.
-    env: { ...testDatabaseUrls, SIGNUP: "open" },
+    // The suite must not depend on whoever is running it. dotenv loads the
+    // developer's .env above, so anything that reaches the outside world is
+    // pinned off here: with a real LLM or CVR provider configured locally,
+    // the tests make paid API calls and assertions change meaning depending
+    // on the machine. SIGNUP is opened because every fixture registers
+    // users; that the shipped default is "closed" is proven in
+    // tests/auth/signup-gate.
+    env: {
+      ...testDatabaseUrls,
+      SIGNUP: "open",
+      LLM_PROVIDER: "none",
+      CVR_PROVIDER: "none",
+    },
     environment: "node",
     include: ["tests/**/*.test.ts"],
     globalSetup: ["tests/global-setup.ts"],

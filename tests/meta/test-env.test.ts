@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { getCvrProvider } from "@/core/cvr";
+import { getLlmProvider } from "@/core/llm";
+import { env } from "@/core/env";
 import { databaseName, maintenanceUrl, resolveTestDatabaseUrls } from "../test-env";
 
 /**
@@ -68,5 +71,24 @@ describe("maintenanceUrl", () => {
     expect(maintenanceUrl("postgres://postgres:pw@localhost:5432/haij_test")).toBe(
       "postgres://postgres:pw@localhost:5432/postgres",
     );
+  });
+});
+
+/**
+ * Nothing in the suite reaches the outside world, whoever runs it.
+ *
+ * dotenv loads the developer's own .env, so a machine with a real Mistral
+ * key or CVR access would otherwise make paid calls from a test run and
+ * change what the assertions mean. It happened once: a signals test scored
+ * three signals against the live model on one laptop and zero everywhere
+ * else. vitest.config.mts pins the providers off; this proves the pin is
+ * still there.
+ */
+describe("outbound providers", () => {
+  it("are off no matter what the local .env says", () => {
+    expect(env.LLM_PROVIDER).toBe("none");
+    expect(env.CVR_PROVIDER).toBe("none");
+    expect(getLlmProvider()).toBeNull();
+    expect(getCvrProvider()).toBeNull();
   });
 });
