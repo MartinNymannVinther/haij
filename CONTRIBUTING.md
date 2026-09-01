@@ -30,6 +30,24 @@ a new ADR that names the trade-off.
   `TEST_APP_DATABASE_URL` and `TEST_AUTH_DATABASE_URL` — the same guard
   applies to those.
 
+## Versions
+
+The running app names itself in the foot of the sidebar and in full under
+Indstillinger → Om, as `<version>+<commit>`: the semver from `package.json`
+and the commit it was built from. Both are resolved in `next.config.ts` and
+inlined at build time, because a container has no git checkout and a version
+looked up at runtime is a version that can lie.
+
+- Raise `version` in `package.json` by hand when a step is worth naming.
+  Nothing else needs touching.
+- Container builds must pass `HAIJ_COMMIT` (and ideally `HAIJ_BUILT_AT`) as
+  build arguments — `.dockerignore` excludes `.git`, so without them the app
+  honestly reports `unknown` rather than guessing. `docker-compose.yml`
+  forwards both from the environment.
+- `GET /api/version` answers the same release without a login, so a deploy
+  can be verified from outside. It deliberately says nothing about _this_
+  installation; `/api/health` still answers only `ok`.
+
 ## The tenancy checklist (every new table)
 
 1. `org_id` column on every domain table, RLS **enabled and forced**, with

@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { OrgSwitcher } from "./org-switcher";
 import { SidebarNav, SidebarSettingsLink } from "./sidebar-nav";
 import { UserMenu } from "./user-menu";
+import { VersionLink } from "./version-link";
 
 /**
  * The 2a navigation rail: 236 px on the sidebar ground with no outer edge of
@@ -40,6 +41,7 @@ export async function AppSidebar({
         />
         <SidebarSettingsLink />
         <UserMenu name={userName} email={userEmail} variant="row" />
+        <VersionLink />
       </div>
     </aside>
   );

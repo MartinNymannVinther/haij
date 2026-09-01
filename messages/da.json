@@ -209,6 +209,35 @@
       "work": "Arbejde",
       "economy": "Økonomi",
       "insight": "Indsigt"
+    },
+    "about": {
+      "title": "Om Haij",
+      "subtitle": "Hvilken udgave af platformen der kører her, og om databasen følger med.",
+      "short": "v{release}",
+      "dirtyShort": "ændret",
+      "dirty": "Lokale ændringer",
+      "dirtyHint": "Bygget fra en arbejdsmappe med ændringer der ikke er committet. Commit-nummeret fortæller altså ikke hele sandheden om koden der kører.",
+      "releaseHint": "Versionsnummeret hæves i hånden når et spring er værd at navngive. Commit-nummeret bages ind ved build og peger på præcis den kode der svarer.",
+      "versionLabel": "Version",
+      "commitLabel": "Commit",
+      "builtAtLabel": "Bygget",
+      "environmentLabel": "Miljø",
+      "runtimeLabel": "Runtime",
+      "environments": {
+        "development": "Udvikling",
+        "test": "Test",
+        "production": "Drift"
+      },
+      "schemaTitle": "Databaseskema",
+      "schemaHint": "Antallet af migreringer koden er bygget med, holdt op mod dem databasen har kørt.",
+      "schemaBehind": "Migreringer mangler",
+      "schemaBehindHint": "Databasen har færre migreringer end koden forventer. Kør migreringerne før du bruger systemet videre.",
+      "migrationLabel": "Seneste migrering",
+      "appliedLabel": "Kørt",
+      "appliedValue": "{applied} af {expected}",
+      "appliedAtLabel": "Senest kørt",
+      "unknown": "Ukendt",
+      "license": "Haij er open source under AGPL-3.0."
     }
   },
   "crm": {
@@ -926,7 +955,8 @@
       "company": "Virksomhed",
       "security": "Sikkerhed",
       "ai": "AI",
-      "signals": "Signaler"
+      "signals": "Signaler",
+      "about": "Om"
     }
   }
 }

@@ -209,6 +209,35 @@
       "work": "Work",
       "economy": "Finances",
       "insight": "Insight"
+    },
+    "about": {
+      "title": "About Haij",
+      "subtitle": "Which build of the platform is running here, and whether the database has kept up.",
+      "short": "v{release}",
+      "dirtyShort": "modified",
+      "dirty": "Local changes",
+      "dirtyHint": "Built from a working tree with uncommitted changes, so the commit does not tell the whole truth about the code that is running.",
+      "releaseHint": "The version number is raised by hand when a step is worth naming. The commit is stamped in at build time and points at exactly the code answering here.",
+      "versionLabel": "Version",
+      "commitLabel": "Commit",
+      "builtAtLabel": "Built",
+      "environmentLabel": "Environment",
+      "runtimeLabel": "Runtime",
+      "environments": {
+        "development": "Development",
+        "test": "Test",
+        "production": "Production"
+      },
+      "schemaTitle": "Database schema",
+      "schemaHint": "The number of migrations the build was made from, against the number the database has applied.",
+      "schemaBehind": "Migrations pending",
+      "schemaBehindHint": "The database has fewer migrations than the code expects. Run the migrations before using the system further.",
+      "migrationLabel": "Latest migration",
+      "appliedLabel": "Applied",
+      "appliedValue": "{applied} of {expected}",
+      "appliedAtLabel": "Last applied",
+      "unknown": "Unknown",
+      "license": "Haij is open source under AGPL-3.0."
     }
   },
   "crm": {
@@ -926,7 +955,8 @@
       "company": "Organization",
       "security": "Security",
       "ai": "AI",
-      "signals": "Signals"
+      "signals": "Signals",
+      "about": "About"
     }
   }
 }

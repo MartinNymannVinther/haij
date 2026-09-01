@@ -36,6 +36,11 @@ services:
     build:
       context: .
       target: runner
+      args:
+        # Coolify and any CI runner should pass these so the running app can
+        # name the code it was built from. Unset means "unknown", not a lie.
+        HAIJ_COMMIT: ${HAIJ_COMMIT:-}
+        HAIJ_BUILT_AT: ${HAIJ_BUILT_AT:-}
     restart: unless-stopped
     environment:
       APP_DATABASE_URL: postgres://haij_app:${HAIJ_APP_PASSWORD:?}@db:5432/haij

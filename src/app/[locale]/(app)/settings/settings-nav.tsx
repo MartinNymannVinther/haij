@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/settings/security", key: "security" },
   { href: "/settings/signals", key: "signals" },
   { href: "/settings/ai", key: "ai" },
+  { href: "/settings/about", key: "about" },
 ] as const;
 
 /** Vertical sub-navigation for settings, mirroring the main nav's active style. */

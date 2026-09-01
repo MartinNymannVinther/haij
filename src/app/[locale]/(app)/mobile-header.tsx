@@ -10,6 +10,7 @@ import { Link } from "@/i18n/navigation";
 import { OrgSwitcher } from "./org-switcher";
 import { SidebarNav, SidebarSettingsLink } from "./sidebar-nav";
 import { UserMenu } from "./user-menu";
+import { VersionLink } from "./version-link";
 
 /** Slim top bar for small screens: burger menu, brand, user. */
 export function MobileHeader({
@@ -47,6 +48,7 @@ export function MobileHeader({
                   label={tOrg("switch")}
                 />
                 <SidebarSettingsLink onNavigate={() => setOpen(false)} />
+                <VersionLink onNavigate={() => setOpen(false)} />
               </div>
             </SheetContent>
           </Sheet>

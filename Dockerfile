@@ -16,6 +16,12 @@ RUN pnpm install --frozen-lockfile
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# The build stamp the running app reports. .dockerignore excludes .git, so
+# the commit has to be handed in; without it the app honestly says
+# "unknown" rather than guessing.
+ARG HAIJ_COMMIT=""
+ARG HAIJ_BUILT_AT=""
+ENV HAIJ_COMMIT=$HAIJ_COMMIT HAIJ_BUILT_AT=$HAIJ_BUILT_AT
 # Dummy values so importing env-validated modules never fails at build time;
 # real values come from the environment at runtime.
 ENV APP_DATABASE_URL=postgres://build:build@localhost:5432/build \
