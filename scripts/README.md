@@ -43,7 +43,28 @@ pnpm script scripts/delete-invoice.ts <org-slug> <nummer>
 pnpm script scripts/delete-invoice.ts <org-slug> <nummer> --confirm
 ```
 
-## Why the last two are scripts and not buttons
+## set-password.ts
+
+Sets a password on an existing account.
+
+```
+pnpm script scripts/set-password.ts <email>          # spørger, uden ekko
+... | pnpm script scripts/set-password.ts <email>    # læser fra stdin
+```
+
+For the one situation the application has no way out of: an owner who
+signs in only with a passkey, and who needs to reach the same account
+from a different origin. Passkeys are bound to the origin they were
+created for, by design, so moving an installation from localhost to a real
+domain locks a passkey-only owner out of their own system — and there is
+no "forgot password" to fall back on, because Haij has no email provider
+yet.
+
+It is a script and not a feature because setting someone else's password
+outside the login flow is exactly the capability an attacker wants. It
+belongs on the machine that already has database credentials.
+
+## Why the destructive ones are scripts and not buttons
 
 An issued invoice is immutable and undeletable inside Haij, enforced by
 database triggers, because bogføringsloven wants the number sequence
@@ -51,7 +72,7 @@ unbroken: a deleted invoice leaves a hole nobody can explain years later,
 and the right answer against real books is a credit note.
 
 Testing and moving in need something the rules forbid. Rather than
-softening the rules for everyone, the two destructive tools live outside
+softening the rules for everyone, the destructive tools live outside
 the application: they connect as the migration role, set
 `session_replication_role = replica` for the length of one transaction so
 the guards stand down, delete children before parents by hand (that
