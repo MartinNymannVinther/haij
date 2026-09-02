@@ -23,7 +23,7 @@ const USER = "user_report";
 const CTX = { orgId: ORG, userId: USER };
 
 let admin: Pool;
-let aka: string;
+let kasse: string;
 let other: string;
 let projectId: string;
 let roleId: string;
@@ -49,23 +49,26 @@ beforeAll(async () => {
     defaultHourlyRateOere: 80000,
   });
 
-  aka = await createCompany(CTX, { name: "Eksempel A-kasse" }, "manual");
+  kasse = await createCompany(CTX, { name: "Eksempel A-kasse" }, "manual");
   other = await createCompany(CTX, { name: "Anden kunde" }, "manual");
   await setCustomerFrame(CTX, other, {
     hourlyRateOere: 150000,
     budgetMinutes: null,
     budgetAmountOere: null,
   });
-  projectId = await createProject(CTX, { name: "Digitalt Transformationsprogram", companyId: aka });
+  projectId = await createProject(CTX, {
+    name: "Digitalt Transformationsprogram",
+    companyId: kasse,
+  });
   roleId = (await createRole(CTX, "Transformation Lead"))!;
-  await setRoleRate(CTX, { companyId: aka }, roleId, 80000);
+  await setRoleRate(CTX, { companyId: kasse }, roleId, 80000);
 
-  // July on the customer, invoiced. August on the customer, still open. One day elsewhere.
+  // July on the a-kasse, invoiced. August there too, still open. One day elsewhere.
   await addEntry(CTX, {
     entryDate: "2026-07-27",
     durationMinutes: 480,
     projectId,
-    companyId: aka,
+    companyId: kasse,
     roleId,
     note: "Opstart",
   });
@@ -73,17 +76,17 @@ beforeAll(async () => {
     entryDate: "2026-07-28",
     durationMinutes: 480,
     projectId,
-    companyId: aka,
+    companyId: kasse,
     roleId,
   });
-  invoiceId = await createDraftFromTime(CTX, aka, { grouping: "month" });
+  invoiceId = await createDraftFromTime(CTX, kasse, { grouping: "month" });
   await issueInvoice(CTX, invoiceId);
 
   await addEntry(CTX, {
     entryDate: "2026-08-03",
     durationMinutes: 420,
     projectId,
-    companyId: aka,
+    companyId: kasse,
     roleId,
   });
   await addEntry(CTX, { entryDate: "2026-08-04", durationMinutes: 300, companyId: other });

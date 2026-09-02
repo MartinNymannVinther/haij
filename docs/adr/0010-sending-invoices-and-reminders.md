@@ -124,7 +124,8 @@ stk. 2). Store the dispatch date; the communication log already does.
 Related limit worth validating against: in business relationships an
 agreed payment term may not exceed 30 days from dispatch unless expressly
 approved and not unreasonable (§ 3 a); against a public authority 30 days
-is absolute (§ 3 b, stk. 1). the customer is one.
+is absolute (§ 3 b, stk. 1), and several of the customers Haij is built for
+are public authorities.
 
 ## What is deliberately not built
 

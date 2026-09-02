@@ -1,11 +1,16 @@
 /**
  * One-off onboarding for Vinther Consulting: the signals and knowledge
- * setup, plus the 2026 history for Eksempel A-kasse carried over
- * from FreeAgent.
+ * setup, plus one customer's history (hours and issued invoices) carried
+ * over from the previous system.
  *
  * Run it from the project root with the app's own environment:
  *
- *     pnpm script scripts/onboard-vinther.ts <org-slug-or-id> [--dry-run]
+ *     pnpm script scripts/onboard-vinther.ts <org-slug-or-id> <history.json> [--dry-run]
+ *
+ * The history file is not part of the repository: it is one customer's
+ * real hours, rates and invoices, so it lives outside version control.
+ * `scripts/data/example.json` shows the shape with made-up values and
+ * doubles as a way to try the script on a scratch organization.
  *
  * Idempotent: every step checks for what it would create and skips it,
  * so a second run reports "findes" rather than duplicating anything. It
@@ -18,8 +23,7 @@
 import "dotenv/config";
 
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { resolve } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import { appPool, authDb, authPool } from "@/core/db/client";
 import {
@@ -41,9 +45,8 @@ import { addSource } from "@/modules/knowledge/service";
 import { saveSignalSettings } from "@/modules/signals/service";
 import { addEntry } from "@/modules/time/service";
 
-const here = dirname(fileURLToPath(import.meta.url));
 const dryRun = process.argv.includes("--dry-run");
-const target = process.argv[2];
+const [target, historyFile] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
 
 /* ------------------------------ Signaler ----------------------------- */
 
@@ -77,8 +80,8 @@ const TED_KEYWORDS = [
 /**
  * Branches where Martin's customers actually sit: banks, insurance and
  * pension, public administration, compulsory social security (which is
- * where an a-kasse such as the customer is registered), and the trade and
- * professional bodies around them.
+ * where the a-kasser are registered), and the trade and professional
+ * bodies around them.
  */
 const CVR_BRANCHE_PREFIXES = "6419,6512,6530,6619,8411,8412,8413,8430,9411,9412";
 
@@ -103,7 +106,7 @@ const KNOWLEDGE_SOURCES = [
 
 /* -------------------------------- Data ------------------------------- */
 
-type AkaData = {
+type HistoryData = {
   customer: { name: string; cvr: string; address: string; zipcode: string; city: string };
   contact: { name: string; isPrimary: boolean };
   project: { name: string };
@@ -131,9 +134,9 @@ const log = (message: string) => console.log(message);
 const skip = (message: string) => console.log(`  – ${message} (findes, springer over)`);
 
 async function resolveContext(): Promise<OrgContext> {
-  if (!target) {
+  if (!target || !historyFile) {
     throw new Error(
-      "Angiv organisationens slug eller id: pnpm script scripts/onboard-vinther.ts <org>",
+      "Brug: pnpm script scripts/onboard-vinther.ts <org-slug-eller-id> <historik.json> [--dry-run]",
     );
   }
   // The org lookup runs on the auth role: the application role only sees
@@ -192,8 +195,12 @@ async function setupKnowledge(ctx: OrgContext) {
   }
 }
 
-async function importAka(ctx: OrgContext) {
-  const data = JSON.parse(readFileSync(join(here, "data", "aka-2026.json"), "utf8")) as AkaData;
+async function importHistory(ctx: OrgContext) {
+  // Resolved against the working directory, so a path outside the
+  // repository works as naturally as the example next to this script.
+  const file = resolve(historyFile!);
+  const data = JSON.parse(readFileSync(file, "utf8")) as HistoryData;
+  log(`Historik: ${file}`);
 
   log("\nKunde, projekt og rolle");
 
@@ -369,7 +376,7 @@ async function main() {
   const ctx = await resolveContext();
   await setupSignals(ctx);
   await setupKnowledge(ctx);
-  await importAka(ctx);
+  await importHistory(ctx);
   log("\nFærdig.");
 }
 

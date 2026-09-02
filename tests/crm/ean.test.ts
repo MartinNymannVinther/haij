@@ -7,23 +7,23 @@ import { isValidEan, normalizeEan } from "@/core/ean";
  */
 describe("isValidEan", () => {
   it("accepts numbers with a correct GS1 check digit", () => {
-    // Both check out by hand: 5798765432109 sums to 122 -> check 8,
-    // 5791234567890 sums to 87 -> check 3.
+    // Both check out by hand: 5798765432109 sums to 111 -> check 9,
+    // 5791234567890 sums to 130 -> check 0.
     expect(isValidEan("5798765432109")).toBe(true);
     expect(isValidEan("5791234567890")).toBe(true);
   });
 
   it("rejects a single mistyped digit", () => {
     expect(isValidEan("5798765432109")).toBe(true);
-    expect(isValidEan("5798009811579")).toBe(false);
-    expect(isValidEan("5798009811678")).toBe(false);
+    expect(isValidEan("5798765432100")).toBe(false);
+    expect(isValidEan("5798765432209")).toBe(false);
   });
 
   it("rejects anything that is not thirteen digits", () => {
     expect(isValidEan("")).toBe(false);
-    expect(isValidEan("579800981157")).toBe(false);
+    expect(isValidEan("579876543210")).toBe(false);
     expect(isValidEan("57987654321090")).toBe(false);
-    expect(isValidEan("5798009811A78")).toBe(false);
+    expect(isValidEan("5798765432A09")).toBe(false);
   });
 
   it("ignores the spaces and dashes people paste in", () => {

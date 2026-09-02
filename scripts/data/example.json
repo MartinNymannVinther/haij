@@ -1,0 +1,60 @@
+{
+  "source": "Made-up history in the shape onboard-vinther.ts reads. Real history files stay outside the repository; see scripts/README.md.",
+  "customer": {
+    "name": "Eksempel A-kasse",
+    "cvr": "87654321",
+    "address": "Eksempelvej 1",
+    "zipcode": "8000",
+    "city": "Aarhus C"
+  },
+  "contact": {
+    "name": "Kirsten Eksempel",
+    "isPrimary": true
+  },
+  "project": {
+    "name": "Digitalt løft"
+  },
+  "role": {
+    "name": "Rådgiver",
+    "hourlyRateOere": 95000
+  },
+  "timeEntries": [
+    { "date": "2026-01-12", "minutes": 450, "note": "Opstartsmøde og plan" },
+    { "date": "2026-01-13", "minutes": 480, "note": null },
+    { "date": "2026-02-02", "minutes": 300, "note": "Workshop med ledelsen" }
+  ],
+  "invoices": [
+    {
+      "ref": "1001",
+      "date": "2026-01-31",
+      "terms": 30,
+      "paidDate": "2026-02-20",
+      "lines": [
+        {
+          "qty": 15.5,
+          "priceOere": 95000,
+          "desc": "Rådgivning, januar 2026",
+          "vatRateBp": 2500,
+          "coversMonth": "2026-01",
+          "unit": "hour"
+        }
+      ]
+    },
+    {
+      "ref": "1002",
+      "date": "2026-02-28",
+      "terms": 30,
+      "paidDate": null,
+      "lines": [
+        {
+          "qty": 5,
+          "priceOere": 95000,
+          "desc": "Rådgivning, februar 2026",
+          "vatRateBp": 2500,
+          "coversMonth": "2026-02",
+          "unit": "hour"
+        }
+      ]
+    }
+  ]
+}

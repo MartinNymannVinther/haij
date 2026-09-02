@@ -18,8 +18,8 @@ const company = {
   name: "Eksempel A-kasse",
   cvr: "87654321",
   address: "Eksempelvej 1",
-  zipcode: "1606",
-  city: "København V",
+  zipcode: "8000",
+  city: "Aarhus C",
   eanGln: "5798765432109",
 } as Company;
 
@@ -63,7 +63,7 @@ describe("withPreviewParties", () => {
     const preview = withPreviewParties(draft, company, profile);
     expect(preview.buyerName).toBe("Eksempel A-kasse");
     expect(preview.buyerCvr).toBe("87654321");
-    expect(preview.buyerCity).toBe("København V");
+    expect(preview.buyerCity).toBe("Aarhus C");
     expect(preview.buyerEanGln).toBe("5798765432109");
     expect(preview.sellerName).toBe("Vinther Consulting");
     expect(preview.sellerBankKonto).toBe("0001585252");

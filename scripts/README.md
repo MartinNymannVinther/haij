@@ -9,13 +9,20 @@ Run them with `pnpm script <fil> [argumenter]`.
 ## onboard-vinther.ts
 
 Sets up the signals service profile, CVR branch codes, TED keywords and
-RSS sources for Vinther Consulting, and imports the 2026 history for
-Eksempel A-kasse from the FreeAgent export in `data/aka-2026.json`.
+RSS sources for Vinther Consulting, and imports one customer's history
+(hours, agreed rate, issued invoices and their payment dates) from a JSON
+file carried over from the previous system.
 
 ```
-pnpm script scripts/onboard-vinther.ts <org-slug> --dry-run
-pnpm script scripts/onboard-vinther.ts <org-slug>
+pnpm script scripts/onboard-vinther.ts <org-slug> ~/privat/historik.json --dry-run
+pnpm script scripts/onboard-vinther.ts <org-slug> ~/privat/historik.json
 ```
+
+The history file is real business data about a real customer, so it is
+not in the repository and `.gitignore` refuses every JSON file in
+`scripts/data/` except `example.json`, which shows the shape with made-up
+values. Keep the real file outside the repository folder and point the
+script at it.
 
 Idempotent: a second run reports what already exists and creates nothing.
 Writes through the ordinary service layer, so RLS, the audit log and the
