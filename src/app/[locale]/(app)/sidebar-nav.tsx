@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { CountPill } from "@/components/ui/count-pill";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -89,19 +90,29 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-/** Settings sits apart at the foot of the sidebar, above the user card. */
-export function SidebarSettingsLink({ onNavigate }: { onNavigate?: () => void }) {
+/**
+ * Settings sits apart at the foot of the sidebar, above the user card. The
+ * count is the installation owner's: applications waiting for a decision.
+ */
+export function SidebarSettingsLink({
+  onNavigate,
+  attention = 0,
+}: {
+  onNavigate?: () => void;
+  attention?: number;
+}) {
   const t = useTranslations("app.nav");
   const pathname = usePathname();
   const active = pathname.startsWith("/settings");
   return (
     <Link
-      href="/settings/company"
+      href={attention > 0 ? "/settings/access" : "/settings/company"}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={navItemClass(active)}
+      className={cn(navItemClass(active), "flex items-center")}
     >
       {t("settings")}
+      <CountPill count={attention} />
     </Link>
   );
 }

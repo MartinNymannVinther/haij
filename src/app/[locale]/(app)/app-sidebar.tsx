@@ -15,10 +15,13 @@ export async function AppSidebar({
   userName,
   userEmail,
   organization,
+  attention = 0,
 }: {
   userName: string;
   userEmail: string;
   organization: string;
+  /** Items waiting for the installation's owner; zero for everyone else. */
+  attention?: number;
 }) {
   const t = await getTranslations("app.orgSwitcher");
   const switchLabel = t("switch");
@@ -39,7 +42,7 @@ export async function AppSidebar({
           triggerClassName="text-sidebar-foreground hover:bg-sidebar-hover h-auto w-full justify-between rounded-[9px] px-3 py-2.5 text-sm font-normal"
           label={switchLabel}
         />
-        <SidebarSettingsLink />
+        <SidebarSettingsLink attention={attention} />
         <UserMenu name={userName} email={userEmail} variant="row" />
         <VersionLink />
       </div>

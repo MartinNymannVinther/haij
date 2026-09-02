@@ -71,7 +71,13 @@
       "errorEmailExists": "Der findes allerede en konto med denne e-mail.",
       "errorGeneric": "Kontoen kunne ikke oprettes. Prøv igen.",
       "closedTitle": "Oprettelse er lukket",
-      "closedBody": "Denne installation af Haij tager ikke imod nye brugere. Kontakt ejeren hvis du skal have adgang."
+      "closedBody": "Denne installation af Haij tager ikke imod nye brugere. Kontakt ejeren hvis du skal have adgang.",
+      "invitedSubtitle": "Du er inviteret. Kontoen oprettes til den e-mail og den virksomhed, invitationen gælder for.",
+      "lockedHint": "Fastlagt af invitationen.",
+      "errorInvitationInvalid": "Invitationen er udløbet eller allerede brugt. Bed om et nyt link.",
+      "invitationInvalidTitle": "Linket virker ikke længere",
+      "invitationInvalidBody": "Invitationen er udløbet, brugt eller erstattet af en nyere. Bed den der inviterede dig om et nyt link, eller ansøg om adgang igen.",
+      "applyLink": "Ansøg om adgang"
     },
     "twoFactor": {
       "title": "Totrinsbekræftelse",
@@ -85,6 +91,23 @@
       "organizationName": "Virksomhedens navn",
       "submit": "Opret organisation",
       "error": "Organisationen kunne ikke oprettes. Prøv igen."
+    },
+    "apply": {
+      "title": "Ansøg om adgang",
+      "subtitle": "Denne installation af Haij tager imod nye brugere efter en kort ansøgning. Ejeren ser den personligt og svarer per mail.",
+      "name": "Dit navn",
+      "email": "E-mail",
+      "organizationName": "Din virksomhed",
+      "message": "Hvad laver du?",
+      "messageHint": "Valgfrit. En linje eller to om din forretning gør det nemmere at sige ja.",
+      "submit": "Send ansøgning",
+      "sentTitle": "Tak, ansøgningen er modtaget",
+      "sentBody": "Du hører fra ejeren af denne installation på {email}. Svaret kommer fra et menneske, så regn med en dag eller to.",
+      "errorInvalid": "Tjek felterne og prøv igen.",
+      "errorTooMany": "Der er sendt mange ansøgninger herfra på kort tid. Prøv igen om en time.",
+      "privacy": "Vi gemmer navn, e-mail og virksomhed for at behandle ansøgningen, og ikke andet. Bliver den afvist, står oplysningerne kun tilbage som en note om afgørelsen.",
+      "haveAccount": "Har du allerede en konto?",
+      "loginLink": "Log ind"
     }
   },
   "app": {
@@ -974,7 +997,40 @@
       "ai": "AI",
       "signals": "Signaler",
       "about": "Om",
-      "data": "Data"
+      "data": "Data",
+      "access": "Adgang"
+    },
+    "access": {
+      "title": "Adgang til installationen",
+      "subtitle": "Hvem der må oprette en organisation her. Du godkender og sender linket; resten sker af sig selv.",
+      "pendingTitle": "Ansøgninger",
+      "pendingEmpty": "Ingen ventende ansøgninger.",
+      "approve": "Godkend",
+      "decline": "Afvis",
+      "declinedToast": "Ansøgningen er afvist.",
+      "linkTitle": "Link til {email}",
+      "linkBody": "Vises kun nu. Kopiér det og send det selv. Det virker i 7 dage og kun én gang.",
+      "copy": "Kopiér link",
+      "copiedToast": "Linket er kopieret.",
+      "inviteTitle": "Inviter direkte",
+      "inviteBody": "Uden ansøgning først. Samme link, samme regler.",
+      "inviteEmail": "E-mail",
+      "inviteOrganization": "Virksomhedens navn",
+      "inviteSubmit": "Opret invitation",
+      "invitationsTitle": "Invitationer",
+      "invitationsEmpty": "Ingen invitationer endnu.",
+      "renew": "Nyt link",
+      "expires": "Udløber {date}",
+      "used": "Brugt {date}",
+      "applied": "Ansøgt {date}",
+      "decidedApproved": "Godkendt {date}",
+      "decidedDeclined": "Afvist {date}",
+      "historyTitle": "Tidligere afgørelser",
+      "stateOpen": "Ubrugt",
+      "stateUsed": "Brugt",
+      "stateExpired": "Udløbet",
+      "stateRevoked": "Erstattet",
+      "errorInvalid": "Tjek e-mail og virksomhedsnavn."
     }
   }
 }

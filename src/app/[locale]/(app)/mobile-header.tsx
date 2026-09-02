@@ -17,10 +17,12 @@ export function MobileHeader({
   userName,
   userEmail,
   organization,
+  attention = 0,
 }: {
   userName: string;
   userEmail: string;
   organization: string;
+  attention?: number;
 }) {
   const t = useTranslations("app.nav");
   const tOrg = useTranslations("app.orgSwitcher");
@@ -47,7 +49,7 @@ export function MobileHeader({
                   triggerClassName="text-sidebar-foreground hover:bg-sidebar-hover h-auto w-full justify-between rounded-[9px] px-3 py-2.5 text-sm font-normal"
                   label={tOrg("switch")}
                 />
-                <SidebarSettingsLink onNavigate={() => setOpen(false)} />
+                <SidebarSettingsLink onNavigate={() => setOpen(false)} attention={attention} />
                 <VersionLink onNavigate={() => setOpen(false)} />
               </div>
             </SheetContent>

@@ -113,6 +113,32 @@ users came with the data.
 Setting `SIGNUP=open` re-opens registration for anyone who finds the
 address. That is for a demo instance, not for a company's own Haij.
 
+### Letting people in one at a time
+
+A closed installation still has a front door. `/register` shows a short
+application (name, e-mail, company, a line about what they do) instead of
+a closed sign; nothing is created until you decide. The installation's
+owner sees applications under Indstillinger → Adgang with a count in the
+navigation, approves or declines, and gets a registration link to send
+(Haij sends no mail yet, so you send it yourself). The link is a
+single-use key bound to that e-mail address, valid for seven days; the
+same page can mint a new one, which retires the old, and can invite
+someone directly without an application. ADR 0013 has the reasoning.
+
+The owner is the first account created on an empty installation, recorded
+as `platform_role = 'owner'` on the user. The first migration that knows
+about the role gives it to the oldest user of an existing installation.
+To hand it to someone else, or to a second person, do it in the database,
+as the migration role:
+
+```sql
+update users set platform_role = 'owner' where email = 'you@example.dk';
+```
+
+It is never set from a request, and it is not the same thing as owning an
+organization: it says who may admit new organizations to this
+installation, nothing more.
+
 ## 6. Nightly encrypted backups (EU object storage)
 
 Per the project constitution: nightly encrypted dumps to EU-owned object

@@ -5,11 +5,12 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { organization, twoFactor } from "better-auth/plugins";
+import { platformRoleForNewUser } from "@/core/access/service";
 import { recordAuthEvent } from "@/core/audit/events";
 import { authDb } from "@/core/db/client";
 import * as schema from "@/core/db/schema";
 import { env } from "@/core/env";
-import { signupAllowed } from "./signup";
+import { countUsers, INVITATION_HEADER, signupAllowed } from "./signup";
 
 const baseUrl = new URL(env.BETTER_AUTH_URL);
 
@@ -37,7 +38,14 @@ export const auth = betterAuth({
       rate_limits: schema.rateLimits,
     },
   }),
-  user: { modelName: "users" },
+  user: {
+    modelName: "users",
+    additionalFields: {
+      // Role on the installation (see src/core/access). `input: false`
+      // keeps it out of every request body: nobody registers as owner.
+      platformRole: { type: "string", required: false, input: false },
+    },
+  },
   session: { modelName: "sessions" },
   account: { modelName: "accounts" },
   verification: { modelName: "verifications" },
@@ -62,6 +70,16 @@ export const auth = betterAuth({
     },
   },
   databaseHooks: {
+    user: {
+      create: {
+        // The first account on an empty installation owns it. Decided
+        // here, at the moment of creation, so it holds for every path
+        // that can create a user and not only for the registration form.
+        before: async (user) => ({
+          data: { ...user, platformRole: platformRoleForNewUser(await countUsers()) },
+        }),
+      },
+    },
     session: {
       create: {
         before: async (session) => ({
@@ -89,8 +107,15 @@ export const auth = betterAuth({
     // The endpoint is the door, not the page. Hiding the registration form
     // closes the front door only; this closes the one that matters.
     before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path === "/sign-up/email" && !(await signupAllowed())) {
-        throw new APIError("FORBIDDEN", { code: "SIGNUP_CLOSED", message: "Sign-up is closed" });
+      if (ctx.path === "/sign-up/email") {
+        const body = (ctx.body ?? {}) as { email?: unknown };
+        const attempt = {
+          email: typeof body.email === "string" ? body.email : null,
+          invitationToken: ctx.headers?.get(INVITATION_HEADER) ?? null,
+        };
+        if (!(await signupAllowed(attempt))) {
+          throw new APIError("FORBIDDEN", { code: "SIGNUP_CLOSED", message: "Sign-up is closed" });
+        }
       }
     }),
     after: createAuthMiddleware(async (ctx) => {

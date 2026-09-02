@@ -169,6 +169,20 @@
       "when": 1788244338002,
       "tag": "0023_migration_journal_read",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1788356323324,
+      "tag": "0024_admission",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788356324324,
+      "tag": "0025_admission_grants",
+      "breakpoints": true
     }
   ]
 }

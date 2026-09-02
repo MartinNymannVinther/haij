@@ -71,7 +71,13 @@
       "errorEmailExists": "An account with this email already exists.",
       "errorGeneric": "The account could not be created. Please try again.",
       "closedTitle": "Registration is closed",
-      "closedBody": "This Haij installation is not accepting new users. Contact the owner if you need access."
+      "closedBody": "This Haij installation is not accepting new users. Contact the owner if you need access.",
+      "invitedSubtitle": "You are invited. The account is created for the e-mail and the company the invitation was issued for.",
+      "lockedHint": "Set by the invitation.",
+      "errorInvitationInvalid": "The invitation has expired or has already been used. Ask for a new link.",
+      "invitationInvalidTitle": "This link no longer works",
+      "invitationInvalidBody": "The invitation has expired, been used, or been replaced by a newer one. Ask whoever invited you for a new link, or apply for access again.",
+      "applyLink": "Apply for access"
     },
     "twoFactor": {
       "title": "Two-factor authentication",
@@ -85,6 +91,23 @@
       "organizationName": "Company name",
       "submit": "Create organization",
       "error": "The organization could not be created. Please try again."
+    },
+    "apply": {
+      "title": "Apply for access",
+      "subtitle": "This installation of Haij admits new users after a short application. The owner reads it personally and replies by e-mail.",
+      "name": "Your name",
+      "email": "E-mail",
+      "organizationName": "Your company",
+      "message": "What do you do?",
+      "messageHint": "Optional. A line or two about your business makes it easier to say yes.",
+      "submit": "Send application",
+      "sentTitle": "Thanks, your application is in",
+      "sentBody": "The owner of this installation will get back to you at {email}. The reply comes from a person, so allow a day or two.",
+      "errorInvalid": "Check the fields and try again.",
+      "errorTooMany": "Many applications have been sent from here in a short time. Try again in an hour.",
+      "privacy": "We keep your name, e-mail and company to handle the application, and nothing else. If it is declined, the details remain only as a note of the decision.",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Sign in"
     }
   },
   "app": {
@@ -974,7 +997,40 @@
       "ai": "AI",
       "signals": "Signals",
       "about": "About",
-      "data": "Data"
+      "data": "Data",
+      "access": "Access"
+    },
+    "access": {
+      "title": "Access to this installation",
+      "subtitle": "Who may create an organization here. You approve and send the link; the rest takes care of itself.",
+      "pendingTitle": "Applications",
+      "pendingEmpty": "No pending applications.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "declinedToast": "The application was declined.",
+      "linkTitle": "Link for {email}",
+      "linkBody": "Shown only now. Copy it and send it yourself. It works for 7 days and only once.",
+      "copy": "Copy link",
+      "copiedToast": "Link copied.",
+      "inviteTitle": "Invite directly",
+      "inviteBody": "Without an application first. Same link, same rules.",
+      "inviteEmail": "E-mail",
+      "inviteOrganization": "Company name",
+      "inviteSubmit": "Create invitation",
+      "invitationsTitle": "Invitations",
+      "invitationsEmpty": "No invitations yet.",
+      "renew": "New link",
+      "expires": "Expires {date}",
+      "used": "Used {date}",
+      "applied": "Applied {date}",
+      "decidedApproved": "Approved {date}",
+      "decidedDeclined": "Declined {date}",
+      "historyTitle": "Earlier decisions",
+      "stateOpen": "Unused",
+      "stateUsed": "Used",
+      "stateExpired": "Expired",
+      "stateRevoked": "Replaced",
+      "errorInvalid": "Check the e-mail and company name."
     }
   }
 }

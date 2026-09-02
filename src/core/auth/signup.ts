@@ -1,4 +1,5 @@
 import { count } from "drizzle-orm";
+import { invitationAdmits } from "@/core/access/service";
 import { authDb } from "@/core/db/client";
 import { users } from "@/core/db/schema";
 import { env } from "@/core/env";
@@ -20,6 +21,9 @@ import { env } from "@/core/env";
  */
 export type SignupMode = typeof env.SIGNUP;
 
+/** Request-level header the registration flow uses to present its key. */
+export const INVITATION_HEADER = "x-haij-invitation";
+
 export function signupAllowedFor(mode: SignupMode, existingUsers: number): boolean {
   return mode === "open" || existingUsers === 0;
 }
@@ -29,8 +33,25 @@ export async function countUsers(): Promise<number> {
   return Number(row?.total ?? 0);
 }
 
-export async function signupAllowed(): Promise<boolean> {
+export type SignupAttempt = {
+  /** Address the account would be created for. */
+  email?: string | null;
+  /** Invitation key presented with the attempt, if any. */
+  invitationToken?: string | null;
+};
+
+/**
+ * The one door that is opened on purpose: a closed installation still
+ * admits an address that holds a valid invitation from the owner (see
+ * src/core/access). The key alone is not enough, the address has to be
+ * the one it was issued for.
+ */
+export async function signupAllowed(attempt: SignupAttempt = {}): Promise<boolean> {
   // Skip the count when the answer cannot depend on it.
   if (env.SIGNUP === "open") return true;
-  return signupAllowedFor(env.SIGNUP, await countUsers());
+  if (signupAllowedFor(env.SIGNUP, await countUsers())) return true;
+  if (attempt.invitationToken && attempt.email) {
+    return invitationAdmits(attempt.invitationToken, attempt.email);
+  }
+  return false;
 }

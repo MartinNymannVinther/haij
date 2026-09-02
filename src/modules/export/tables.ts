@@ -66,5 +66,8 @@ export const EXPORT_TABLES: ExportTable[] = [
  * - Everything Better Auth owns (users, sessions, accounts, passkeys, two
  *   factors, rate limits). Sessions and passkeys are credentials, and the
  *   people are exported as members below rather than as auth rows.
+ * - `access_requests` and `access_invitations`: they belong to the
+ *   installation, not to any organization, and describe people who are
+ *   not users of it. The application role cannot read them anyway.
  */
 export const MEMBERS_SHEET = "Brugere";

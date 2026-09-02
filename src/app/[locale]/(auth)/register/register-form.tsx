@@ -17,7 +17,13 @@ import { Input } from "@/components/ui/input";
 import { registerAction } from "@/core/auth/actions";
 import { Link, useRouter } from "@/i18n/navigation";
 
-export function RegisterForm() {
+/** What an invitation link fixes in advance; the form shows it, locked. */
+export type InvitationPrefill = { token: string; email: string; organizationName: string };
+
+/** A field the invitation decided: visibly settled, not visibly disabled. */
+const lockedClass = "bg-muted text-muted-foreground focus-visible:ring-0";
+
+export function RegisterForm({ invitation }: { invitation?: InvitationPrefill }) {
   const t = useTranslations("auth.register");
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -33,6 +39,7 @@ export function RegisterForm() {
       email: String(form.get("email") ?? ""),
       organizationName: String(form.get("organizationName") ?? ""),
       password: String(form.get("password") ?? ""),
+      ...(invitation ? { invitationToken: invitation.token } : {}),
     });
     if (!result.ok) {
       setPending(false);
@@ -40,6 +47,7 @@ export function RegisterForm() {
         emailExists: t("errorEmailExists"),
         invalid: t("errorInvalid"),
         closed: t("closedBody"),
+        invitationInvalid: t("errorInvitationInvalid"),
         generic: t("errorGeneric"),
       };
       setError(messages[result.error]);
@@ -53,7 +61,7 @@ export function RegisterForm() {
     <Card>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
-        <CardDescription>{t("subtitle")}</CardDescription>
+        <CardDescription>{invitation ? t("invitedSubtitle") : t("subtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -64,7 +72,17 @@ export function RegisterForm() {
             </Field>
             <Field>
               <FieldLabel htmlFor="email">{t("email")}</FieldLabel>
-              <Input id="email" name="email" type="email" autoComplete="email" required />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                readOnly={Boolean(invitation)}
+                defaultValue={invitation?.email}
+                aria-describedby={invitation ? "invitation-locked" : undefined}
+                className={invitation ? lockedClass : undefined}
+              />
             </Field>
             <Field>
               <FieldLabel htmlFor="organizationName">{t("organizationName")}</FieldLabel>
@@ -74,7 +92,13 @@ export function RegisterForm() {
                 autoComplete="organization"
                 required
                 maxLength={200}
+                readOnly={Boolean(invitation)}
+                defaultValue={invitation?.organizationName}
+                className={invitation ? lockedClass : undefined}
               />
+              {invitation ? (
+                <FieldDescription id="invitation-locked">{t("lockedHint")}</FieldDescription>
+              ) : null}
             </Field>
             <Field>
               <FieldLabel htmlFor="password">{t("password")}</FieldLabel>

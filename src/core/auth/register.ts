@@ -1,20 +1,24 @@
 import { APIError } from "better-auth";
 import { z } from "zod";
+import { consumeInvitation, findValidInvitation } from "@/core/access/service";
 import { organizationSlug } from "@/lib/slug";
 import { auth } from "./auth";
-import { signupAllowed } from "./signup";
+import { INVITATION_HEADER, signupAllowed } from "./signup";
 
 export const RegisterSchema = z.object({
   name: z.string().trim().min(1).max(200),
   email: z.email().max(320),
   password: z.string().min(12).max(128),
   organizationName: z.string().trim().min(1).max(200),
+  /** Key from an invitation link; the only way in while signup is closed. */
+  invitationToken: z.string().min(1).max(200).optional(),
 });
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 
 export type RegisterResult =
-  { ok: true } | { ok: false; error: "invalid" | "emailExists" | "closed" | "generic" };
+  | { ok: true }
+  | { ok: false; error: "invalid" | "emailExists" | "closed" | "invitationInvalid" | "generic" };
 
 /** Turns the set-cookie headers of an API response into a cookie header. */
 function cookieHeaderFrom(responseHeaders: Headers): Headers {
@@ -40,27 +44,53 @@ export async function registerUserWithOrganization(
   if (!parsed.success) {
     return { ok: false, error: "invalid" };
   }
+  const { name, password, invitationToken } = parsed.data;
+  let { email, organizationName } = parsed.data;
+
+  // An invited registration is for the address and the organization the
+  // owner approved, whatever the form says: the invitation is the source,
+  // the form only shows it. A key that no longer opens anything is told
+  // apart from a closed door, because the person holding it did nothing
+  // wrong and should ask for a new link rather than give up.
+  if (invitationToken) {
+    const invitation = await findValidInvitation(invitationToken);
+    if (!invitation) return { ok: false, error: "invitationInvalid" };
+    email = invitation.email;
+    organizationName = invitation.organizationName;
+  }
+
   // Checked here as well as in the Better Auth hook, so the form can say
   // something useful instead of showing a generic failure.
-  if (!(await signupAllowed())) {
+  if (!(await signupAllowed({ email, invitationToken }))) {
     return { ok: false, error: "closed" };
   }
-  const { name, email, password, organizationName } = parsed.data;
+
+  // The key reaches the gate inside Better Auth as a request header: the
+  // sign-up body is Better Auth's, and a header is what its hook can read.
+  const signUpHeaders = new Headers(requestHeaders);
+  if (invitationToken) signUpHeaders.set(INVITATION_HEADER, invitationToken);
 
   let sessionHeaders: Headers;
+  let userId: string | null = null;
   try {
-    const { headers: responseHeaders } = await auth.api.signUpEmail({
+    const { headers: responseHeaders, response } = await auth.api.signUpEmail({
       body: { name, email, password },
-      headers: requestHeaders,
+      headers: signUpHeaders,
       returnHeaders: true,
     });
     sessionHeaders = cookieHeaderFrom(responseHeaders);
+    userId = response.user?.id ?? null;
   } catch (error) {
     if (error instanceof APIError && error.body?.code === "USER_ALREADY_EXISTS") {
       return { ok: false, error: "emailExists" };
     }
     console.error("register: sign-up failed", error);
     return { ok: false, error: "generic" };
+  }
+
+  // The account exists; the key that admitted it is spent.
+  if (invitationToken && userId) {
+    await consumeInvitation(invitationToken, userId);
   }
 
   try {

@@ -1,3 +1,6 @@
+// A checkout keeps its database URL in .env; a deployment has it in the
+// environment already, and a missing file is silently fine.
+import "dotenv/config";
 import { Client } from "pg";
 
 /**
