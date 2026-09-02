@@ -240,6 +240,21 @@
       "appliedAtLabel": "Last applied",
       "unknown": "Unknown",
       "license": "Haij is open source under AGPL-3.0."
+    },
+    "dataExport": {
+      "title": "Data and export",
+      "subtitle": "Take a complete copy of everything Haij holds about your business.",
+      "xlsxTitle": "Spreadsheet",
+      "xlsxBody": "One file with a tab per kind of data. For you, your accountant, or anyone who needs to look at the numbers without knowing Haij.",
+      "xlsxAction": "Download spreadsheet",
+      "jsonTitle": "Machine-readable copy",
+      "jsonBody": "The same data as JSON with every id kept, so you can move to something other than Haij without losing the links between invoices, lines and hours.",
+      "jsonAction": "Download JSON",
+      "sheetsLabel": "Tabs in the file:",
+      "membersSheet": "Users",
+      "notBackupTitle": "This is not a backup.",
+      "notBackupBody": "An export can be read but not restored, and it is only as fresh as the day you downloaded it. The night's encrypted dump is what saves you when the database is gone.",
+      "privacy": "The export contains personal data about your contacts and your own history. Passwords, passkeys and API keys are never included. Downloading it is recorded in the audit log."
     }
   },
   "crm": {
@@ -958,7 +973,8 @@
       "security": "Security",
       "ai": "AI",
       "signals": "Signals",
-      "about": "About"
+      "about": "About",
+      "data": "Data"
     }
   }
 }

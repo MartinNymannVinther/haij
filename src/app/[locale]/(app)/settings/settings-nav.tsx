@@ -9,6 +9,7 @@ const ITEMS = [
   { href: "/settings/security", key: "security" },
   { href: "/settings/signals", key: "signals" },
   { href: "/settings/ai", key: "ai" },
+  { href: "/settings/data", key: "data" },
   { href: "/settings/about", key: "about" },
 ] as const;
 

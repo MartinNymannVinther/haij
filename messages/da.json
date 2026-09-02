@@ -240,6 +240,21 @@
       "appliedAtLabel": "Senest kørt",
       "unknown": "Ukendt",
       "license": "Haij er open source under AGPL-3.0."
+    },
+    "dataExport": {
+      "title": "Data og eksport",
+      "subtitle": "Tag en komplet kopi af alt hvad Haij ved om din virksomhed.",
+      "xlsxTitle": "Regneark",
+      "xlsxBody": "Én fil med en fane per type data. Til dig selv, din revisor eller enhver der skal kigge på tallene uden at kende Haij.",
+      "xlsxAction": "Hent regneark",
+      "jsonTitle": "Maskinlæsbar kopi",
+      "jsonBody": "Samme data som JSON, med alle id'er bevaret. Det er den fil der gør at du kan flytte til noget andet end Haij uden at miste sammenhængene mellem fakturaer, linjer og timer.",
+      "jsonAction": "Hent JSON",
+      "sheetsLabel": "Faner i filen:",
+      "membersSheet": "Brugere",
+      "notBackupTitle": "Det her er ikke en backup.",
+      "notBackupBody": "En eksport kan læses, men den kan ikke lægges tilbage, og den er kun så ny som den dag du hentede den. Den dag databasen er væk, er det det natlige krypterede dump der redder dig.",
+      "privacy": "Eksporten indeholder personoplysninger om dine kontakter og din egen historik. Adgangskoder, passkeys og API-nøgler kommer aldrig med. At du henter filen bliver skrevet i revisionssporet."
     }
   },
   "crm": {
@@ -958,7 +973,8 @@
       "security": "Sikkerhed",
       "ai": "AI",
       "signals": "Signaler",
-      "about": "Om"
+      "about": "Om",
+      "data": "Data"
     }
   }
 }
