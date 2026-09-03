@@ -127,9 +127,12 @@ someone directly without an application. ADR 0013 has the reasoning.
 
 The owner is the first account created on an empty installation, recorded
 as `platform_role = 'owner'` on the user. The first migration that knows
-about the role gives it to the oldest user of an existing installation.
-To hand it to someone else, or to a second person, do it in the database,
-as the migration role:
+about the role gives it to the oldest user of an existing installation,
+which may not be you if the database came from development. To hand it to
+someone else, or to a second person, use the maintenance script on a
+checkout (`pnpm script scripts/grant-owner.ts you@example.dk --only`) or,
+on the server, one statement as the migration role in the database
+container:
 
 ```sql
 update users set platform_role = 'owner' where email = 'you@example.dk';

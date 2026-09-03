@@ -71,6 +71,23 @@ It is a script and not a feature because setting someone else's password
 outside the login flow is exactly the capability an attacker wants. It
 belongs on the machine that already has database credentials.
 
+## grant-owner.ts
+
+Names the installation's owner: the one account that may admit new
+organizations (Indstillinger → Adgang).
+
+```
+pnpm script scripts/grant-owner.ts                 # viser hvem der har rollen
+pnpm script scripts/grant-owner.ts <email>         # giver rollen til den bruger
+pnpm script scripts/grant-owner.ts <email> --only  # ... og tager den fra alle andre
+```
+
+The first account on an empty installation gets the role by itself, and
+the migration that introduced it gave it to the oldest user of an
+installation that already existed. That is right for a fresh install and
+wrong for a development database full of test users, which is what this
+script is for. ADR 0013 explains why it is a script and not a setting.
+
 ## Why the destructive ones are scripts and not buttons
 
 An issued invoice is immutable and undeletable inside Haij, enforced by
