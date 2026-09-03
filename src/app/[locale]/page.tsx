@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/wordmark";
 import { getSession } from "@/core/auth/session";
+import { signupAllowed } from "@/core/auth/signup";
 import { Link, redirect } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,9 @@ const MODULE_KEYS = [
 export default async function HomePage() {
   const session = await getSession();
   const locale = await getLocale();
+  // The same button leads to /register either way; what it promises should
+  // match what is behind it: an account, or an application for one.
+  const open = await signupAllowed();
   if (session) {
     redirect({ href: "/dashboard", locale });
     return null;
@@ -42,7 +46,7 @@ export default async function HomePage() {
             {t("nav.login")}
           </Link>
           <Link href="/register" className={cn(buttonVariants({ size: "sm" }))}>
-            {t("nav.register")}
+            {open ? t("nav.register") : t("nav.apply")}
           </Link>
         </nav>
       </header>
@@ -70,7 +74,7 @@ export default async function HomePage() {
             </p>
             <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
               <Link href="/register" className={cn(buttonVariants({ size: "lg" }), "px-4")}>
-                {t("hero.ctaPrimary")}
+                {open ? t("hero.ctaPrimary") : t("hero.ctaApply")}
               </Link>
               <Link
                 href="/login"

@@ -13,14 +13,16 @@
   "landing": {
     "nav": {
       "login": "Log ind",
-      "register": "Opret konto"
+      "register": "Opret konto",
+      "apply": "Ansøg om adgang"
     },
     "hero": {
       "title": "Kunder, timer og fakturaer. På dine betingelser.",
       "subtitle": "Haij er en open source-forretningsplatform til selvstændige og mikrovirksomheder. Dansk først, hostet i EU, og bygget så du kan tage alle dine data med dig, den dag du vil.",
       "ctaPrimary": "Opret gratis konto",
       "ctaSecondary": "Log ind",
-      "trust": "Open source · AGPL-3.0 · Data i EU"
+      "trust": "Open source · AGPL-3.0 · Data i EU",
+      "ctaApply": "Ansøg om adgang"
     },
     "values": {
       "danishTitle": "Dansk fra bunden",
@@ -30,7 +32,7 @@
       "securityTitle": "Sikkerhed som standard",
       "securityBody": "Passkeys og totrinsbekræftelse fra første dag, adskillelse mellem organisationer helt nede i databasen, og hver ændring i et revisionsspor."
     },
-    "status": "Under åben udvikling. Fundamentet er på plads; CRM og tidsregistrering er de næste moduler.",
+    "status": "I daglig brug. Kunder, timer, fakturaer, økonomi, projekter, signaler og viden er på plads. Adgang efter ansøgning.",
     "footer": {
       "license": "Open source under AGPL-3.0",
       "language": "English"

@@ -13,14 +13,16 @@
   "landing": {
     "nav": {
       "login": "Sign in",
-      "register": "Create account"
+      "register": "Create account",
+      "apply": "Apply for access"
     },
     "hero": {
       "title": "Customers, hours and invoices. On your terms.",
       "subtitle": "Haij is an open source business platform for solo consultants and micro-businesses. Danish-first, hosted in the EU, and built so you can take all of your data with you the day you want to.",
       "ctaPrimary": "Create free account",
       "ctaSecondary": "Sign in",
-      "trust": "Open source · AGPL-3.0 · Data in the EU"
+      "trust": "Open source · AGPL-3.0 · Data in the EU",
+      "ctaApply": "Apply for access"
     },
     "values": {
       "danishTitle": "Danish from the ground up",
@@ -30,7 +32,7 @@
       "securityTitle": "Security by default",
       "securityBody": "Passkeys and two-factor authentication from day one, tenant isolation enforced in the database itself, and every change in an audit trail."
     },
-    "status": "In open development. The foundation is in place; CRM and time tracking are the next modules.",
+    "status": "In daily use. Customers, hours, invoices, economy, projects, signals and knowledge are in place. Access by application.",
     "footer": {
       "license": "Open source under AGPL-3.0",
       "language": "Dansk"
