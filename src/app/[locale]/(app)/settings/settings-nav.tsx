@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/settings/company", key: "company" },
+  { href: "/settings/time", key: "time" },
   { href: "/settings/security", key: "security" },
   { href: "/settings/signals", key: "signals" },
   { href: "/settings/ai", key: "ai" },
@@ -23,8 +24,13 @@ const ITEMS = [
 export function SettingsNav({ access }: { access: { pending: number } | null }) {
   const t = useTranslations("settings.nav");
   const pathname = usePathname();
+  // Access sits second to last, just above "Om", however long the list gets.
   const items = access
-    ? [...ITEMS.slice(0, 5), { href: "/settings/access", key: "access" } as const, ITEMS[5]]
+    ? [
+        ...ITEMS.slice(0, -1),
+        { href: "/settings/access", key: "access" } as const,
+        ITEMS[ITEMS.length - 1]!,
+      ]
     : ITEMS;
 
   return (

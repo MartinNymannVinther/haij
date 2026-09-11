@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addTimeEntryAction } from "@/modules/time/actions";
+import type { EntrySelection } from "@/modules/time/prefill";
 import { useRouter } from "@/i18n/navigation";
 
 const NONE = "none";
@@ -30,6 +31,11 @@ export type ProjectOption = {
 export type TaskOption = { id: string; title: string; projectId: string };
 
 export type RoleOption = { id: string; name: string };
+
+/** A remembered id becomes a picker value; nothing remembered means NONE. */
+function toValue(id: string | null): string {
+  return id ?? NONE;
+}
 
 function PickerSelect({
   value,
@@ -64,20 +70,26 @@ export function AddEntryForm({
   projects,
   tasks,
   roles,
+  initialSelection,
+  keepSelection,
 }: {
   defaultDate: string;
   companies: Array<{ id: string; name: string }>;
   projects: ProjectOption[];
   tasks: TaskOption[];
   roles: RoleOption[];
+  /** What the last entry suggests; all nulls when there is nothing to suggest. */
+  initialSelection: EntrySelection;
+  /** Leave the pickers as they are after a registration instead of clearing them. */
+  keepSelection: boolean;
 }) {
   const t = useTranslations("time.add");
   const tCommon = useTranslations("common");
   const router = useRouter();
-  const [companyId, setCompanyId] = useState<string>(NONE);
-  const [projectId, setProjectId] = useState<string>(NONE);
-  const [taskId, setTaskId] = useState<string>(NONE);
-  const [roleId, setRoleId] = useState<string>(NONE);
+  const [companyId, setCompanyId] = useState<string>(toValue(initialSelection.companyId));
+  const [projectId, setProjectId] = useState<string>(toValue(initialSelection.projectId));
+  const [taskId, setTaskId] = useState<string>(toValue(initialSelection.taskId));
+  const [roleId, setRoleId] = useState<string>(toValue(initialSelection.roleId));
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,11 +166,15 @@ export function AddEntryForm({
       setError(result.error === "invalidDuration" ? t("invalidDuration") : tCommon("error"));
       return;
     }
+    // reset() clears the date, duration and note; duration and note are
+    // always cleared so the same hours cannot be booked twice by accident.
     formElement.reset();
-    setCompanyId(NONE);
-    setProjectId(NONE);
-    setTaskId(NONE);
-    setRoleId(NONE);
+    if (!keepSelection) {
+      setCompanyId(NONE);
+      setProjectId(NONE);
+      setTaskId(NONE);
+      setRoleId(NONE);
+    }
     toast.success(t("addedToast"));
     router.refresh();
   }

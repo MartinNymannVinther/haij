@@ -12,7 +12,9 @@ import {
   shiftWeek,
   weekDates,
 } from "@/modules/time/duration";
+import { EMPTY_SELECTION, narrowSelection } from "@/modules/time/prefill";
 import { listWeek } from "@/modules/time/service";
+import { getTimeSettings, lastEntrySelection } from "@/modules/time/settings";
 import { listCompanies } from "@/modules/crm/service";
 import { listRoles } from "@/modules/invoicing/roles";
 import { listActiveProjectsForPicker, listOpenTasksForPicker } from "@/modules/projects/service";
@@ -45,15 +47,25 @@ export default async function TimePage({
     ? isoWeekMonday(new Date(`${week}T12:00:00Z`))
     : currentMonday;
 
-  const [t, entries, companies, projects, tasks, roleList, format] = await Promise.all([
-    getTranslations("time"),
-    listWeek(context, monday),
-    listCompanies(context),
-    listActiveProjectsForPicker(context),
-    listOpenTasksForPicker(context),
-    listRoles(context),
-    getFormatter(),
-  ]);
+  const [t, entries, companies, projects, tasks, roleList, format, timeSettings, lastSelection] =
+    await Promise.all([
+      getTranslations("time"),
+      listWeek(context, monday),
+      listCompanies(context),
+      listActiveProjectsForPicker(context),
+      listOpenTasksForPicker(context),
+      listRoles(context),
+      getFormatter(),
+      getTimeSettings(context),
+      lastEntrySelection(context),
+    ]);
+
+  // The suggestion is narrowed to what the pickers can still offer, so a
+  // project closed since yesterday never arrives as a preselected choice
+  // the form would refuse to save.
+  const prefill = timeSettings.prefillFromLastEntry
+    ? narrowSelection(lastSelection, { companies, projects, tasks, roles: roleList })
+    : EMPTY_SELECTION;
 
   const days = weekDates(monday);
   const weekTotal = entries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
@@ -112,6 +124,8 @@ export default async function TimePage({
         projects={projects}
         tasks={tasks}
         roles={roleList.map((role) => ({ id: role.id, name: role.name }))}
+        initialSelection={prefill}
+        keepSelection={timeSettings.prefillFromLastEntry}
       />
 
       <Card>

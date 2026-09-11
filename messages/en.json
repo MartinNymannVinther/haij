@@ -499,6 +499,14 @@
       "exportExcel": "Download as Excel",
       "exportPdf": "Download as PDF",
       "link": "Time report"
+    },
+    "settings": {
+      "title": "Time",
+      "hint": "How time tracking behaves for you. The setting applies to your own user only.",
+      "prefillTitle": "Remember the last entry",
+      "prefillHint": "Customer, project, task and role from your last entry are ready the next time you register time. The date is set to today, and duration and note always start empty.",
+      "prefillLabel": "Suggest customer, project, task and role from the last entry",
+      "savedToast": "Setting saved"
     }
   },
   "orgProfile": {
@@ -1000,7 +1008,8 @@
       "signals": "Signals",
       "about": "About",
       "data": "Data",
-      "access": "Access"
+      "access": "Access",
+      "time": "Time"
     },
     "access": {
       "title": "Access to this installation",

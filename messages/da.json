@@ -499,6 +499,14 @@
       "exportExcel": "Hent som Excel",
       "exportPdf": "Hent som PDF",
       "link": "Timerapport"
+    },
+    "settings": {
+      "title": "Tid",
+      "hint": "Hvordan tidsregistreringen opfører sig for dig. Indstillingen gælder kun din egen bruger.",
+      "prefillTitle": "Husk seneste registrering",
+      "prefillHint": "Kunde, projekt, opgave og rolle fra din seneste registrering står klar, næste gang du registrerer tid. Datoen sættes til i dag, og varighed og note er altid tomme.",
+      "prefillLabel": "Foreslå kunde, projekt, opgave og rolle fra seneste registrering",
+      "savedToast": "Indstillingen er gemt"
     }
   },
   "orgProfile": {
@@ -1000,7 +1008,8 @@
       "signals": "Signaler",
       "about": "Om",
       "data": "Data",
-      "access": "Adgang"
+      "access": "Adgang",
+      "time": "Tid"
     },
     "access": {
       "title": "Adgang til installationen",

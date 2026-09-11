@@ -384,6 +384,34 @@ export const timeEntries = pgTable(
 );
 
 /**
+ * Per-user time-tracking preferences, scoped to one organization.
+ *
+ * Deliberately not on org_profiles: whether the last entry should be
+ * offered again is a personal working habit, and one person's answer
+ * says nothing about the next person's. A row is written the first time
+ * someone changes the setting; the absence of a row means the default.
+ */
+export const userTimeSettings = pgTable(
+  "user_time_settings",
+  {
+    id: domainId("id"),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /**
+     * Offer the customer, project, task and role from this user's most
+     * recent entry as the starting point for the next one.
+     */
+    prefillFromLastEntry: boolean("prefill_from_last_entry").notNull().default(true),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("user_time_settings_org_user_uq").on(t.orgId, t.userId)],
+);
+
+/**
  * Org-wide role catalog: names only (e.g. "Transformation Lead",
  * "Agil coach"). A role carries no price of its own — rates are agreed
  * per customer or per project in `role_rates`, because the same role is

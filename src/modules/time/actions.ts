@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireOrgContext } from "@/core/auth/guard";
 import { parseDurationToMinutes } from "./duration";
 import { addEntry, deleteEntry } from "./service";
+import { saveTimeSettings } from "./settings";
 
 type ActionError =
   "unauthorized" | "invalid" | "invalidDuration" | "notFound" | "invoiced" | "generic";
@@ -98,6 +99,23 @@ export async function deleteTimeEntryAction(entryId: unknown): Promise<TimeActio
       return { ok: false, error: "invoiced" };
     }
     console.error("time: delete entry failed", error);
+    return { ok: false, error: "generic" };
+  }
+}
+
+const TimeSettingsSchema = z.object({ prefillFromLastEntry: z.boolean() });
+
+export async function saveTimeSettingsAction(input: unknown): Promise<TimeActionResult> {
+  const ctx = await requireOrgContext();
+  if (!ctx) return { ok: false, error: "unauthorized" };
+  const parsed = TimeSettingsSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  try {
+    await saveTimeSettings(ctx, parsed.data);
+    return { ok: true };
+  } catch (error) {
+    console.error("time: save settings failed", error);
     return { ok: false, error: "generic" };
   }
 }

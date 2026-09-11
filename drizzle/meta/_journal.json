@@ -183,6 +183,20 @@
       "when": 1788356324324,
       "tag": "0025_admission_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1789135741258,
+      "tag": "0026_user_time_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1789135742258,
+      "tag": "0027_user_time_settings_rls_audit",
+      "breakpoints": true
     }
   ]
 }
