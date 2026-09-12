@@ -1,3 +1,9 @@
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# The deprecated @esbuild-kit packages (pulled in by drizzle-kit, merged
+# into tsx upstream) pin esbuild ^0.18, which has GHSA-67mh-4wv8-2f99.
+# Scoped to that one path so every other esbuild stays on its own range.
+overrides:
+  "@esbuild-kit/core-utils>esbuild": "^0.25.0"
