@@ -101,6 +101,9 @@ non-negotiables below override any default you would otherwise pick.
 6. When Danish law details matter, verify current rules before hardcoding
    numbers or deadlines.
 7. Ask before adding any dependency not implied by this file.
+8. Pushing to main does not deploy anything: deployment is a manual step
+   Martin performs in Coolify. Still, only push when build and tests are
+   green — main is what gets deployed.
 
 ## Roadmap
 
