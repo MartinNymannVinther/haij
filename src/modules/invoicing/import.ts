@@ -34,7 +34,7 @@ import { invoiceTotals, lineNetOere, lineVatOere } from "./money";
 
 export type HistoricLine = {
   description: string;
-  /** Quantity in hundredths, e.g. 136.50 hours as 13650. */
+  /** Quantity in hundredths, e.g. 42.50 hours as 4250. */
   quantityHundredths: number;
   unit?: "hour" | "day" | "piece" | "fixed";
   unitPriceOere: number;

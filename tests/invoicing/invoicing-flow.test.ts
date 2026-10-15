@@ -86,7 +86,7 @@ describe("org profile", () => {
   it("upserts and reads back", async () => {
     expect(await getOrgProfile(CTX_A)).toBeNull();
     await upsertOrgProfile(CTX_A, {
-      legalName: "Vinther Consulting",
+      legalName: "Eksempel Konsulent",
       cvr: "44444442",
       address: "Havnegade 12",
       zipcode: "8000",
@@ -98,10 +98,10 @@ describe("org profile", () => {
       defaultHourlyRateOere: 80000,
     });
     const created = await getOrgProfile(CTX_A);
-    expect(created?.legalName).toBe("Vinther Consulting");
+    expect(created?.legalName).toBe("Eksempel Konsulent");
 
     await upsertOrgProfile(CTX_A, {
-      legalName: "Vinther Consulting ApS",
+      legalName: "Eksempel Konsulent ApS",
       cvr: "44444442",
       address: "Havnegade 12",
       zipcode: "8000",
@@ -110,7 +110,7 @@ describe("org profile", () => {
       defaultHourlyRateOere: 80000,
     });
     const updated = await getOrgProfile(CTX_A);
-    expect(updated?.legalName).toBe("Vinther Consulting ApS");
+    expect(updated?.legalName).toBe("Eksempel Konsulent ApS");
   });
 });
 
@@ -169,7 +169,7 @@ describe("issue", () => {
     expect(inv?.dueDate).toBe(addDaysIso(today, 8));
     expect(inv?.buyerName).toBe("Kunde Alfa ApS");
     expect(inv?.buyerCvr).toBe("11111118");
-    expect(inv?.sellerName).toBe("Vinther Consulting ApS");
+    expect(inv?.sellerName).toBe("Eksempel Konsulent ApS");
     expect(inv?.sellerCvr).toBe("44444442");
     expect(inv?.issuedAt).toBeTruthy();
 

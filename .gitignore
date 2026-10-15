@@ -41,9 +41,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# one-off import data: real customer history stays outside the repository
+# one-off import data: a real profile and real customer history stay
+# outside the repository; only the made-up examples are tracked
 /scripts/data/*.json
 !/scripts/data/example.json
+!/scripts/data/example-profile.json
 
 # patches passed around by hand
 *.patch

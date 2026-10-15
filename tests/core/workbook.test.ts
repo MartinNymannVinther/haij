@@ -34,12 +34,12 @@ const sheets = [
   {
     name: "Kunder",
     columns: [{ header: "Navn" }, { header: "CVR" }],
-    rows: [["Eksempel A-kasse", "12345678"]],
+    rows: [["Eksempel Logistik A/S", "12345678"]],
   },
   {
     name: "Fakturaer",
     columns: [{ header: "Nummer" }, { header: "Beløb" }],
-    rows: [[284, 96000]],
+    rows: [[1042, 337500]],
   },
   { name: "Tomt ark", columns: [{ header: "(ingen rækker)" }], rows: [] },
 ];
@@ -68,9 +68,9 @@ describe("buildWorkbook", () => {
 
   it("puts each sheet's own rows in its own part", () => {
     const { read } = unzip(buildWorkbook(sheets));
-    expect(read("xl/worksheets/sheet1.xml")).toContain("Eksempel A-kasse");
-    expect(read("xl/worksheets/sheet1.xml")).not.toContain("96000");
-    expect(read("xl/worksheets/sheet2.xml")).toContain("<v>284</v>");
+    expect(read("xl/worksheets/sheet1.xml")).toContain("Eksempel Logistik A/S");
+    expect(read("xl/worksheets/sheet1.xml")).not.toContain("337500");
+    expect(read("xl/worksheets/sheet2.xml")).toContain("<v>1042</v>");
     expect(read("xl/worksheets/sheet3.xml")).toContain("(ingen rækker)");
   });
 

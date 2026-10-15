@@ -44,11 +44,19 @@ does not do, and this ADR is the record of the exception.
 Real import data lives outside the repository. `.gitignore` refuses every
 JSON file in `scripts/data/` except a made-up example in the same shape,
 and the script takes the path to the real file as an argument instead of
-finding it next to itself. Test fixtures name invented companies, with
-CVR and GLN numbers that pass the checks without belonging to anyone;
-the author's own company details are the one deliberate exception,
-because they are public registry data about the person publishing the
-code. Secrets were never in the history: `.env` has been ignored since
+finding it next to itself. Test fixtures name invented companies,
+people, addresses and bank details, with CVR and GLN numbers that pass
+the checks without belonging to anyone.
+
+Amended 2026-10-15: the author's own company details were at first kept
+in fixtures as a deliberate exception, being public registry data. The
+exception is withdrawn: they are invented like everything else, and the
+onboarding script reads the organization's service profile, keywords,
+branch codes and sources from a file outside the repository, the same
+way it reads the history, with a made-up example beside it. The public
+repository holds technical material only.
+
+Secrets were never in the history: `.env` has been ignored since
 the initial commit, the secret scan in CI has run since the first day,
 and a sweep of every commit before publishing found only the localhost
 development credentials from the compose file.

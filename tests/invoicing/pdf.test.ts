@@ -75,12 +75,12 @@ function fakeInvoice(overrides: Partial<Invoice>): Invoice {
     buyerCity: "Aarhus C",
     buyerEanGln: null,
     buyerReference: "Projekt Ø-2026",
-    sellerName: "Vinther Consulting ApS",
+    sellerName: "Eksempel Konsulent ApS",
     sellerCvr: "44444442",
     sellerAddress: "Havnegade 12",
     sellerZipcode: "8000",
     sellerCity: "Aarhus C",
-    sellerEmail: "faktura@vinther.example",
+    sellerEmail: "faktura@konsulent.example",
     sellerPhone: "+45 12 34 56 78",
     sellerBankReg: "1234",
     sellerBankKonto: "0012345678",
@@ -199,7 +199,7 @@ describe("draft", () => {
       fakeLine({ position: 0 }),
     ]);
     const text = extractText(pdf);
-    expect(text).toContain("Vinther Consulting ApS");
+    expect(text).toContain("Eksempel Konsulent ApS");
     expect(text).toContain("Kunde Alfa ApS");
   });
 });

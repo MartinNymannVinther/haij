@@ -5,7 +5,7 @@ import { withOrgContext, type OrgContext } from "@/core/db/tenant";
 /**
  * The org's role catalog and the rates agreed for those roles.
  *
- * A role is a name, nothing more: "Transformation Lead" costs what the
+ * A role is a name, nothing more: "Projektleder" costs what the
  * customer agreed it costs, so the price lives in `role_rates` bound to
  * one customer or one project. Deleting a role keeps the time entries and
  * clears the link (issued invoices carry their own frozen prices anyway)

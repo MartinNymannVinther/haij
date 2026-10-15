@@ -533,7 +533,7 @@
     "roles": {
       "title": "Roller",
       "hint": "Navne på de roller du sælger. Prisen aftales per kunde eller projekt, ikke her.",
-      "empty": "Ingen roller endnu. Tilføj fx Transformation Lead eller Agil coach.",
+      "empty": "Ingen roller endnu. Tilføj fx Projektleder eller Agil coach.",
       "namePlaceholder": "Rollenavn…",
       "add": "Tilføj",
       "invalid": "Skriv et navn på rollen.",

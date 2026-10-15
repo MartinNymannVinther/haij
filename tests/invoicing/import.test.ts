@@ -32,10 +32,10 @@ beforeAll(async () => {
   ]);
   await upsertOrgProfile(CTX, {
     legalName: "Import ApS",
-    cvr: "30769201",
-    address: "Slotsmarken 18",
-    zipcode: "2970",
-    city: "Hørsholm",
+    cvr: "44444442",
+    address: "Prøvegade 3",
+    zipcode: "5000",
+    city: "Odense C",
     defaultPaymentTermsDays: 14,
   });
   companyId = await createCompany(CTX, { name: "Gammel kunde A/S" }, "manual");
@@ -48,7 +48,7 @@ afterAll(async () => {
 describe("importHistoricInvoice", () => {
   it("keeps the old number, date and payment, and marks the hours billed", async () => {
     const entryId = (await addEntry(CTX, {
-      entryDate: "2026-01-15",
+      entryDate: "2026-03-16",
       durationMinutes: 480,
       companyId,
       note: "Historisk arbejde",
@@ -56,29 +56,29 @@ describe("importHistoricInvoice", () => {
 
     const invoiceId = await importHistoricInvoice(CTX, {
       companyId,
-      invoiceNumber: 278,
-      invoiceDate: "2026-01-30",
+      invoiceNumber: 512,
+      invoiceDate: "2026-03-31",
       status: "paid",
-      paidDate: "2026-02-13",
+      paidDate: "2026-04-10",
       lines: [
         {
-          description: "Transformation Lead",
-          quantityHundredths: 13650,
-          unitPriceOere: 80000,
+          description: "Projektleder",
+          quantityHundredths: 4200,
+          unitPriceOere: 95000,
           timeEntryIds: [entryId],
         },
       ],
     });
 
     const detail = await getInvoiceDetail(CTX, invoiceId);
-    expect(detail?.invoice.invoiceNumber).toBe(278);
-    expect(detail?.invoice.invoiceDate).toBe("2026-01-30");
-    expect(detail?.invoice.dueDate).toBe("2026-02-13");
+    expect(detail?.invoice.invoiceNumber).toBe(512);
+    expect(detail?.invoice.invoiceDate).toBe("2026-03-31");
+    expect(detail?.invoice.dueDate).toBe("2026-04-14");
     expect(detail?.invoice.status).toBe("paid");
-    expect(detail?.invoice.netOere).toBe(10_920_000); // 109.200 kr.
-    expect(detail?.invoice.vatOere).toBe(2_730_000);
+    expect(detail?.invoice.netOere).toBe(3_990_000); // 42 t à 950 kr. = 39.900 kr.
+    expect(detail?.invoice.vatOere).toBe(997_500);
     expect(detail?.invoice.buyerName).toBe("Gammel kunde A/S");
-    expect(detail?.invoice.sellerCvr).toBe("30769201");
+    expect(detail?.invoice.sellerCvr).toBe("44444442");
 
     const entry = await admin.query(`select invoice_line_id from time_entries where id = $1`, [
       entryId,
@@ -87,26 +87,26 @@ describe("importHistoricInvoice", () => {
   });
 
   it("pushes the counter past the imported history", async () => {
-    expect(await getNextInvoiceNumber(CTX)).toBe(279);
+    expect(await getNextInvoiceNumber(CTX)).toBe(513);
 
     const draftId = await createDraft(CTX, companyId);
     await addLine(CTX, draftId, {
       description: "Første egen faktura",
       quantityHundredths: 100,
       unit: "hour",
-      unitPriceOere: 80000,
+      unitPriceOere: 95000,
       vatCategory: "standard",
       vatRateBp: 2500,
     });
-    expect(await issueInvoice(CTX, draftId)).toBe(279);
+    expect(await issueInvoice(CTX, draftId)).toBe(513);
   });
 
   it("refuses a number the history already used", async () => {
     await expect(
       importHistoricInvoice(CTX, {
         companyId,
-        invoiceNumber: 278,
-        invoiceDate: "2026-01-30",
+        invoiceNumber: 512,
+        invoiceDate: "2026-03-31",
         status: "paid",
         lines: [{ description: "Dublet", quantityHundredths: 100, unitPriceOere: 1000 }],
       }),
@@ -115,7 +115,7 @@ describe("importHistoricInvoice", () => {
 
   it("leaves the imported invoice as immutable as any other", async () => {
     await expect(
-      admin.query(`update invoices set net_oere = 1 where invoice_number = 278`),
+      admin.query(`update invoices set net_oere = 1 where invoice_number = 512`),
     ).rejects.toThrow(/immutable/);
   });
 });

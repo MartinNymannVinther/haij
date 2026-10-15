@@ -6,9 +6,10 @@ Status: accepted · Date: 2026-08-29
 
 ADR 0004 gave every role in the catalog one hourly rate for the whole
 organization, and put that rate at the top of the resolution chain. That
-was wrong in practice: a solo consultant sells the same role at 800 kr.
-to one customer and 1.850 kr. to another, so a single number on the role
-either lies or has to be worked around on every entry.
+was wrong in practice: a solo consultant often sells the same role at
+different prices to different customers (say 900 kr. to one and 1.200 kr.
+to another), so a single number on the role either lies or has to be
+worked around on every entry.
 
 The role catalog is now names only. Prices live in `role_rates`, one row
 per agreement, bound to **either** one customer **or** one project, never

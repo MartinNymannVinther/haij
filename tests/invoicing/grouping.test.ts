@@ -13,10 +13,10 @@ function entry(over: Partial<GroupableEntry> & { id: string }): GroupableEntry {
     entryDate: "2026-08-03",
     durationMinutes: 60,
     note: null,
-    projectName: "Digitalt Transformationsprogram",
+    projectName: "Nyt lagersystem",
     taskTitle: null,
-    roleName: "Transformation Lead",
-    unitPriceOere: 80000,
+    roleName: "Projektleder",
+    unitPriceOere: 95000,
     ...over,
   };
 }
@@ -66,12 +66,12 @@ describe("groupEntriesIntoLines", () => {
 
   it("never merges two rates into one line", () => {
     const mixed = [
-      entry({ id: "cheap", unitPriceOere: 80000 }),
-      entry({ id: "dear", unitPriceOere: 185000, entryDate: "2026-08-04" }),
+      entry({ id: "cheap", unitPriceOere: 95000 }),
+      entry({ id: "dear", unitPriceOere: 140000, entryDate: "2026-08-04" }),
     ];
     const lines = groupEntriesIntoLines(mixed, "month");
     expect(lines).toHaveLength(2);
-    expect(lines.map((line) => line.unitPriceOere).sort((a, b) => a - b)).toEqual([80000, 185000]);
+    expect(lines.map((line) => line.unitPriceOere).sort((a, b) => a - b)).toEqual([95000, 140000]);
     expect(total(lines)).toBe(total(groupEntriesIntoLines(mixed, "entry")));
   });
 
@@ -86,15 +86,13 @@ describe("groupEntriesIntoLines", () => {
 
   it("names the group and the period it covers", () => {
     const [line] = groupEntriesIntoLines(august, "project");
-    expect(line!.description).toBe("Digitalt Transformationsprogram · august 2026");
+    expect(line!.description).toBe("Nyt lagersystem · august 2026");
 
     const spanning = groupEntriesIntoLines(
       [entry({ id: "a", entryDate: "2026-06-02" }), entry({ id: "b", entryDate: "2026-08-27" })],
       "project",
     );
-    expect(spanning[0]!.description).toBe(
-      "Digitalt Transformationsprogram · 02.06.2026 – 27.08.2026",
-    );
+    expect(spanning[0]!.description).toBe("Nyt lagersystem · 02.06.2026 – 27.08.2026");
   });
 
   it("gives work outside the grouping a name of its own rather than a blank one", () => {
@@ -109,7 +107,7 @@ describe("groupEntriesIntoLines", () => {
     const lines = groupEntriesIntoLines(august, "entry");
     expect(lines).toHaveLength(3);
     expect(lines[0]!.description).toContain("03.08.2026");
-    expect(lines[0]!.description).toContain("(Transformation Lead)");
+    expect(lines[0]!.description).toContain("(Projektleder)");
   });
 
   it("reads chronologically whichever grouping is chosen", () => {

@@ -31,10 +31,10 @@ beforeAll(async () => {
   ]);
   await upsertOrgProfile(CTX, {
     legalName: "Tid ApS",
-    cvr: "30769201",
-    address: "Slotsmarken 18",
-    zipcode: "2970",
-    city: "Hørsholm",
+    cvr: "44444442",
+    address: "Prøvegade 3",
+    zipcode: "5000",
+    city: "Odense C",
     defaultHourlyRateOere: 80000,
   });
   companyId = await createCompany(CTX, { name: "Timekunde ApS" }, "manual");
