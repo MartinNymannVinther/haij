@@ -1,16 +1,20 @@
 /**
- * One-off onboarding for Vinther Consulting: the signals and knowledge
- * setup, plus one customer's history (hours and issued invoices) carried
- * over from the previous system.
+ * One-off onboarding for an organization moving into Haij: the signals
+ * and knowledge setup from a profile file, plus one customer's history
+ * (hours and issued invoices) carried over from the previous system.
  *
  * Run it from the project root with the app's own environment:
  *
- *     pnpm script scripts/onboard-vinther.ts <org-slug-or-id> <history.json> [--dry-run]
+ *     pnpm script scripts/onboard-vinther.ts <org-slug-or-id> <profile.json> <history.json> [--dry-run]
  *
- * The history file is not part of the repository: it is one customer's
- * real hours, rates and invoices, so it lives outside version control.
- * `scripts/data/example.json` shows the shape with made-up values and
- * doubles as a way to try the script on a scratch organization.
+ * Neither file is part of the repository. The profile describes the
+ * organization's own business (what it sells, to whom, at what rates,
+ * and which branches, keywords and feeds the signals engine should
+ * watch), and the history is one customer's real hours, rates and
+ * invoices, so both live outside version control.
+ * `scripts/data/example-profile.json` and `scripts/data/example.json`
+ * show the shapes with made-up values and double as a way to try the
+ * script on a scratch organization.
  *
  * Idempotent: every step checks for what it would create and skips it,
  * so a second run reports "findes" rather than duplicating anything. It
@@ -25,6 +29,7 @@ import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
+import { z } from "zod";
 import { appPool, authDb, authPool } from "@/core/db/client";
 import {
   companies,
@@ -46,68 +51,74 @@ import { saveSignalSettings } from "@/modules/signals/service";
 import { addEntry } from "@/modules/time/service";
 
 const dryRun = process.argv.includes("--dry-run");
-const [target, historyFile] = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+const [target, profileFile, historyFile] = process.argv
+  .slice(2)
+  .filter((arg) => !arg.startsWith("--"));
 
-/* ------------------------------ Signaler ----------------------------- */
+/* ------------------------------- Profil ------------------------------ */
 
-const SERVICE_PROFILE = `Vinther Consulting er et enmandsrådgivningshus i Hørsholm, etableret 2007, der hjælper større danske organisationer med at tage kunstig intelligens ansvarligt i brug og med at gennemføre digitale transformationer der lander.
-
-Kerneydelser:
-- AI-governance og compliance med EU AI Act: risikoklassificering, kvalitetsledelsessystemer efter prEN 18286, og oplæring af interne kontrolfunktioner.
-- AI-adoption og digital dannelse: at få medarbejdere til at bruge værktøjerne fornuftigt frem for at forbyde dem.
-- Transformationsledelse som Transformation Lead eller programleder på flerårige digitaliseringsprogrammer.
-- Agil coaching og porteføljestyring.
-- Digital suverænitet: rådgivning om EU-hostede og selvhostede alternativer til amerikanske skytjenester.
-
-Typiske kunder: a-kasser, pensions- og forsikringsselskaber, banker og datacentraler, medicovirksomheder og offentlige myndigheder, typisk fra 200 medarbejdere og opefter. Opgaverne løber fra tre måneder til flere år, faktureres på timebasis mellem 800 og 1.850 kr., og indgås enten direkte med en digitaliserings- eller it-direktør eller som underleverandør gennem et etableret konsulenthus.
-
-Et godt signal: en organisation i de brancher der offentliggør en AI-strategi, opretter en AI-funktion, får en tilsynssag eller et påbud på data- eller AI-området, sætter et større digitaliseringsprogram i gang, eller søger folk til AI-governance, dataetik eller transformationsledelse.
-
-Et dårligt signal: rene it-leverancer, hardware, bemanding, og alt der handler om at sælge en platform frem for at ændre en organisation.`;
-
-const TED_KEYWORDS = [
-  "kunstig intelligens",
-  "AI-governance",
-  "AI-forordningen",
-  "digital transformation",
-  "digitaliseringsprogram",
-  "forandringsledelse",
-  "agil transformation",
-  "porteføljestyring",
-  "dataetik",
-].join(", ");
+/** A string, or a list of paragraphs joined with blank lines. */
+const Paragraphs = z
+  .union([z.string(), z.array(z.string())])
+  .transform((value) => (Array.isArray(value) ? value.join("\n\n") : value).trim());
 
 /**
- * Branches where Martin's customers actually sit: banks, insurance and
- * pension, public administration, compulsory social security (which is
- * where the a-kasser are registered), and the trade and professional
- * bodies around them.
+ * The organization's own setup. Limits mirror what the signals and
+ * knowledge settings accept in the app, so a file that passes here is one
+ * the settings pages could have saved.
  */
-const CVR_BRANCHE_PREFIXES = "6419,6512,6530,6619,8411,8412,8413,8430,9411,9412";
+const ProfileSchema = z.object({
+  serviceProfile: Paragraphs.pipe(z.string().min(1).max(4000)),
+  tedKeywords: z
+    .array(z.string().trim().min(1))
+    .default([])
+    .refine((list) => list.join(", ").length <= 500, "tedKeywords: højst 500 tegn i alt"),
+  cvrBranchePrefixes: z
+    .array(z.string().regex(/^\d{2,6}$/, "cvrBranchePrefixes: 2-6 cifre"))
+    .default([])
+    .refine((list) => list.join(",").length <= 200, "cvrBranchePrefixes: højst 200 tegn i alt"),
+  signalFeeds: z
+    .array(z.object({ label: z.string().trim().min(1).max(100), url: z.url().max(1000) }))
+    .max(10)
+    .default([]),
+  knowledgeSources: z
+    .array(z.object({ name: z.string().trim().min(1).max(100), url: z.url().max(1000) }))
+    .max(15)
+    .default([]),
+});
 
-/** Buying triggers: policy, supervision and public-sector programmes. */
-const SIGNAL_FEEDS = [
-  { label: "Altinget: digital", url: "https://www.altinget.dk/digital/rss" },
-  { label: "Digitaliseringsstyrelsen", url: "https://digst.dk/nyheder/nyhedsarkiv/?rss=true" },
-  { label: "Finanstilsynet", url: "https://www.finanstilsynet.dk/handlers/DynamicRss.ashx" },
-  { label: "Version2", url: "https://www.version2.dk/rss" },
-];
+type Profile = z.infer<typeof ProfileSchema>;
 
-/** Reading material for the knowledge centre and its digests. */
-const KNOWLEDGE_SOURCES = [
-  { name: "EU AI Act", url: "https://artificialintelligenceact.eu/feed/" },
-  { name: "EU digital strategy", url: "https://digital-strategy.ec.europa.eu/en/rss.xml" },
-  { name: "EDPB", url: "https://www.edpb.europa.eu/rss.xml" },
-  { name: "Datatilsynet", url: "https://www.datatilsynet.dk/handlers/DynamicRss.ashx" },
-  { name: "Mistral AI", url: "https://mistral.ai/news/rss" },
-  { name: "Ingeniøren", url: "https://ing.dk/rss.xml" },
-  { name: "Computerworld", url: "https://www.computerworld.dk/rss/all" },
-];
+function readJson(path: string): unknown {
+  // Resolved against the working directory, so a path outside the
+  // repository works as naturally as the examples next to this script.
+  return JSON.parse(readFileSync(resolve(path), "utf8"));
+}
+
+function loadProfile(path: string): Profile {
+  const parsed = ProfileSchema.safeParse(readJson(path));
+  if (!parsed.success) {
+    const problems = parsed.error.issues
+      .map((issue) => `  ${issue.path.join(".") || "(rod)"}: ${issue.message}`)
+      .join("\n");
+    throw new Error(`Profilen ${resolve(path)} har fejl:\n${problems}`);
+  }
+  log(`Profil: ${resolve(path)}`);
+  return parsed.data;
+}
 
 /* -------------------------------- Data ------------------------------- */
 
 type HistoryData = {
-  customer: { name: string; cvr: string; address: string; zipcode: string; city: string };
+  customer: {
+    name: string;
+    cvr: string;
+    address: string;
+    zipcode: string;
+    city: string;
+    /** DB07 code, six digits; optional. */
+    industryCode?: string | null;
+  };
   contact: { name: string; isPrimary: boolean };
   project: { name: string };
   role: { name: string; hourlyRateOere: number };
@@ -134,9 +145,9 @@ const log = (message: string) => console.log(message);
 const skip = (message: string) => console.log(`  – ${message} (findes, springer over)`);
 
 async function resolveContext(): Promise<OrgContext> {
-  if (!target || !historyFile) {
+  if (!target || !profileFile || !historyFile) {
     throw new Error(
-      "Brug: pnpm script scripts/onboard-vinther.ts <org-slug-eller-id> <historik.json> [--dry-run]",
+      "Brug: pnpm script scripts/onboard-vinther.ts <org-slug-eller-id> <profil.json> <historik.json> [--dry-run]",
     );
   }
   // The org lookup runs on the auth role: the application role only sees
@@ -161,27 +172,26 @@ async function resolveContext(): Promise<OrgContext> {
   return { orgId: org.id, userId: member.userId };
 }
 
-async function setupSignals(ctx: OrgContext) {
+async function setupSignals(ctx: OrgContext, profile: Profile) {
   log("\nSignaler");
-  if (dryRun) return log("  – tørløb, skriver ikke");
+  const summary = `serviceprofil, ${profile.signalFeeds.length} feeds, ${profile.cvrBranchePrefixes.length} branchekoder, ${profile.tedKeywords.length} søgeord`;
+  if (dryRun) return log(`  – tørløb, skriver ikke (${summary})`);
   await saveSignalSettings(ctx, {
-    serviceProfile: SERVICE_PROFILE,
-    tedKeywords: TED_KEYWORDS,
-    cvrBranchePrefixes: CVR_BRANCHE_PREFIXES,
-    rssFeeds: SIGNAL_FEEDS,
+    serviceProfile: profile.serviceProfile,
+    tedKeywords: profile.tedKeywords.join(", ") || null,
+    cvrBranchePrefixes: profile.cvrBranchePrefixes.join(",") || null,
+    rssFeeds: profile.signalFeeds,
   });
-  log(
-    `  serviceprofil, ${SIGNAL_FEEDS.length} feeds, ${CVR_BRANCHE_PREFIXES.split(",").length} branchekoder`,
-  );
+  log(`  ${summary}`);
 }
 
-async function setupKnowledge(ctx: OrgContext) {
+async function setupKnowledge(ctx: OrgContext, profile: Profile) {
   log("\nViden");
   const existing = await withOrgContext(ctx, (tx) =>
     tx.select({ url: knowledgeSources.url }).from(knowledgeSources),
   );
   const have = new Set(existing.map((s) => s.url));
-  for (const source of KNOWLEDGE_SOURCES) {
+  for (const source of profile.knowledgeSources) {
     if (have.has(source.url)) {
       skip(source.name);
       continue;
@@ -196,11 +206,8 @@ async function setupKnowledge(ctx: OrgContext) {
 }
 
 async function importHistory(ctx: OrgContext) {
-  // Resolved against the working directory, so a path outside the
-  // repository works as naturally as the example next to this script.
-  const file = resolve(historyFile!);
-  const data = JSON.parse(readFileSync(file, "utf8")) as HistoryData;
-  log(`Historik: ${file}`);
+  const data = readJson(historyFile!) as HistoryData;
+  log(`\nHistorik: ${resolve(historyFile!)}`);
 
   log("\nKunde, projekt og rolle");
 
@@ -215,11 +222,7 @@ async function importHistory(ctx: OrgContext) {
   if (companyId) {
     skip(data.customer.name);
   } else if (!dryRun) {
-    companyId = await createCompany(
-      ctx,
-      { ...data.customer, country: "DK", industryCode: "843000" },
-      "manual",
-    );
+    companyId = await createCompany(ctx, { ...data.customer, country: "DK" }, "manual");
     await addContact(ctx, companyId, data.contact);
     log(`  + ${data.customer.name} med ${data.contact.name}`);
   } else {
@@ -374,8 +377,9 @@ async function importHistory(ctx: OrgContext) {
 async function main() {
   if (dryRun) log("TØRLØB: intet skrives.\n");
   const ctx = await resolveContext();
-  await setupSignals(ctx);
-  await setupKnowledge(ctx);
+  const profile = loadProfile(profileFile!);
+  await setupSignals(ctx, profile);
+  await setupKnowledge(ctx, profile);
   await importHistory(ctx);
   log("\nFærdig.");
 }

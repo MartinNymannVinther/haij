@@ -15,7 +15,7 @@ type Company = typeof companies.$inferSelect;
 type Profile = typeof orgProfiles.$inferSelect;
 
 const company = {
-  name: "Eksempel A-kasse",
+  name: "Eksempel Logistik A/S",
   cvr: "87654321",
   address: "Eksempelvej 1",
   zipcode: "8000",
@@ -24,15 +24,15 @@ const company = {
 } as Company;
 
 const profile = {
-  legalName: "Vinther Consulting",
-  cvr: "30769201",
-  address: "Slotsmarken 18",
-  zipcode: "2970",
-  city: "Hørsholm",
-  email: "martin@vintherconsulting.dk",
+  legalName: "Eksempel Konsulent",
+  cvr: "44444442",
+  address: "Prøvegade 3",
+  zipcode: "5000",
+  city: "Odense C",
+  email: "faktura@example.com",
   phone: null,
-  bankReg: "5475",
-  bankKonto: "0001585252",
+  bankReg: "1234",
+  bankKonto: "0012345678",
 } as Profile;
 
 const draft = {
@@ -61,12 +61,12 @@ const draft = {
 describe("withPreviewParties", () => {
   it("fills a draft with the customer and the company profile", () => {
     const preview = withPreviewParties(draft, company, profile);
-    expect(preview.buyerName).toBe("Eksempel A-kasse");
+    expect(preview.buyerName).toBe("Eksempel Logistik A/S");
     expect(preview.buyerCvr).toBe("87654321");
     expect(preview.buyerCity).toBe("Aarhus C");
     expect(preview.buyerEanGln).toBe("5798765432109");
-    expect(preview.sellerName).toBe("Vinther Consulting");
-    expect(preview.sellerBankKonto).toBe("0001585252");
+    expect(preview.sellerName).toBe("Eksempel Konsulent");
+    expect(preview.sellerBankKonto).toBe("0012345678");
   });
 
   it("shows the dates and payment terms the customer will be given", () => {
@@ -96,7 +96,7 @@ describe("withPreviewParties", () => {
       status: "issued",
       buyerName: "Gammelt navn ApS",
       buyerAddress: "Gammel vej 1",
-      invoiceDate: "2026-01-30",
+      invoiceDate: "2026-03-16",
     } as Invoice;
     expect(withPreviewParties(issued, company, profile)).toBe(issued);
   });

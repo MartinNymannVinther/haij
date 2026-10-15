@@ -21,7 +21,7 @@ const USER = "user_contact_cat";
 const CTX = { orgId: ORG, userId: USER };
 
 let admin: Pool;
-let akaId: string;
+let firstId: string;
 let otherId: string;
 
 beforeAll(async () => {
@@ -34,15 +34,15 @@ beforeAll(async () => {
   await admin.query(`insert into users (id, name, email) values ($1, 'K', 'kontakt@example.com')`, [
     USER,
   ]);
-  akaId = await createCompany(CTX, { name: "A-kassen" }, "manual");
+  firstId = await createCompany(CTX, { name: "Logistikfirmaet" }, "manual");
   otherId = await createCompany(CTX, { name: "Pensionsselskabet" }, "manual");
 
-  await addContact(CTX, akaId, {
-    name: "Kasper",
-    title: "Programchef",
+  await addContact(CTX, firstId, {
+    name: "Karl",
+    title: "Driftschef",
     categories: ["decision_maker", "practitioner"],
   });
-  await addContact(CTX, akaId, { name: "Thomas", categories: ["practitioner"] });
+  await addContact(CTX, firstId, { name: "Tove", categories: ["practitioner"] });
   await addContact(CTX, otherId, {
     name: "Eva",
     email: "eva@pension.test",
@@ -58,30 +58,30 @@ afterAll(async () => {
 describe("listAllContacts", () => {
   it("gathers contacts across customers, sorted by name", async () => {
     const rows = await listAllContacts(CTX);
-    expect(rows.map((row) => row.name)).toEqual(["Eva", "Kasper", "Thomas", "Uden kategori"]);
+    expect(rows.map((row) => row.name)).toEqual(["Eva", "Karl", "Tove", "Uden kategori"]);
     expect(rows.find((row) => row.name === "Eva")?.companyName).toBe("Pensionsselskabet");
   });
 
   it("filters on a category, including contacts that carry several", async () => {
     const practitioners = await listAllContacts(CTX, undefined, "practitioner");
-    expect(practitioners.map((row) => row.name)).toEqual(["Kasper", "Thomas"]);
+    expect(practitioners.map((row) => row.name)).toEqual(["Karl", "Tove"]);
 
     const deciders = await listAllContacts(CTX, undefined, "decision_maker");
-    expect(deciders.map((row) => row.name)).toEqual(["Kasper"]);
+    expect(deciders.map((row) => row.name)).toEqual(["Karl"]);
   });
 
   it("searches name, title, email and customer name", async () => {
-    expect((await listAllContacts(CTX, "programchef")).map((r) => r.name)).toEqual(["Kasper"]);
+    expect((await listAllContacts(CTX, "driftschef")).map((r) => r.name)).toEqual(["Karl"]);
     expect((await listAllContacts(CTX, "eva@pension")).map((r) => r.name)).toEqual(["Eva"]);
-    expect((await listAllContacts(CTX, "A-kassen")).map((r) => r.name)).toEqual([
-      "Kasper",
-      "Thomas",
+    expect((await listAllContacts(CTX, "Logistikfirmaet")).map((r) => r.name)).toEqual([
+      "Karl",
+      "Tove",
     ]);
   });
 
   it("combines search and category", async () => {
-    const rows = await listAllContacts(CTX, "A-kassen", "decision_maker");
-    expect(rows.map((row) => row.name)).toEqual(["Kasper"]);
+    const rows = await listAllContacts(CTX, "Logistikfirmaet", "decision_maker");
+    expect(rows.map((row) => row.name)).toEqual(["Karl"]);
   });
 });
 
@@ -98,13 +98,13 @@ describe("countContactsByCategory", () => {
 
 describe("updateContact", () => {
   it("replaces the categories rather than adding to them", async () => {
-    const kasper = (await listAllContacts(CTX, "Kasper"))[0]!;
-    await updateContact(CTX, kasper.id, {
-      name: kasper.name,
-      title: kasper.title,
+    const karl = (await listAllContacts(CTX, "Karl"))[0]!;
+    await updateContact(CTX, karl.id, {
+      name: karl.name,
+      title: karl.title,
       categories: ["door_opener"],
     });
-    const after = (await listAllContacts(CTX, "Kasper"))[0]!;
+    const after = (await listAllContacts(CTX, "Karl"))[0]!;
     expect(after.categories).toEqual(["door_opener"]);
   });
 });
@@ -113,7 +113,7 @@ describe("the vocabulary stays closed", () => {
   it("the database refuses a category nobody agreed on", async () => {
     await expect(
       admin.query(
-        `update contacts set categories = array['influencer'] where org_id = $1 and name = 'Thomas'`,
+        `update contacts set categories = array['influencer'] where org_id = $1 and name = 'Tove'`,
         [ORG],
       ),
     ).rejects.toThrow(/contacts_categories_valid/);

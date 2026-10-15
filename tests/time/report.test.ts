@@ -23,7 +23,7 @@ const USER = "user_report";
 const CTX = { orgId: ORG, userId: USER };
 
 let admin: Pool;
-let kasse: string;
+let customer: string;
 let other: string;
 let projectId: string;
 let roleId: string;
@@ -42,14 +42,14 @@ beforeAll(async () => {
   );
   await upsertOrgProfile(CTX, {
     legalName: "Rapport ApS",
-    cvr: "30769201",
-    address: "Slotsmarken 18",
-    zipcode: "2970",
-    city: "Hørsholm",
-    defaultHourlyRateOere: 80000,
+    cvr: "44444442",
+    address: "Prøvegade 3",
+    zipcode: "5000",
+    city: "Odense C",
+    defaultHourlyRateOere: 90000,
   });
 
-  kasse = await createCompany(CTX, { name: "Eksempel A-kasse" }, "manual");
+  customer = await createCompany(CTX, { name: "Eksempel Logistik A/S" }, "manual");
   other = await createCompany(CTX, { name: "Anden kunde" }, "manual");
   await setCustomerFrame(CTX, other, {
     hourlyRateOere: 150000,
@@ -57,18 +57,18 @@ beforeAll(async () => {
     budgetAmountOere: null,
   });
   projectId = await createProject(CTX, {
-    name: "Digitalt Transformationsprogram",
-    companyId: kasse,
+    name: "Nyt lagersystem",
+    companyId: customer,
   });
-  roleId = (await createRole(CTX, "Transformation Lead"))!;
-  await setRoleRate(CTX, { companyId: kasse }, roleId, 80000);
+  roleId = (await createRole(CTX, "Projektleder"))!;
+  await setRoleRate(CTX, { companyId: customer }, roleId, 95000);
 
-  // July on the a-kasse, invoiced. August there too, still open. One day elsewhere.
+  // July on the first customer, invoiced. August there too, still open. One day elsewhere.
   await addEntry(CTX, {
     entryDate: "2026-07-27",
     durationMinutes: 480,
     projectId,
-    companyId: kasse,
+    companyId: customer,
     roleId,
     note: "Opstart",
   });
@@ -76,17 +76,17 @@ beforeAll(async () => {
     entryDate: "2026-07-28",
     durationMinutes: 480,
     projectId,
-    companyId: kasse,
+    companyId: customer,
     roleId,
   });
-  invoiceId = await createDraftFromTime(CTX, kasse, { grouping: "month" });
+  invoiceId = await createDraftFromTime(CTX, customer, { grouping: "month" });
   await issueInvoice(CTX, invoiceId);
 
   await addEntry(CTX, {
     entryDate: "2026-08-03",
     durationMinutes: 420,
     projectId,
-    companyId: kasse,
+    companyId: customer,
     roleId,
   });
   await addEntry(CTX, { entryDate: "2026-08-04", durationMinutes: 300, companyId: other });
@@ -101,8 +101,8 @@ describe("getTimeReport", () => {
     const report = await getTimeReport(CTX, {});
     expect(report.rows).toHaveLength(4);
     expect(report.totalMinutes).toBe(1680);
-    // 16 t à 800 + 7 t à 800 + 5 t à 1.500 = 12.800 + 5.600 + 7.500 = 25.900 kr.
-    expect(report.totalValueOere).toBe(2_590_000);
+    // 16 t à 950 + 7 t à 950 + 5 t à 1.500 = 15.200 + 6.650 + 7.500 = 29.350 kr.
+    expect(report.totalValueOere).toBe(2_935_000);
     expect(report.onInvoiceMinutes).toBe(960);
   });
 

@@ -533,7 +533,7 @@
     "roles": {
       "title": "Roles",
       "hint": "Names of the roles you sell. The price is agreed per customer or project, not here.",
-      "empty": "No roles yet. Add e.g. Transformation Lead or Agile coach.",
+      "empty": "No roles yet. Add e.g. Project manager or Agile coach.",
       "namePlaceholder": "Role name…",
       "add": "Add",
       "invalid": "Give the role a name.",

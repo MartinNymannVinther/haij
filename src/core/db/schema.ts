@@ -412,7 +412,7 @@ export const userTimeSettings = pgTable(
 );
 
 /**
- * Org-wide role catalog: names only (e.g. "Transformation Lead",
+ * Org-wide role catalog: names only (e.g. "Projektleder",
  * "Agil coach"). A role carries no price of its own — rates are agreed
  * per customer or per project in `role_rates`, because the same role is
  * sold at different prices to different customers (decided with Martin,

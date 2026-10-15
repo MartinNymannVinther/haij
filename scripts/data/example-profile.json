@@ -1,0 +1,20 @@
+{
+  "source": "Made-up organization profile in the shape onboard-vinther.ts reads. Real profiles stay outside the repository; see scripts/README.md.",
+  "serviceProfile": [
+    "Eksempel Konsulent ApS er et lille rådgivningsfirma i Odense, der hjælper danske transport- og logistikvirksomheder med at digitalisere lager, planlægning og drift.",
+    "Kerneydelser:\n- Kortlægning af lager- og leveringsflow.\n- Valg og indførelse af lagerstyringssystemer.\n- Projektledelse på digitaliseringsprojekter.\n- Oplæring af medarbejdere i nye systemer.",
+    "Typiske kunder: vognmænd, lager- og distributionsvirksomheder og grossister med 50 til 500 medarbejdere. Opgaverne løber fra en måned til et år og faktureres på timebasis mellem 900 og 1.200 kr.",
+    "Et godt signal: en virksomhed i de brancher der åbner et nyt lager, skifter lagersystem, vokser hurtigt eller søger folk til drift og planlægning.",
+    "Et dårligt signal: rene hardwareindkøb, bemanding og alt der handler om at sælge en platform frem for at forbedre en drift."
+  ],
+  "tedKeywords": ["lagerstyring", "logistik", "transportplanlægning", "digitalisering"],
+  "cvrBranchePrefixes": ["4941", "5210", "5229", "4690"],
+  "signalFeeds": [
+    { "label": "Version2", "url": "https://www.version2.dk/rss" },
+    { "label": "Ingeniøren", "url": "https://ing.dk/rss.xml" }
+  ],
+  "knowledgeSources": [
+    { "name": "EU digital strategy", "url": "https://digital-strategy.ec.europa.eu/en/rss.xml" },
+    { "name": "Datatilsynet", "url": "https://www.datatilsynet.dk/handlers/DynamicRss.ashx" }
+  ]
+}

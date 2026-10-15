@@ -8,21 +8,29 @@ Run them with `pnpm script <fil> [argumenter]`.
 
 ## onboard-vinther.ts
 
-Sets up the signals service profile, CVR branch codes, TED keywords and
-RSS sources for Vinther Consulting, and imports one customer's history
-(hours, agreed rate, issued invoices and their payment dates) from a JSON
-file carried over from the previous system.
+Sets up an organization's signals service profile, CVR branch codes, TED
+keywords, RSS feeds and knowledge sources from a profile file, and imports
+one customer's history (hours, agreed rate, issued invoices and their
+payment dates) from a JSON file carried over from the previous system.
 
 ```
-pnpm script scripts/onboard-vinther.ts <org-slug> ~/privat/historik.json --dry-run
-pnpm script scripts/onboard-vinther.ts <org-slug> ~/privat/historik.json
+pnpm script scripts/onboard-vinther.ts <org-slug> <path-to-profile.json> <path-to-history.json> --dry-run
+pnpm script scripts/onboard-vinther.ts <org-slug> <path-to-profile.json> <path-to-history.json>
 ```
 
-The history file is real business data about a real customer, so it is
-not in the repository and `.gitignore` refuses every JSON file in
-`scripts/data/` except `example.json`, which shows the shape with made-up
-values. Keep the real file outside the repository folder and point the
-script at it.
+Both files are real business data — the profile describes the
+organization's own services, customers and rates, the history a real
+customer — so neither is in the repository. `.gitignore` refuses every
+JSON file in `scripts/data/` except the two made-up examples that show the
+shapes: `example-profile.json` and `example.json` (the history). Keep the
+real files outside the repository folder and point the script at them.
+
+The profile is checked before anything is written: `serviceProfile` is a
+string or a list of paragraphs (at most 4000 characters), `tedKeywords`
+and `cvrBranchePrefixes` are lists (branch prefixes are 2-6 digits),
+`signalFeeds` holds at most 10 `{ label, url }` and `knowledgeSources` at
+most 15 `{ name, url }`, the same limits the settings pages enforce. The
+history's `customer.industryCode` is optional.
 
 Idempotent: a second run reports what already exists and creates nothing.
 Writes through the ordinary service layer, so RLS, the audit log and the

@@ -30,7 +30,7 @@ const sheet = {
   name: "Timer",
   columns: [{ header: "Dato" }, { header: "Kunde" }, { header: "Timer" }],
   rows: [
-    [new Date(2026, 0, 30), "Eksempel A-kasse", 7.5],
+    [new Date(2026, 2, 16), "Eksempel Logistik A/S", 7.5],
     [new Date(2026, 7, 3), "Rasmus & Sønner <A/S>", 8],
     [null, "Uden dato", 0],
   ],
@@ -56,15 +56,15 @@ describe("buildXlsx", () => {
     expect(xml).toContain(
       '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">Dato</t></is></c>',
     );
-    expect(xml).toContain('<t xml:space="preserve">Eksempel A-kasse</t>');
+    expect(xml).toContain('<t xml:space="preserve">Eksempel Logistik A/S</t>');
     expect(xml).toContain('<c r="C2"><v>7.5</v></c>');
     expect(xml).toContain('<c r="C4"><v>0</v></c>');
   });
 
   it("writes dates as Excel serials, so they sort as dates and not as text", () => {
     const xml = unzip(buildXlsx(sheet))("xl/worksheets/sheet1.xml");
-    // 30 January 2026 is serial 46052; style 2 carries the date format.
-    expect(xml).toContain('<c r="A2" s="2"><v>46052</v></c>');
+    // 16 March 2026 is serial 46097; style 2 carries the date format.
+    expect(xml).toContain('<c r="A2" s="2"><v>46097</v></c>');
     expect(xml).toContain('<c r="A4"/>');
   });
 
